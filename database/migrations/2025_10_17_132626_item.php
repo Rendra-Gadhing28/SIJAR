@@ -16,11 +16,9 @@ return new class extends Migration
             $table->string('nama_item');
             $table->string('jenis_item');
             $table->bigInteger('stok_barang');
-            $table->enum('kondisi_barang' ,['baik','rusak']);
             $table->string('foto_barang');
             $table->timestamps(); 
             $table->softDeletes();
-            $table->foreign('jurusan')->references('jurusan')->on('users')->onDelete('cascade');
         });
         DB::statement('ALTER TABLE item AUTO_INCREMENT = 1000;');
     }

@@ -14,16 +14,13 @@ return new class extends Migration
         Schema::create('peminjaman', function (Blueprint $table) {
             $table->id();
             $table->string('keperluan');
-            $table->foreignId('user_id')->constrained('users'); 
-            $table->foreignId('items')->constrained('items');
-            $table->enum('status_pinjaman',['proses','diperbolehkan','tidak diperbolehkan']);
-            $table->string('jam_ke');
+            $table->foreignId('user_id')->constrained('users')->nullable(); 
+            $table->foreignId('items')->constrained('items')->nullable();
+            $table->enum('status_pinjaman',['dipinjam','dikembalikan']);
             $table->string('gambar_bukti')->nullable();
             $table->datetime('waktu')->nullable();
             $table->timestamps(); 
-            $table->foreign('jurusan')->references('jurusan')->on('users')->onDelete('cascade');
-            $table->foreign('kelas')->references('kelas')->on('users')->onDelete('cascade');
-            $table->foreign('jurusan')->references('jurusan')->on('users')->onDelete('cascade');
+
         });
     }
 
