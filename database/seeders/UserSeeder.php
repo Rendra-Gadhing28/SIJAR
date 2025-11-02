@@ -55,7 +55,7 @@ public function run(): void
             'XII DKV 1',
             'XII DKV 2',
             'XII DKV 3',
-            'XII LK 1',
+            'XII LK 1', 
             'XII LK 2',
         ];
 

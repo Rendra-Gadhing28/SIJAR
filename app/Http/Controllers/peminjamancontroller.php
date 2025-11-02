@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class item extends Controller
+class peminjamancontroller extends Controller
 {
     //
 }

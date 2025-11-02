@@ -3,19 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use DB;
+use App\Models\items;
 
 class item extends Model
 {
-    protected $table = 'item' ;
+    protected $table = "item";
     protected $fillable = [
         'id',
-        'nama_item',
-        'jenis_item',
-        'stok_barang',
-        'kondisi_barang',
-        'foto_barang',
+        'item_id'
     ];
-
-    
+    public static function getItem(){
+        return DB::table('item')->get();
+    }
+    public function item(){
+        return $this->belongsTo(items::class);
+    }
 }

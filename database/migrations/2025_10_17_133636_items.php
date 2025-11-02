@@ -14,7 +14,6 @@ return new class extends Migration
          Schema::create('items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained('item');
-            $table->enum('status_item',['tersedia','dipinjam','rusak']);
             $table->timestamps(); 
         });
     }

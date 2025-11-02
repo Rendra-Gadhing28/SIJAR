@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('jenis_item');
             $table->bigInteger('stok_barang');
             $table->string('foto_barang');
+            $table->enum('status_item',['tersedia','dipinjam','rusak']);
             $table->timestamps(); 
             $table->softDeletes();
         });

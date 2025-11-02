@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('keperluan');
             $table->foreignId('user_id')->constrained('users')->nullable(); 
-            $table->foreignId('items')->constrained('items')->nullable();
-            $table->enum('status_pinjaman',['dipinjam','dikembalikan']);
+            $table->foreignId('items_id')->constrained('items')->nullable();
+            $table->enum('status_pinjaman',['dipinjam','selesai']);
             $table->string('gambar_bukti')->nullable();
             $table->datetime('waktu')->nullable();
             $table->timestamps(); 
-
         });
     }
 
