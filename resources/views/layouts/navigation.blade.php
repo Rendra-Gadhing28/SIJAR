@@ -1,4 +1,4 @@
-<nav class="bg-gradient-to-r from-sky-300 to-sky-600 rounded-2xl py-4 shadow-md flex items-center justify-between px-6 relative">
+<nav class="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-sky-300 to-sky-600 rounded-2xl py-4 shadow-md flex items-center justify-between px-6 relative">
     <div class="flex items-center gap-2">
         <img src="{{ asset('images/logo.png') }}" alt="Logo SIJAR" class="w-14 h-14">
     </div>
