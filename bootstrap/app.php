@@ -11,7 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-         \App\Http\Middleware\HandleInertiaRequests::class;
+        \App\Http\Middleware\HandleInertiaRequests::class;
+        $middleware->append(\App\Http\Middleware\HandleInertiaRequests::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
