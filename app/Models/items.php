@@ -11,17 +11,15 @@ class items extends Model
         'id',
         'nama_item',
         'jenis_item',
+        'nama_jurusan',
         'stok_barang',
         'foto_barang',
-        'status item',    
+        'status_item',    
     ];
     public static function getItem(){
         return DB::table('items')->get();
     }
-        public function peminjaman(){
-        return $this->hasMany(item::class);
-    }
-        public function peminjaman(){
+        public function item(){
         return $this->hasMany(item::class);
     }
 

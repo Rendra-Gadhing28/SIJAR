@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use db;
 
 class User extends Authenticatable
 {
@@ -18,10 +19,16 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
+        'role',
+        'jurusan_id',
+        'kelas',
     ];
+
+    public static function users(){
+        return db::table('users')->get();
+    }
 
     public function peminjaman(){
         return $this->hasMany(peminjaman::class);
