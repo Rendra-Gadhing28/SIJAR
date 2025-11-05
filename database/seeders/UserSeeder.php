@@ -14,80 +14,45 @@ class UserSeeder extends Seeder
      */
 public function run(): void
     {
-        User::create([
-            'name' => 'Admin Jurusan',
-            'email' => 'adminjurusan@gmail.com',
-            'password' => bcrypt('adM1n_jUurus4nn'),
-            'role' => 'admin',
-            'jurusan' => 'semua',
-            'kelas' => 'null'
-        ]);
-
+          $adminJurusan = Jurusan::firstOrCreate(['nama_jurusan' => 'admin']);
+       
         $kelas = [
-            'X PS 1',
-            'X PS 2',
-            'X TJKT 1',
-            'X TJKT 2',
-            'X PPLG 1',
-            'X PPLG 2',
-            'X PPLG 3',
-            'X DKV 1',
-            'X DKV 2',
-            'X DKV 3',
-            'X LK 1',
-            'X LK 2',
-            'XI PS 1',
-            'XI PS 2',
-            'XI TJKT 1',
-            'XI TJKT 2',
-            'XI PPLG 1',
-            'XI PPLG 2',
-            'XI PPLG 3',
-            'XI DKV 1',
-            'XI DKV 2',
-            'XI DKV 3',
-            'XI LK 1',
-            'XI LK 2',
-            'XII PS 1',
-            'XII PS 2',
-            'XII TJKT 1',
-            'XII TJKT 2',
-            'XII PPLG 1',
-            'XII PPLG 2',
-            'XII PPLG 3',
-            'XII DKV 1',
-            'XII DKV 2',
-            'XII DKV 3',
-            'XII LK 1', 
-            'XII LK 2',
+            'X',
+            'XI',
+            'XII',
+        ]; 
+
+        $admin = [
+            'admin'
         ];
 
-        foreach ($kelas as $k) {
-            if (str_contains($k, 'PPLG')){
-                $jurusan = 'PPLG';
-            }elseif (str_contains($k, 'TJKT')){
-                $jurusan = 'TJKT';
-            }elseif (str_contains($k, 'DKV')){
-                $jurusan = 'DKV';
-            }elseif (str_contains($k, 'PS')){
-                $jurusan = 'PS';
-            }elseif (str_contains($k, 'LK')){
-                $jurusan = 'LK';
-            }else {
-                $jurusan = 'Lainnya';
-            }
-            $jurusanModel = Jurusan::where('nama_jurusan', $jurusan)->first();
-            
+        foreach ($admin as $adm) {
             User::create([
-                'name' => $k,
-                'email' => strtolower(str_replace(' ', '', $k)) . '@gmail.com',
-                'password' => bcrypt('sijar_' . str_replace(' ', '', strtolower($k))),
-                'role' => 'user',
-                'jurusan_id' => $jurusanModel ? $jurusanModel->id : null,
-                'kelas' => explode(' ', $k)[0],
+                'name' => 'Admin Jurusan',
+                'email' => 'adminjurusan@gmail.com',
+                'password' => bcrypt('adM1n_jUurus4nn'),
+                'role' => 'admin',
+                'jurusan_id' => $adminJurusan->where('nama_jurusan', 'admin')->first()->id,
+                'kelas' => $admin[0]
             ]);
         }
 
-        User::Factory()->count(10)->create();
+
+  
+
+        $jurusans = Jurusan::where('nama_jurusan', '!=', 'admin')->get();
+        foreach ($kelas as $kls) {
+            foreach ($jurusans as $jrs) {
+            $name = $kls.' '.$jrs->nama_jurusan;
+                User::create([
+                    'name' => $name,
+                    'email' => strtolower(str_replace(' ', '', $name)) . '@gmail.com',
+                    'password' => bcrypt('sijar_' . str_replace(' ', '', strtolower($name))),
+                    'role' => 'user',
+                    'jurusan_id' => $jrs->id,
+                    'kelas' => $kls,
+                ]);
+            }
+        }
     }
 } 

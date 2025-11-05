@@ -12,7 +12,12 @@ return new class extends Migration {
     {
         Schema::create('jurusans', function (Blueprint $table) {
             $table->id();
-            $table->enum('nama_jurusan', ['PPLG', 'LK', 'TJKT', 'DKV', 'PS']);
+            $table->enum('nama_jurusan', ['PPLG 1','PPLG 2','PPLG 3',
+             'LK 1','LK 2',
+             'TJKT 1','TJKT 2',
+             'DKV 1','DKV 2','DKV 3',
+             'PS 1','PS 2',
+            'admin']);
             $table->timestamps();
         });
     }

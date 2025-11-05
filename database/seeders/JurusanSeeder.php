@@ -14,16 +14,16 @@ class JurusanSeeder extends Seeder
     public function run(): void
     {
         $jurusans = [
-            'PS',
-            'TJKT',
-            'PPLG',
-            'DKV',
-            'LK',
-            'Lainnya'
+            'PPLG 1','PPLG 2','PPLG 3',
+            'LK 1', 'LK 2',
+            'TJKT 1', 'TJKT 2',
+            'DKV 1', 'DKV 2', 'DKV 3',
+            'PS 1', 'PS 2',
+            'admin'
         ];
 
-        foreach ($jurusans as $nama_jurusan) {
-            Jurusan::create(['nama_jurusan' => $nama_jurusan]);
+      foreach ($jurusans as $nama_jurusan) {
+        Jurusan::create(['nama_jurusan' => $nama_jurusan]);
         }
     }
 }

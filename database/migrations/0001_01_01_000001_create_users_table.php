@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role',['admin','user','guest']);
-            $table->unsignedBigInteger('jurusans_id')->nullable();
-            $table->enum('kelas',['X','XI','XII']);
+            $table->foreignId('jurusan_id')->nullable()->constrained('jurusans')->onDelete('set null');
+            $table->enum('kelas',['X','XI','XII','admin']);
             $table->rememberToken();
             $table->timestamps();
         });
