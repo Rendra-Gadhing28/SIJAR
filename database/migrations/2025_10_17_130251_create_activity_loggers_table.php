@@ -24,7 +24,7 @@ return new class extends Migration
             $table->json("old_values")->nullable();
             $table->json("new_values")->nullable();
             $table->timestamps();
-            $table->index(["model", "model_id"]);
+            $table->index(["model", "model_id"])->nullable();
             $table->index("action");
             $table->index("user_id");
         });

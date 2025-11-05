@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('peminjaman', function (Blueprint $table) {
             $table->id();
             $table->string('keperluan');
-            $table->foreignId('user_id')->constrained('users')->nullable()->onDelete('cascade'); 
-            $table->foreignId('items_id')->constrained('items')->nullable()->onDelete('cascade');
-            $table->foreignId('jurusans_id')->constrained('jurusans')->nullable()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade'); 
+            $table->foreignId('items_id')->nullable()->constrained('items')->onDelete('cascade');
+            $table->foreignId('jurusans_id')->nullable()->constrained('jurusans')->onDelete('cascade');
             $table->enum('status_pinjaman',['dipinjam','selesai']);
             $table->string('gambar_bukti')->nullable();
             $table->datetime('waktu')->nullable();

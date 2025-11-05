@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_item');
             $table->string('jenis_item');
-            $table->foreignId('jurusans_id')->constrained('jurusans')->onDelete('cascade');
+            $table->foreignId('jurusans_id')->nullable()->constrained('jurusans')->onDelete('cascade');
             $table->bigInteger('stok_barang');
             $table->string('foto_barang');
             $table->enum('status_item',['tersedia','dipinjam','rusak'])->default('tersedia' );
