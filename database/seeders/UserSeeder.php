@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\Jurusan;
 
 class UserSeeder extends Seeder
 {
@@ -17,7 +18,9 @@ public function run(): void
             'name' => 'Admin Jurusan',
             'email' => 'adminjurusan@gmail.com',
             'password' => bcrypt('adM1n_jUurus4nn'),
-            'role' => 'admin'
+            'role' => 'admin',
+            'jurusan' => 'semua',
+            'kelas' => 'null'
         ]);
 
         $kelas = [
@@ -60,11 +63,28 @@ public function run(): void
         ];
 
         foreach ($kelas as $k) {
+            if (str_contains($k, 'PPLG')){
+                $jurusan = 'PPLG';
+            }elseif (str_contains($k, 'TJKT')){
+                $jurusan = 'TJKT';
+            }elseif (str_contains($k, 'DKV')){
+                $jurusan = 'DKV';
+            }elseif (str_contains($k, 'PS')){
+                $jurusan = 'PS';
+            }elseif (str_contains($k, 'LK')){
+                $jurusan = 'LK';
+            }else {
+                $jurusan = 'Lainnya';
+            }
+            $jurusanModel = Jurusan::where('nama_jurusan', $jurusan)->first();
+            
             User::create([
                 'name' => $k,
                 'email' => strtolower(str_replace(' ', '', $k)) . '@gmail.com',
                 'password' => bcrypt('sijar_' . str_replace(' ', '', strtolower($k))),
                 'role' => 'user',
+                'jurusan_id' => $jurusanModel ? $jurusanModel->id : null,
+                'kelas' => explode(' ', $k)[0],
             ]);
         }
 

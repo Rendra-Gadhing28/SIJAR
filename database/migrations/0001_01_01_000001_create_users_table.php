@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role',['admin','user','guest']);
-            $table->foreignId('jurusans_id')->nullable()->constrained('jurusans')->onDelete('cascade');
+            $table->unsignedBigInteger('jurusans_id')->nullable();
             $table->enum('kelas',['X','XI','XII']);
             $table->rememberToken();
             $table->timestamps();

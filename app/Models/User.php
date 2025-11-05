@@ -33,6 +33,10 @@ class User extends Authenticatable
     public function peminjaman(){
         return $this->hasMany(peminjaman::class);
     }
+
+    public function jurusan(){
+        return $this->belongsTo(Jurusan::class, 'jurusan_id');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
