@@ -18,6 +18,7 @@ return new class extends Migration {
              'DKV 1','DKV 2','DKV 3',
              'PS 1','PS 2',
             'admin']);
+            $table->foreignId('kategori_id')->nullable()->constrained('kategori_jurusan');
             $table->timestamps();
         });
     }

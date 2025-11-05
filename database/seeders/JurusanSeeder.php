@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Jurusan;
+use App\Models\Kategori;
 
 class JurusanSeeder extends Seeder
 {
@@ -14,16 +15,23 @@ class JurusanSeeder extends Seeder
     public function run(): void
     {
         $jurusans = [
-            'PPLG 1','PPLG 2','PPLG 3',
-            'LK 1', 'LK 2',
-            'TJKT 1', 'TJKT 2',
-            'DKV 1', 'DKV 2', 'DKV 3',
-            'PS 1', 'PS 2',
-            'admin'
+            ['nama_jurusan' => 'PPLG 1', 'nama_kategori' => 'PPLG'],
+            ['nama_jurusan' => 'PPLG 2', 'nama_kategori' => 'PPLG'],
+            ['nama_jurusan' => 'PPLG 3', 'nama_kategori' => 'PPLG'],
+            ['nama_jurusan' => 'TJKT 1', 'nama_kategori' => 'TJKT'],
+            ['nama_jurusan' => 'TJKT 2', 'nama_kategori' => 'TJKT'],
+            ['nama_jurusan' => 'DKV 1', 'nama_kategori' => 'DKV'],
+            ['nama_jurusan' => 'DKV 2', 'nama_kategori' => 'DKV'],
+            ['nama_jurusan' => 'DKV 3', 'nama_kategori' => 'DKV'],
+            ['nama_jurusan' => 'LK 1', 'nama_kategori' => 'LK'],
+            ['nama_jurusan' => 'LK 2', 'nama_kategori' => 'LK'],
+            ['nama_jurusan' => 'PS 1', 'nama_kategori' => 'PS'],
+            ['nama_jurusan' => 'PS 2', 'nama_kategori' => 'PS'],
         ];
 
-      foreach ($jurusans as $nama_jurusan) {
-        Jurusan::create(['nama_jurusan' => $nama_jurusan]);
+      foreach ($jurusans as $jurusan) {
+        $kategori = Kategori::firstOrCreate(['nama_kategori' => $jurusan['nama_kategori']]);
+        Jurusan::create(['nama_jurusan' => $jurusan['nama_jurusan'], 'kategori_id' => $kategori->id]);
         }
     }
 }

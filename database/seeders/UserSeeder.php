@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Jurusan;
-
+use  App\Models\Kategori;
 class UserSeeder extends Seeder
 {
     /**
@@ -15,6 +15,7 @@ class UserSeeder extends Seeder
 public function run(): void
     {
           $adminJurusan = Jurusan::firstOrCreate(['nama_jurusan' => 'admin']);
+          $kategoriAdmin = Kategori::firstOrCreate(['nama_kategori' => 'admin']);
        
         $kelas = [
             'X',
@@ -33,6 +34,7 @@ public function run(): void
                 'password' => bcrypt('adM1n_jUurus4nn'),
                 'role' => 'admin',
                 'jurusan_id' => $adminJurusan->where('nama_jurusan', 'admin')->first()->id,
+                'kategori_id' => $kategoriAdmin->id,
                 'kelas' => $admin[0]
             ]);
         }
@@ -50,6 +52,7 @@ public function run(): void
                     'password' => bcrypt('sijar_' . str_replace(' ', '', strtolower($name))),
                     'role' => 'user',
                     'jurusan_id' => $jrs->id,
+                    'kategori_id' => $jrs->kategori_id,
                     'kelas' => $kls,
                 ]);
             }

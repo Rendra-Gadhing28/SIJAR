@@ -8,7 +8,9 @@ class Jurusan extends Model
 {
     protected $table = 'jurusans';
     protected $fillable = [
+        'id',
         'nama_jurusan',
+        'kategori_id',
     ];
 
     public function items()

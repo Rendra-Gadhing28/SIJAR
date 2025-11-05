@@ -6,6 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Kategori;
+use App\Models\Jurusan;
+use App\Models\peminjaman;
 use db;
 
 class User extends Authenticatable
@@ -36,6 +39,9 @@ class User extends Authenticatable
 
     public function jurusan(){
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
+    }
+    public function kategori(){
+        return $this->belongsTo(Kategori::class, 'kategori_id');
     }
     /**
      * The attributes that should be hidden for serialization.
