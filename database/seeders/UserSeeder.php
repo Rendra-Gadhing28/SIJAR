@@ -14,15 +14,9 @@ class UserSeeder extends Seeder
      */
 public function run(): void
     {
-<<<<<<< HEAD
-          $adminJurusan = Jurusan::firstOrCreate(['nama_jurusan' => 'admin']);
-          $kategoriAdmin = Kategori::firstOrCreate(['nama_kategori' => 'admin']);
-       
-=======
         $adminJurusan = Jurusan::firstOrCreate(['nama_jurusan' => 'admin']);
         $kategoriAdmin = Kategori::firstOrCreate(['nama_kategori' => 'admin']);
     
->>>>>>> eae2b90 (login dan homepage)
         $kelas = [
             'X',
             'XI',
@@ -46,11 +40,6 @@ public function run(): void
         }
 
 
-<<<<<<< HEAD
-  
-
-=======
->>>>>>> eae2b90 (login dan homepage)
         $jurusans = Jurusan::where('nama_jurusan', '!=', 'admin')->get();
         foreach ($kelas as $kls) {
             foreach ($jurusans as $jrs) {

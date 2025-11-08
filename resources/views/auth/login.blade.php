@@ -7,23 +7,15 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('/images/logo_sijar.png') }}">
     <title>Login SIJAR</title>
     @vite('resources/css/app.css')
-<<<<<<< HEAD
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
-</head>
-
-<body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Roboto_Slab']">
-=======
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
-<body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins']">
->>>>>>> eae2b90 (login dan homepage)
+<body class="bg-gradient-to-b from-gray-200 to-white min-h-screen font-['Poppins'] overflow-y-auto">
 
     @include('layouts.navigation')
 
-    <div class="flex flex-col items-center justify-center flex-grow">
-        <div
-            class="bg-gradient-to-b from-gray-100 to-gray-200 shadow-[0_-8px_20px_rgba(0,0,0,0.3)] rounded-2xl p-8 w-80 sm:w-96">
+    <div class="flex flex-col items-center justify-center flex-grow mt-28 md:mt-36 lg:mt-40 px-4">
+        <div class="bg-gradient-to-b from-gray-100 to-gray-200 shadow-[0_-8px_20px_rgba(0,0,0,0.3)] rounded-2xl p-8 w-full max-w-sm mx-4 sm:max-w-md">
 
             <div class="flex justify-center mb-6">
                 <img src="{{ asset('images/logo.png') }}" alt="Logo SIJAR" class="w-16 h-16">
@@ -34,32 +26,20 @@
                 LOGIN
             </h2>
 
-<<<<<<< HEAD
-
-            <form action="/home" method="POST" class="space-y-6">
-                @csrf
-
-                <div>
-                    <label for="code_kelas" class="block text-sm font-bold text-gray-800">Code Kelas</label>
-                    <input id="code_kelas" name="code_kelas" type="text" required
-                        class="mt-1 block w-full rounded-md bg-gradient-to-r from-[#B7DBFF] via-[#8FADCA] to-[#3F4F5F] px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"
-                        placeholder="Masukkan kode kelas">
-=======
-            <form action="{{ route('login') }}" method="POST" class="space-y-6">
+            <form action="{{ route('login.store') }}" method="POST" class="space-y-6">
                 @csrf
 
                 <div>
                     <label for="email" class="block text-sm font-bold text-gray-800">Email</label>
                     <input id="email" name="email" type="text" required
-                        class="mt-1 block w-full rounded-md bg-gradient-to-r from-[#B7DBFF] via-[#8FADCA] to-[#3F4F5F] px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"
+                        class="mt-1 block w-full rounded-md bg-gradient-to-r from-[#B7DBFF] via-[#8FADCA] to-[#3F4F5F] px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-0 focus:border-transparent shadow-inner"
                         placeholder="Masukkan email anda">
->>>>>>> eae2b90 (login dan homepage)
                 </div>
 
                 <div>
                     <label for="password" class="block text-sm font-bold text-gray-800">Password</label>
                     <input id="password" name="password" type="password" required
-                        class="mt-1 block w-full rounded-md bg-gradient-to-r from-[#B7DBFF] via-[#8FADCA] to-[#3F4F5F] px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-inner"
+                        class="mt-1 block w-full rounded-md bg-gradient-to-r from-[#B7DBFF] via-[#8FADCA] to-[#3F4F5F] px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-0 focus:border-transparent shadow-inner"
                         placeholder="Masukkan password">
                 </div>
 
@@ -70,13 +50,7 @@
                 </div>
 
                 <button type="submit"
-<<<<<<< HEAD
-                    class="w-full bg-gradient-to-r from-[#99E1FF] via-[#31A6D7] to-[#1683B1] text-white font-bold py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                    <a href="{{ route('user.homepage') }}" class="block text-center">Submit</a>
-                </button>
-            </form>
-=======
-                    class="w-full bg-gradient-to-r from-[#99E1FF] via-[#31A6D7] to-[#1683B1] text-white font-bold py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 block text-center">
+                    class="w-3/4 sm:w-1/2 mx-auto block bg-gradient-to-r from-[#99E1FF] via-[#31A6D7] to-[#1683B1] text-black font-bold py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">
                     Submit
                 </button>
             </form>
@@ -92,7 +66,6 @@
                 </div>
             @endif
 
->>>>>>> eae2b90 (login dan homepage)
         </div>
     </div>
 

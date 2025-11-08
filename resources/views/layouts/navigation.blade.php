@@ -8,3 +8,4 @@
     </h1>
     <div class="w-14 h-14"></div>
 </nav>
+{{-- ini blm responsive ya, susah jjg dipikir pikir --}}
