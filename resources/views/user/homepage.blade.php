@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="{{ asset('/images/logo_sijar.png') }}">
-    <title>Login SIJAR</title>
+    <title>Beranda SIJAR</title>
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,7 +13,6 @@
 <body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins']">
     @include('layouts.navigation')
     <main class="pt-28 px-6 md:px-12">
-        <!-- Card Barang -->
         <section class="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6 text-center">
             <h2 class="text-2xl font-bold mb-6">Barang</h2>
             <div class="flex justify-center gap-6">
@@ -27,13 +26,9 @@
                 </div>
             </div>
         </section>
-
-        <!-- List Barang -->
         <section class="max-w-4xl mx-auto mt-8 bg-white rounded-2xl shadow p-6">
             <p class="font-medium mb-2">List barang yang dipinjam:</p>
-            <!-- nanti di sini tinggal looping data dari database -->
             <div id="list-barang">
-                <!-- contoh isi dummy -->
                 <p class="text-gray-500 italic">Belum ada data</p>
             </div>
         </section>

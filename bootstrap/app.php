@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         \App\Http\Middleware\HandleInertiaRequests::class;
         $middleware->append(\App\Http\Middleware\HandleInertiaRequests::class);
+        $middleware->admin = \App\Http\Middleware\IsAdmin::class;
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

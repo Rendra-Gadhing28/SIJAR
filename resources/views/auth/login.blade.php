@@ -15,7 +15,8 @@
     @include('layouts.navigation')
 
     <div class="flex flex-col items-center justify-center flex-grow mt-28 md:mt-36 lg:mt-40 px-4">
-        <div class="bg-gradient-to-b from-gray-100 to-gray-200 shadow-[0_-8px_20px_rgba(0,0,0,0.3)] rounded-2xl p-8 w-full max-w-sm mx-4 sm:max-w-md">
+        <div
+            class="bg-gradient-to-b from-gray-100 to-gray-200 shadow-[0_-8px_20px_rgba(0,0,0,0.3)] rounded-2xl p-8 w-full max-w-sm mx-4 sm:max-w-md">
 
             <div class="flex justify-center mb-6">
                 <img src="{{ asset('images/logo.png') }}" alt="Logo SIJAR" class="w-16 h-16">
@@ -26,7 +27,7 @@
                 LOGIN
             </h2>
 
-            <form action="{{ route('login.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('login') }}" method="POST" class="space-y-6">
                 @csrf
 
                 <div>

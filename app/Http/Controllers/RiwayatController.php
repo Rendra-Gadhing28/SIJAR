@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Peminjaman;
 
-class PeminjamanController extends Controller
+class RiwayatController extends Controller
 {
     public function index(){
-        return view('user.pinjam');
+        return view('user.riwayat');
     }
 
     public function show($id){
