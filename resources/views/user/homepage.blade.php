@@ -13,7 +13,7 @@
 <body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins']">
     @include('layouts.navigation')
     <main class="pt-28 px-6 md:px-12">
-        <section class="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6 text-center">
+        <section class="max-w-2xl mx-auto bg-white rounded-2xl shadow p-6 text-center">
             <h2 class="text-2xl font-bold mb-6">Barang</h2>
             <div class="flex justify-center gap-6">
                 <div class="bg-gray-100 rounded-lg p-4 w-32 text-center shadow">
@@ -26,7 +26,7 @@
                 </div>
             </div>
         </section>
-        <section class="max-w-4xl mx-auto mt-8 bg-white rounded-2xl shadow p-6">
+        <section class="max-w-2xl mx-auto mt-8 bg-white rounded-2xl shadow p-6">
             <p class="font-medium mb-2">List barang yang dipinjam:</p>
             <div id="list-barang">
                 <p class="text-gray-500 italic">Belum ada data</p>
