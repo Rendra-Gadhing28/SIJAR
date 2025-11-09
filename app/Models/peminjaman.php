@@ -7,7 +7,7 @@ use DB;
 use App\Models\User;
 use App\Models\items;
 
-class peminjaman extends Model
+class Peminjaman extends Model
 {
     protected $table = "peminjaman";
     protected $fillable = [

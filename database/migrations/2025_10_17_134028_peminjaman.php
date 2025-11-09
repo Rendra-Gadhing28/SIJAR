@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade'); 
             $table->foreignId('items_id')->nullable()->constrained('items')->onDelete('cascade');
             $table->foreignId('jurusans_id')->nullable()->constrained('jurusans')->onDelete('cascade');
+            $table->foreignId('kategori_jurusan_id')->nullable()->constrained('kategori_jurusan')->onDelete('cascade');
             $table->enum('status_pinjaman',['dipinjam','selesai']);
             $table->string('gambar_bukti')->nullable();
             $table->datetime('waktu')->nullable();

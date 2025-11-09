@@ -5,7 +5,7 @@ namespace App\Models;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-class items extends Model
+class Items extends Model
 {
     protected $table = 'items' ;
     protected $fillable = [
@@ -13,7 +13,8 @@ class items extends Model
         'nama_item',
         'jenis_item',
         'nama_jurusan',
-        'stok_barang',
+        'kategori_jurusan_id',
+        'stok_barang', 
         'foto_barang',
         'status_item',    
     ];

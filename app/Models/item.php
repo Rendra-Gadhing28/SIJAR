@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use DB;
 use App\Models\items;
 
-class item extends Model
+class Item extends Model
 {
     protected $table = "item";
     protected $fillable = [
