@@ -12,9 +12,8 @@ class Items extends Model
         'id',
         'nama_item',
         'jenis_item',
-        'nama_jurusan',
         'kategori_jurusan_id',
-        'stok_barang', 
+        'stok_barang',
         'foto_barang',
         'status_item',    
     ];
