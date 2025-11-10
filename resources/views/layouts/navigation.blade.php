@@ -11,19 +11,19 @@
 
         <div class="hidden lg:flex items-center gap-1">
             <a href="{{ route('user.homepage') }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('homepage') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
+                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('homepage*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
                 Beranda
             </a>
             <a href="{{ route("peminjaman.index") }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
+                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
                 Pinjam
             </a>
-            <a href="/Barang"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('Barang') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
+            <a href="{{ route('barang.index') }}"
+                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('barang*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
                 Barang
             </a>
-            <a href="/Riwayat"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('Riwayat') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
+            <a href="{{ route('riwayat.index') }}"
+                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('riwayat*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
                 Riwayat
             </a>
         </div>
@@ -41,20 +41,19 @@
 
     <div id="mobileMenu" class="lg:hidden hidden mt-4 space-y-2 pb-2">
         <a href="{{ route('user.homepage') }}"
-            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('homepage') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
+            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('homepage*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Beranda
         </a>
         <a href="{{ route("peminjaman.index") }}"
-            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('Pinjam') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
+            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Pinjam
         </a>
-        {{-- barang sama riwayat belum di routing ya --}}
-        <a href="/Barang"
-            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('Barang') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
+        <a href="{{ route('barang.index') }}"
+            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('barang*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Barang
         </a>
-        <a href="/Riwayat"
-            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('Riwayat') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
+        <a href="{{ route('riwayat.index') }}"
+            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('riwayat*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Riwayat
         </a>
     </div>

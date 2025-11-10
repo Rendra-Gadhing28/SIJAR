@@ -13,7 +13,7 @@ class ItemController extends Controller
     public function index()
     {
         $data = item::all();
-        return view('item.index', compact('data'));
+        return view('user.listbarang', compact('data'));
     }
 
     /**
