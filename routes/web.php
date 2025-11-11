@@ -19,6 +19,7 @@ Route::get('/homepage', function () {
 Route::middleware('auth')->group(function () {
     Route::get("/peminjaman", [PeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get("/peminjaman{id}", [PeminjamanController::class, 'show'])->name('peminjaman.show');
+    Route::get("/barang", [ItemController::class, 'index'])->name('barang.index');
     Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
