@@ -8,15 +8,15 @@ use App\Models\items;
 
 class Item extends Model
 {
-    protected $table = "item";
+    protected $table = "items";
     protected $fillable = [
         'id',
         'item_id'
     ];
     public static function getItem(){
-        return DB::table('item')->get();
+        return DB::table('items')->get();
     }
-    public function item(){
+    public function items(){
         return $this->belongsTo(items::class);
     }
 }

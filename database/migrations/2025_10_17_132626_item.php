@@ -13,11 +13,11 @@ return new class extends Migration {
         Schema::create('item', function (Blueprint $table) {
             $table->id();
             $table->string('nama_item');
+            $table->string('kode_unit')->unique(); 
             $table->string('jenis_item');
             $table->foreignId('kategori_jurusan_id')->constrained('kategori_jurusan')->onDelete('cascade');
-            $table->bigInteger('stok_barang');
-            $table->string('foto_barang');
             $table->enum('status_item', ['tersedia', 'dipinjam', 'rusak'])->default('tersedia');
+            $table->longText('foto_barang')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

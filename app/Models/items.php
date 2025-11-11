@@ -7,18 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 class Items extends Model
 {
-    protected $table = 'items' ;
+    protected $table = 'item' ;
     protected $fillable = [
         'id',
         'nama_item',
+        'kode_unit',
         'jenis_item',
         'kategori_jurusan_id',
-        'stok_barang',
+        'status_item',   
         'foto_barang',
-        'status_item',    
+         
     ];
     public static function getItem(){
-        return DB::table('items')->get();
+        return DB::table('item')->get();
     }
         public function item(){
         return $this->hasMany(item::class);
