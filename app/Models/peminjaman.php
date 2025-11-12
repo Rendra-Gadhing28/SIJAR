@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use DB;
 use App\Models\User;
-use App\Models\items;
+use App\Models\Items;
 
 class Peminjaman extends Model
 {
@@ -17,18 +16,26 @@ class Peminjaman extends Model
         'items_id',
         'status_pinjaman',
         'gambar_bukti',
-        'waktu'       
+        'waktu'
     ];
-    public static function getItem(){
-        return DB::table('peminjaman')->get();
+    public static function getItem()
+    {
+        return self::all();
     }
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
-    public function items(){
-        return $this->belongsTo(items::class);
+    public function items()
+    {
+        return $this->belongsTo(Items::class, 'items_id');
     }
-     public function slotPeminjaman(){
+    public function slotPeminjaman()
+    {
         return $this->hasMany(slot_peminjaman::class);
+    }
+    public function waktu_pembelajaran()
+    {
+        return $this->belongsTo(waktu_pembelajaran::class, 'waktu_id');
     }
 }
