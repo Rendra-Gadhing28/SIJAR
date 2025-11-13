@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Kategori;
+use Illuminate\Support\Str;
 use App\Models\Items;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -47,14 +48,20 @@ class itemPPLG extends Seeder
                     foreach($namaVariasi as $var)
                     $tryPath = "{$PPLG}/{$var}.{$ext}";
                     
-                    if (Storage::disk('public')->exists($tryPath)) {
-                        $origin = $tryPath;
-                        $content = Storage::disk('public')->get($tryPath);
-                        $encrypt = Crypt::encrypt($content);
-                        $gambarEnkrip = $encrypt;
+                   $encrypt = null; // Deklarasi di luar
 
-                        break;
-                    }
+    if (Storage::disk('public')->exists($tryPath)) {
+    $origin = $tryPath;
+    $content = Storage::disk('public')->get($tryPath);
+    
+    $extension = pathinfo($tryPath, PATHINFO_EXTENSION);
+    $encrypt = hash('sha256', $content . time()) . '.' . $extension;
+    
+    // Simpan file
+    Storage::disk('public')->put('encrypted/' . $encrypt, $content);
+    
+    break;
+    }   
                 }
                
                  // 🔢 Buat unit individual untuk setiap stok
@@ -68,7 +75,7 @@ class itemPPLG extends Seeder
                         'jenis_item' => $brg['jenis'],
                         'kategori_jurusan_id' => $jurusan->id,
                         'status_item' => $brg['status'],
-                        'foto_barang' => $gambarEnkrip, // Semua unit punya gambar sama
+                        'foto_barang' => $encrypt, // Semua unit punya gambar sama
                     ]);
                 }
                 

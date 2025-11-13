@@ -5,6 +5,7 @@ namespace App\Models;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+
 class Items extends Model
 {
     protected $table = 'item' ;
@@ -24,6 +25,23 @@ class Items extends Model
         public function item(){
         return $this->hasMany(item::class);
     } 
+    public function kategoriJurusan()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_jurusan_id');
+    }
+     protected $casts = [
+        'status_item' => 'string',
+    ];
+    public function getStatusColorAttribute()
+    {
+        return match($this->status_item) {
+            'tersedia' => 'green',
+            'dipinjam' => 'yellow',
+            'rusak' => 'red',
+            default => 'gray'
+        };
+    }
+
 
     protected function jenisItem(): Attribute
     {

@@ -29,4 +29,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get("/peminjaman/create", [PeminjamanController::class, 'create'])->name('peminjaman.create');
 });
+
+Route::get('/barang', [ItemController::class, 'index'])->name('barang.index');
+Route::get('/items', [ItemController::class, 'index'])->name('items.index'); // Alias
+// Route untuk menampilkan gambar terenkripsi
+Route::get('/item-image/{filename}', [ItemController::class, 'showImage'])->name('image.show');
 require __DIR__ . '/auth.php';
