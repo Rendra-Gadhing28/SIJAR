@@ -2,22 +2,17 @@
 
 namespace App\Models;
 
-use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use app\Models\Item;
+use DB;
 
 class Items extends Model
 {
-    protected $table = 'item' ;
+    protected $table = 'items';
+
     protected $fillable = [
-        'id',
-        'nama_item',
-        'kode_unit',
-        'jenis_item',
-        'kategori_jurusan_id',
-        'status_item',   
-        'foto_barang',
-         
+        'item_id',
     ];
     public static function getItem(){
         return DB::table('item')->get();
@@ -43,11 +38,8 @@ class Items extends Model
     }
 
 
-    protected function jenisItem(): Attribute
+    public function itemm()
     {
-        return Attribute::make(
-            set: fn ($value) => ucfirst(strtolower($value)) // "proyektor" -> "Proyektor"
-        );
+        return $this->belongsTo(Item::class,'item_id');
     }
-
 }
