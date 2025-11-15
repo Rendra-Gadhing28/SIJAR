@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\peminjaman;
 use App\Models\waktu_pembelajaran;
-use db;
+use Illuminate\Support\Facades\DB;
 
 class slot_peminjaman extends Model
 {

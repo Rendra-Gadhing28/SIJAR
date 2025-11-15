@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Kategori;
-use App\Models\Items;
+use App\Models\Item;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 class itemPS extends Seeder
@@ -78,7 +78,7 @@ class itemPS extends Seeder
                     // Format kode unit: PPLG-PROY-1001
                     $prefix = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $brg['nama']), 0, 15));
                     $kodeUnit = sprintf('%s-%s-%04d', $PS, $prefix, $i);
-                    Items::create([
+                    Item::create([
                         'nama_item' => $brg['nama'],
                         'kode_unit' => $kodeUnit, // UNIT INDIVIDUAL
                         'jenis_item' => $brg['jenis'],

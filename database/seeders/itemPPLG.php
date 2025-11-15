@@ -6,8 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Kategori;
 use Illuminate\Support\Str;
-use App\Models\Items;
-use Illuminate\Support\Facades\Crypt;
+use App\Models\Item;
 use Illuminate\Support\Facades\Storage;
 class itemPPLG extends Seeder
 {
@@ -69,7 +68,7 @@ class itemPPLG extends Seeder
                     // Format kode unit: PPLG-PROY-1001
                     $prefix = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $brg['nama']), 0, 4));
                     $kodeUnit = sprintf('%s-%s-%04d', $PPLG, $prefix, $i);
-                    Items::create([
+                    Item::create([
                         'nama_item' => $brg['nama'],
                         'kode_unit' => $kodeUnit, // UNIT INDIVIDUAL
                         'jenis_item' => $brg['jenis'],

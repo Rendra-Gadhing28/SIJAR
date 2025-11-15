@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\Kategori;
 use App\Models\Jurusan;
 use App\Models\peminjaman;
-use db;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -22,15 +22,17 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'name',
         'email',
         'password',
         'role',
         'jurusan_id',
+        'kategori_id',
         'kelas',
     ];
 
     public static function users(){
-        return db::table('users')->get();
+        return DB::table('users')->get();
     }
 
     public function peminjaman(){

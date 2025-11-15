@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Kategori;
+use Illuminate\Support\Facades\DB; // Gunakan Facades\DB
 
 class Item extends Model
 {
@@ -20,7 +22,13 @@ class Item extends Model
 
     public static function getItem()
     {
-        return self::all();
+        return Db::table('item');
     }
+
+     public function kategori_jurusan()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_jurusan_id');
+    }
+  
 
 }

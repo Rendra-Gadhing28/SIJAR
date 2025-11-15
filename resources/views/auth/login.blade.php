@@ -11,10 +11,11 @@
 </head>
 
 <body class="bg-gradient-to-b from-gray-200 to-white min-h-screen font-['Poppins'] overflow-y-auto">
-
+    <header>
     @include('layouts.navigation')
-
-    <div class="flex flex-col items-center justify-center flex-grow mt-28 md:mt-36 lg:mt-40 px-4">
+    </header>
+    <main class="w-screen h-screen mt-28">
+    <div class="flex flex-col items-center justify-center flex-grow mt-36 md:mt-40 lg:mt-48 px-4">
         <div
             class="bg-gradient-to-b from-gray-100 to-gray-200 shadow-[0_-8px_20px_rgba(0,0,0,0.3)] rounded-2xl p-8 w-full max-w-sm mx-4 sm:max-w-md">
 
@@ -60,7 +61,6 @@
                     {{ session('success') }}
                 </div>
             @endif
-
             @if($errors->any())
                 <div class="text-red-600 font-bold mt-2 text-center">
                     {{ $errors->first() }}
@@ -69,6 +69,7 @@
 
         </div>
     </div>
+    </main>
 
 </body>
 

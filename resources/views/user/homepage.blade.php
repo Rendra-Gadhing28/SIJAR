@@ -11,7 +11,8 @@
 </head>
 
 <body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins']">
-    @include('layouts.navigation')
+    <header>@include('layouts.navigation')
+        @include('layouts.navmobile') </header>
     <main class="pt-28 px-6 md:px-12">
         <section class="max-w-2xl mx-auto bg-white rounded-2xl shadow p-6 text-center">
             <h2 class="text-2xl font-bold mb-6">Barang</h2>

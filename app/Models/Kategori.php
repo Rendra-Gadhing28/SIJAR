@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DB;
+use app\Models\Item;
 use Illuminate\Database\Eloquent\Model;
 
 class Kategori extends Model
@@ -27,5 +28,9 @@ class Kategori extends Model
     public function user()
     {
         return $this->hasMany(User::class);
+    }
+    public function item()
+    {
+        return $this->hasMany(Item::class);
     }
 }
