@@ -22,9 +22,7 @@
 
 <body class="bg-gray-100">
     <header class="flex items-center ">
-        <div class="block md:hidden">
-            @include('layouts.navmobile')
-        </div>
+     
         <div class=" md:block">
             @include('layouts.navigation')
         </div>
