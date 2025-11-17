@@ -27,6 +27,11 @@ class JurusanSeeder extends Seeder
             ['nama_jurusan' => 'LK 2', 'nama_kategori' => 'LK'],
             ['nama_jurusan' => 'PS 1', 'nama_kategori' => 'PS'],
             ['nama_jurusan' => 'PS 2', 'nama_kategori' => 'PS'],
+            ['nama_jurusan' => 'Admin PPLG', 'nama_kategori' => 'PPLG'],
+            ['nama_jurusan' => 'Admin TJKT', 'nama_kategori' => 'TJKT'],
+            ['nama_jurusan' => 'Admin PS', 'nama_kategori' => 'PS'],
+            ['nama_jurusan' => 'Admin LK', 'nama_kategori' => 'LK'],
+            ['nama_jurusan' => 'Admin DKV', 'nama_kategori' => 'DKV']
         ];
 
       foreach ($jurusans as $jurusan) {

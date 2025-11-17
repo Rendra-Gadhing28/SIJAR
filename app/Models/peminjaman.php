@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Items;
+use DB;
 
 class Peminjaman extends Model
 {
@@ -13,14 +14,16 @@ class Peminjaman extends Model
         'id',
         'keperluan',
         'user_id',
-        'items_id',
+        'item_id',
+        'tanggal',
+        'dipinjam',
+        'dikembalikan',
         'status_pinjaman',
         'gambar_bukti',
-        'waktu'
     ];
     public static function getItem()
     {
-        return self::all();
+        return DB::table('peminjaman');
     }
     public function user()
     {

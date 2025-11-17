@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('slot_peminjaman', function (Blueprint $table) {
             $table->id();
             $table->foreignId('peminjaman_id')->nullable()->constrained('peminjaman');
-            $table->foreignId('waktu_pembelajaran')->nullable()->constrained('waktu_pembelajaran');
+            $table->foreignId('waktu_pembelajaran_id')->nullable()->constrained('waktu_pembelajaran');
         });
     }
 

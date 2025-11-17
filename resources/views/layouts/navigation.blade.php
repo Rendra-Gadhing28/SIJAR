@@ -65,8 +65,8 @@
             class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('riwayat*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Riwayat
         </a>
-        <a href="{{ route('riwayat.index') }}"
-            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('riwayat*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
+        <a href="{{ route('profile.index') }}"
+            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('profile*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Profil
         </a>
     </div>

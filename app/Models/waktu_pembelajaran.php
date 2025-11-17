@@ -3,20 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use db;
+use DB;
 
 class waktu_pembelajaran extends Model
 {
     protected $table = "waktu_pembelajaran";
     protected $fillable = [
         'id',
+        'jam_ke',
         'start_time',
         'end_time',
-        'pembelajaran'
     ];
 
     public static function pembelajaran(){
-        return db::table('waktu_pembelajaran')->get();
+        return DB::table('waktu_pembelajaran')->get();
     }
     public function slotPeminjaman(){
         return $this->hasMany(slot_peminjaman::class);

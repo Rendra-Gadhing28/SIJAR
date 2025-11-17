@@ -21,6 +21,9 @@ public function index(Request $request)
         // Redirect to login or show error if user is not authenticated
         return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
     }
+
+
+    
     $jurusan = $user->kategori_id;
 
     // Mulai dengan query builder (TANPA get)
@@ -47,22 +50,30 @@ public function index(Request $request)
               ->orWhere('kode_unit', 'LIKE', "%$keyword%");
         });
     }
-
+    
     $barangjurusan = $item->count();
-    $totalbarang = $item->simplePaginate(10)->appends(['search',$request->search]);
-
+   
     // Filter hanya barang yang tersedia
     $item->where('status_item', 'tersedia');
 
     // Ambil data lengkap dengan relasi kategori
-    $data = $item->with('kategori_jurusan')
+   $data = $item->with('kategori_jurusan')
         ->orderBy('created_at', 'desc')
-        ->get();
+        ->paginate(9)
+        ->appends([
+            'search' => $request->search,
+            'kategori_jurusan_id' => $request->kategori_jurusan_id
+        ]);
 
     // Dropdown kategori
     $kategoris = Kategori::orderBy('nama_kategori')->get();
 
-    return view('user.listbarang', compact('data', 'kategoris', 'kategori','barangjurusan','totalbarang'));
+
+    if($user->role=== 'admin'){
+        return redirect()->route('admin.dashboardadmin.index');
+    }
+
+    return view('user.listbarang', compact('data', 'kategoris', 'kategori','barangjurusan'));
 }
 
     /**

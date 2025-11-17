@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         // Call the user seeder to populate users
         $this->call([
+            KategoriSeeder::class,
             JurusanSeeder::class,
             UserSeeder::class,
             KategoriSeeder::class,

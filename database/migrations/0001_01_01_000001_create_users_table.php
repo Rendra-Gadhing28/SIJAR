@@ -22,6 +22,7 @@ return new class extends Migration
           ->nullable()
           ->constrained('kategori_jurusan')  // ← Nama table harus 'kategori_jurusan'
           ->onDelete('set null');
+            $table->longText('profile')->nullable();
             $table->enum('kelas',['X','XI','XII','admin']);
             $table->rememberToken();
             $table->timestamps();

@@ -14,39 +14,75 @@ class UserSeeder extends Seeder
      */
 public function run(): void
     {
-        $adminJurusan = Jurusan::firstOrCreate(['nama_jurusan' => 'admin']);
-        $kategoriAdmin = Kategori::firstOrCreate(['nama_kategori' => 'admin']);
-    
-        $kelas = [
+
+        // $kategoriAdmin = Kategori::firstOrCreate(['nama_kategori' => '']);
+        // $kategoriAdmin = Kategori::get('nama_kategori');
+
+        // $jurusanid = Jurusan::get('nama_jurusan')->where('nama_jurusan','');
+        $jurusanAdmin =[
+            'Admin PPLG' =>[
+                'nama' => 'Admin PPLG',
+                'Password' => 'adM1n_PPLG',
+                'kategori_id' => 1,
+                'role' => 'admin',
+                'kelas' => 'admin'
+            ],
+            'Admin TJKT' =>[
+                'nama' => 'Admin TJKT',
+                'Password' => 'adM1n_TJKT',
+                'kategori_id' => 2,
+                'role' => 'admin',
+                'kelas' => 'admin'
+            ],
+            'Admin DKV' =>[
+                'nama' => 'Admin DKV',
+                'Password' => 'adM1n_DKV',
+                'kategori_id' => 3,
+                'role' => 'admin',
+                'kelas' => 'admin'
+            ],
+            'Admin LK' =>[
+                'nama' => 'Admin LK',
+                'Password' => 'adM1n_LK',
+                'kategori_id' => 4,
+                'role' => 'admin',
+                'kelas' => 'admin'
+            ],
+            'Admin PS' =>[
+                'nama' => 'Admin PS',
+                'Password' => 'adM1n_PS',
+                'kategori_id' => 5,
+                'role' => 'admin',
+                'kelas' => 'admin'
+            ],
+        ] ;
+   
+        
+        foreach($jurusanAdmin as $adm => $jurusan){
+             $adminJurusan = Jurusan::where('nama_jurusan', $jurusan['nama'])->first();
+                User::create([
+                'name' => $adm,
+                'email' => strtolower(str_replace(' ', '', $jurusan['Password'])).'@gmail.com',
+                'password' => bcrypt($adm),
+                'role' => $jurusan['role'],
+                'jurusan_id' => $adminJurusan->id,
+                'kategori_id' => $adminJurusan->kategori_id,
+                'kelas' => $jurusan['kelas']
+            ]);}
+
+
+            $kelas = [
             'X',
             'XI',
-            'XII',
-        ]; 
+            'XII',]; 
 
-        $admin = [
-            'admin'
-        ];
-
-        foreach ($admin as $adm) {
-            User::create([
-                'name' => 'Admin Jurusan',
-                'email' => 'adminjurusan@gmail.com',
-                'password' => bcrypt('adM1n_jUurus4nn'),
-                'role' => 'admin',
-                'jurusan_id' => $adminJurusan->where('nama_jurusan', 'admin')->first()->id,
-                'kategori_id' => $kategoriAdmin->id,
-                'kelas' => $admin[0]
-            ]);
-        }
-
-
-        $jurusans = Jurusan::where('nama_jurusan', '!=', 'admin')->get();
+       $jurusans = Jurusan::where('nama_jurusan', 'not like', '%Admin%')->get();
         foreach ($kelas as $kls) {
             foreach ($jurusans as $jrs) {
             $name = $kls.' '.$jrs->nama_jurusan;
                 User::create([
                     'name' => $name,//X PPLG 3
-                    'email' => strtolower(str_replace(' ', '', $name)) . '@gmail.com',//XPPLG3@gmail.com
+                    'email' => strtoupper(str_replace(' ', '', $name)) . '@gmail.com',//XPPLG3@gmail.com
                     //sijar_xpplg3
                     'password' => bcrypt( str_replace(' ', '', strtolower($name))),
                     'role' => 'user',

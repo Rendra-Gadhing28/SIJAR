@@ -16,7 +16,6 @@ return new class extends Migration
             $table->integer('jam_ke');
             $table->time('start_time');
             $table->time('end_time');
-            $table->string('pembelajaran',50);
             $table->timestamps(); 
         });
     }

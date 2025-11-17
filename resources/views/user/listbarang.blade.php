@@ -11,9 +11,14 @@
 
 </head>
 
-<body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins']">
+<body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins'] pb-32 md:pb-0 lg:pb-0 ">
     <header>
+<<<<<<< Updated upstream
         @include('layouts.navigation')
+=======
+    @include('layouts.navigation')
+    @include('layouts.navmobile')
+>>>>>>> Stashed changes
     </header>
     <main class="pt-28 px-6 md:px-12">
         <form action="{{ route('barang.index') }}" method="GET" class="mb-4 flex gap-2">
@@ -66,9 +71,9 @@
                 </div>
                 @include('layouts.navmobile')
                 {{-- PAGINATION --}}
-                {{-- <div class="mt-6">
+                - <div class="mt-6">
                     {{ $data->links() }}
-                </div> --}}
+                </div> 
             </section>
 
         </form>

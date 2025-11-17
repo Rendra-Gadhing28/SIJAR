@@ -62,7 +62,7 @@
             <div class="flex justify-around items-center">
                 
                 <!-- Home -->
-                <a href="#" class="nav-item active relative flex flex-col items-center group" data-nav="home">
+                <a href="{{ route('user.homepage') }}" class="nav-item active relative flex flex-col items-center group" data-nav="home">
                     <div class="icon-container bg-gray-100 rounded-full p-3">
                         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="icon w-6 h-6 text-gray-600">
@@ -74,7 +74,7 @@
                 </a>
 
                 <!-- Items -->
-                <a href="#" class="nav-item relative flex flex-col items-center group" data-nav="items">
+                <a href="{{ route('barang.index') }}" class="nav-item relative flex flex-col items-center group" data-nav="items">
                     <div class="icon-container bg-gray-100 rounded-full p-3">
                         <svg class="icon w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -85,7 +85,7 @@
                 </a>
 
                 <!-- Add -->
-                <a href="#" class="nav-item relative flex flex-col items-center group" data-nav="add">
+                <a href="{{ route('peminjaman.create') }}" class="nav-item relative flex flex-col items-center group" data-nav="add">
                     <div class="icon-container bg-gray-100 rounded-full p-3">
                         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                             class="icon w-6 h-6 text-gray-600">
@@ -96,7 +96,7 @@
                     <span class="label text-xs mt-1 text-gray-600">Pinjam</span>
                 </a>
                 <!-- History -->
-                <a href="#" class="nav-item relative flex flex-col items-center group" data-nav="history">
+                <a href="{{ route('peminjaman.index') }}" class="nav-item relative flex flex-col items-center group" data-nav="history">
                     <div class="icon-container bg-gray-100 rounded-full p-3">
                         <svg class="icon w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -107,7 +107,7 @@
                 </a>
 
                 <!-- Profile -->
-                <a href="#" class="nav-item relative flex flex-col items-center group" data-nav="profile">
+                <a href="{{ route('profile.index') }}" class="nav-item relative flex flex-col items-center group" data-nav="profile">
                     <div class="icon-container bg-gray-100 rounded-full p-3">
                         <svg class="icon w-6 h-6 text-gray-600" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
