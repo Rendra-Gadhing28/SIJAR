@@ -18,7 +18,13 @@ class DatabaseSeeder extends Seeder
         // Call the user seeder to populate users
         $this->call([
             JurusanSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            KategoriSeeder::class,
+            itemDKV::class,
+            itemLK::class,
+            itemPPLG::class,
+            itemPS::class,
+            itemTJKT::class,
         ]);
     }
 }
