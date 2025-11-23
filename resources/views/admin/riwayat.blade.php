@@ -136,50 +136,12 @@
                                     </p>
                                 @endif
 
-                                {{-- EDIT & CANCEL (Pending Only) --}}
-                                @if($pinjam->status_tujuan == 'Pending')
-                                    <div class="flex gap-3">
-                                        <a href="{{ route('peminjaman.edit', $pinjam->id) }}"
-                                            class="text-blue-600 text-sm hover:underline">
-                                            Edit
-                                        </a>
-
-                                        <form action="{{ route('peminjaman.destroy', $pinjam->id) }}" method="POST"
-                                            onsubmit="return confirm('Yakin ingin membatalkan?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-red-600 text-sm hover:underline">
-                                                Batalkan
-                                            </button>
-                                        </form>
-                                    </div>
-                                @endif
-
-                            </div>
-
-                        </div>
-
-                    </div>
-                @endforeach
-            </div>
-
             {{-- PAGINATION --}}
             <div class="mt-6">
                 {{ $peminjaman->links() }}
             </div>
 
         @else
-            {{-- Jika data kosong --}}
-            <div class="bg-white p-14 rounded-2xl shadow text-center">
-                <h3 class="text-xl font-bold text-gray-600 mb-2">Belum Ada Riwayat</h3>
-                <p class="text-gray-500 mb-4">Anda belum pernah melakukan peminjaman barang.</p>
-
-                <a href="{{ route('peminjaman.create') }}"
-                    class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
-                    Mulai Pinjam Barang
-                </a>
-            </div>
-        @endif
 
     </main>
 

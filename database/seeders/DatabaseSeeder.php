@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             itemPPLG::class,
             itemPS::class,
             itemTJKT::class,
+            jampembelajaran::class
         ]);
     }
 }

@@ -68,11 +68,6 @@ public function index(Request $request)
     // Dropdown kategori
     $kategoris = Kategori::orderBy('nama_kategori')->get();
 
-
-    if($user->role=== 'admin'){
-        return redirect()->route('admin.dashboardadmin.index');
-    }
-
     return view('user.listbarang', compact('data', 'kategoris', 'kategori','barangjurusan'));
 }
 

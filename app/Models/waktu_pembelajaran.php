@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use DB;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
 
 class waktu_pembelajaran extends Model
 {
+    use HasFactory;
     protected $table = "waktu_pembelajaran";
     protected $fillable = [
         'id',
@@ -19,6 +21,6 @@ class waktu_pembelajaran extends Model
         return DB::table('waktu_pembelajaran')->get();
     }
     public function slotPeminjaman(){
-        return $this->hasMany(slot_peminjaman::class);
+        return $this->hasMany(slot_peminjaman::class,'waktu_pembelajaran_id');
     }
 }

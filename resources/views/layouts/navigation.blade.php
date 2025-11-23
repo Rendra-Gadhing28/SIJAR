@@ -20,16 +20,16 @@
                 class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('barang*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
                 Barang
             </a>
-            <a href="{{ route("peminjaman.index") }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
+            <a href="{{ route("peminjaman.create") }}"
+                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman/create*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
                 Pinjam
             </a>
-            <a href="{{ route('riwayat.index') }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('riwayat*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
+            <a href="{{ route('peminjaman.index') }}"
+                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
                 Riwayat
             </a>
-            <a href="{{ route('riwayat.index') }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('riwayat*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
+            <a href="{{ route('profile.index') }}"
+                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('profile*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
                 Profil
             </a>
         </div>
@@ -56,13 +56,13 @@
             class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('barang*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Barang
         </a>
-        <a href="{{ route("peminjaman.index") }}"
-            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
+        <a href="{{ route("peminjaman.create") }}"
+            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 nav-link {{ request()->routeIs('peminjaman.create') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Pinjam
         </a>
       
-        <a href="{{ route('riwayat.index') }}"
-            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('riwayat*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
+        <a href="{{ route('peminjaman.index') }}"
+            class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 nav-link {{ request()->routeIs('peminjaman.index') || request()->routeIs('peminjaman.show') || request()->routeIs('peminjaman.edit') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Riwayat
         </a>
         <a href="{{ route('profile.index') }}"

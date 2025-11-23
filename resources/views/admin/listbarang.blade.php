@@ -8,26 +8,38 @@
     <title>List Barang</title>
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
+    <style>
+    ::root{
+    --button1:#99E1FF;
+    --button2:#31A6D7;
+    --button3:#1683B1;
+}
+    </style>
 </head>
 
 <body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins'] pb-32 md:pb-0 lg:pb-0 ">
     <header>
-    @include('layouts.navigation')
-    @include('layouts.navmobile')
+    @include('layouts.navigationadmin')
     </header>
     <main class="pt-28 px-6 md:px-12">
         <form action="{{ route('barang.index') }}" method="GET" class="mb-4 flex gap-2">
-            <section class="max-w-5xl mx-auto bg-white rounded-2xl shadow p-6">
+            <section class="max-w-5xl mx-auto bg-white/75 rounded-2xl shadow p-6">
                 <form action="{{ route('barang.index') }}" method="GET" class="mb-4 flex gap-2">
+                    <div class="flex flex-wrap justify-center items-center mt-4 gap-4">
                     <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari barang..."
-                        class="px-3 py-2 border rounded-lg w-1/2">
+                        class="px-3 py-2 border rounded-lg w-3/4">
                     <button class="px-3 py-2 hover:bg-blue-600 rounded-lg">
-                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6 hover:stroke-white/80">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
                     </button>
+                    </div>
+                    <div class="flex flex-row justify-end items-end align-top mt-8">
+                    <button class="w-auto h-auto py-3 px-2 bg-[linear-gradient(145deg,#99E1FF,#31A6D7,#1683B1)] hover:bg-black rounded-lg font-bold"><a href="{{ route('admin.barang.create') }}">
+                        Tambah Barang</a></button>
+                    </div>
+                    
                 </form>
 
                 @if(request('search'))
@@ -37,7 +49,7 @@
                     </p>
                 @endif
 
-                <h2 class="text-xl font-bold mb-4">Daftar Barang</h2>
+                <h2 class="text-4xl font-bold mb-4 text-center mt-4">Daftar Barang</h2>
 
                 <span class="text-2xl font-bold">Jurusan: {{ Auth::user()->kategori->nama_kategori }}</span>
                 <span class="text-xl font-bold block">Total: {{ $barangjurusan }}</span>
@@ -65,9 +77,8 @@
                         <p class="col-span-full text-center text-gray-500">Data kosong plong</p>
                     @endforelse
                 </div>
-                @include('layouts.navmobile')
-                {{-- PAGINATION --}}
-                - <div class="mt-6">
+               
+                 <div class="mt-6">
                     {{ $data->links() }}
                 </div> 
             </section>

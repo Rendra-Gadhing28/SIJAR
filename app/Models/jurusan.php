@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Jurusan extends Model
 {
@@ -12,6 +13,10 @@ class Jurusan extends Model
         'nama_jurusan',
         'kategori_id',
     ];
+
+    public static function getAll(){
+        return DB::table('jurusans');
+    }
 
     public function items()
     {

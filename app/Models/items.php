@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use app\Models\Item;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class Items extends Model
 {
