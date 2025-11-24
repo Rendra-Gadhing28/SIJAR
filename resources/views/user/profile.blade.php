@@ -30,9 +30,9 @@
             <div class="space-y-6">
                 {{-- Avatar Section --}}
                 <div class="flex justify-center mb-6">
-                    @if(Auth::user()->avatar)
-                        <img src="{{ asset('storage/avatars/' . Auth::user()->avatar) }}" 
-                             alt="Avatar" 
+                    @if(Auth::user()->profile)
+                        <img src="{{ asset('storage/avatars/' . Auth::user()->profile) }}" 
+                             alt="profile" 
                              class="w-24 h-24 rounded-full object-cover border-4 border-gray-200">
                     @else
                         <div class="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center border-4 border-gray-200">
@@ -50,22 +50,15 @@
 
                     <div class="border-b border-gray-200 pb-3">
                         <p class="text-sm text-gray-500 mb-1">Email</p>
-                        <p class="text-lg text-gray-700">{{ Auth::user()->email }}</p>
+                        <p class="text-lg text-gray-700">{{ strtolower(Auth::user()->email) }}</p>
                     </div>
 
-                    @if(Auth::user()->phone)
+                    
                     <div class="border-b border-gray-200 pb-3">
                         <p class="text-sm text-gray-500 mb-1">Telepon</p>
-                        <p class="text-lg text-gray-700">{{ Auth::user()->phone }}</p>
+                        <p class="text-lg text-gray-700">{{ Auth::user()->telepon ?? '-'}}</p>
                     </div>
-                    @endif
-
-                    @if(Auth::user()->address)
-                    <div class="border-b border-gray-200 pb-3">
-                        <p class="text-sm text-gray-500 mb-1">Alamat</p>
-                        <p class="text-lg text-gray-700">{{ Auth::user()->address }}</p>
-                    </div>
-                    @endif
+                  
 
                     @if(Auth::user()->kategori)
                     <div class="border-b border-gray-200 pb-3">

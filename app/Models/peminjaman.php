@@ -5,40 +5,51 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Items;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Inertia\Commands\StopSsr;
 
 class Peminjaman extends Model
 {
-    protected $table = "peminjaman";
+      protected $table = 'peminjaman';
+
     protected $fillable = [
-        'id',
         'keperluan',
         'user_id',
         'item_id',
         'tanggal',
-        'dipinjam',
-        'dikembalikan',
+        'finished_at',
+        'status_tujuan',
         'status_pinjaman',
         'gambar_bukti',
+        'jam_pembelajaran',
+        'approved_at',
+        'rejected_at',
     ];
-    public static function getItem()
-    {
+
+    protected $casts = [
+        'tanggal' => 'date',
+        'finished_at' => 'datetime',
+        'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
+        'jam_pembelajaran' => 'array'
+    ];
+
+    public static function getAll(){
         return DB::table('peminjaman');
     }
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    public function items()
+
+    public function item()
     {
-        return $this->belongsTo(Items::class, 'items_id');
+        return $this->belongsTo(Item::class);
     }
-    public function slotPeminjaman()
+
+    public function slot_peminjaman()
     {
         return $this->hasMany(slot_peminjaman::class);
-    }
-    public function waktu_pembelajaran()
-    {
-        return $this->belongsTo(waktu_pembelajaran::class, 'waktu_id');
     }
 }

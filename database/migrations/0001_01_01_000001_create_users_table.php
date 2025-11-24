@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role',['admin','user','guest']);
+            $table->integer('telepon')->nullable();
+            
             $table->foreignId('jurusan_id')->nullable()->constrained('jurusans')->onDelete('set null');
             $table->foreignId('kategori_id')
           ->nullable()

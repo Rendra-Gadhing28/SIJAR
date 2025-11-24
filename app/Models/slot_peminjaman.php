@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\peminjaman;
 use App\Models\waktu_pembelajaran;
 use Illuminate\Support\Facades\DB;
 
 class slot_peminjaman extends Model
+
+
 {
     protected $table = "slot_peminjaman";
     protected $fillable = [
@@ -18,14 +19,20 @@ class slot_peminjaman extends Model
     ];
 
     public static function getSlotPeminjaman(){
-        return db::table('slot_peminjaman')->get();
+        return DB::table('slot_peminjaman')->get();
     }
 
     public function peminjaman(){
         return $this->belongsTo(peminjaman::class);
     }
+    public function item()
+{
+    return $this->belongsTo(Item::class, 'item_id');
+}
 
-    public function waktu(){
-        return $this->belongsTo(waktu_pembelajaran::class);
-    }
+
+  public function waktu()
+{
+    return $this->belongsTo(waktu_pembelajaran::class, 'waktu_pembelajaran_id');
+}
 }

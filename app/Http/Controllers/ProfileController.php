@@ -38,27 +38,28 @@ class ProfileController extends Controller
     {
         $request->user()->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
 
         $user = Auth::user();
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'telepon' => 'nullable|string|max:100',
             'profile' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
+        $validated['name'] = $request->name;
+        $validated['email'] = $request->email;
+        $validated['telepon'] = $request->telepon;
 
         if ($request->hasFile('profile')) {
             // if($user->profile &)
             $profile = time() . '_' . $request->file('profile')->getClientOriginalName();
-            $request->file('profile')->storeAs('public/avatars', $profile);
+            $request->file('profile')->storeAs('avatars', $profile, 'public');
             $validated['profile'] = $profile;
         }
         $user->update($validated);
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.index')->with('status', 'profile-updated');
     }
 
     /**

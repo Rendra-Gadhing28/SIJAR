@@ -12,8 +12,8 @@
 
 <body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins'] pb-32 md:pb-0 lg:pb-0">
     <header>
-        @include('layouts.navigation')
-        @include('layouts.navmobile')
+    @include('layouts.navigation')
+    @include('layouts.navmobile')
     </header>
     
     <main class="pt-28 px-6 md:px-12">

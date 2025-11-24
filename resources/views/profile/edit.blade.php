@@ -26,8 +26,8 @@
 
                 {{-- Avatar Upload --}}
                 <div class="flex flex-col items-center mb-6">
-                    @if(Auth::user()->avatar)
-                        <img src="{{ asset('storage/avatars/' . Auth::user()->avatar) }}" 
+                    @if(Auth::user()->profile)
+                        <img src="{{ asset('storage/avatars/' . Auth::user()->profile) }}" 
                              alt="Avatar" 
                              id="avatar-preview"
                              class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 mb-4">
@@ -36,10 +36,10 @@
                             <span class="text-4xl font-bold text-gray-600">{{ substr(Auth::user()->name, 0, 1) }}</span>
                         </div>
                     @endif
-                    <label for="avatar" class="cursor-pointer px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">
+                    <label for="profile" class="cursor-pointer px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">
                         Pilih Foto
                     </label>
-                    <input type="file" id="avatar" name="avatar" class="hidden" accept="image/*" onchange="previewImage(event)">
+                    <input type="file" id="profile" name="profile" class="hidden" accept="image/*" onchange="previewImage(event)">
                     @error('avatar')
                         <p class="text-red-600 text-sm mt-2">{{ $message }}</p>
                     @enderror
@@ -65,7 +65,7 @@
                     <input type="email" 
                            id="email" 
                            name="email" 
-                           value="{{ old('email', Auth::user()->email) }}"
+                           value="{{ old('email', strtolower(Auth::user()->email)) }}"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 @error('email') border-red-500 @enderror"
                            required>
                     @error('email')
@@ -75,31 +75,18 @@
 
                 {{-- Phone --}}
                 <div>
-                    <label for="phone" class="block text-sm text-gray-500 mb-1">Telepon</label>
+                    <label for="telepon" class="block text-sm text-gray-500 mb-1">Telepon</label>
                     <input type="text" 
-                           id="phone" 
-                           name="phone" 
-                           value="{{ old('phone', Auth::user()->phone) }}"
+                           id="telepon" 
+                           name="telepon" 
+                           value="{{ old('telepon', Auth::user()->telepon) }}"
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
                            placeholder="081234567890">
-                    @error('phone')
+                    @error('telepon')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
-
-                {{-- Address --}}
-                <div>
-                    <label for="address" class="block text-sm text-gray-500 mb-1">Alamat</label>
-                    <textarea id="address" 
-                              name="address" 
-                              rows="3"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800"
-                              placeholder="Alamat lengkap...">{{ old('address', Auth::user()->address) }}</textarea>
-                    @error('address')
-                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
+              
                 {{-- Jurusan (Read Only) --}}
                 @if(Auth::user()->kategori)
                 <div>

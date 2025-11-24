@@ -16,14 +16,22 @@ return new class extends Migration
             $table->string('keperluan');
 
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade'); 
-            $table->foreignId('items_id')->nullable()->constrained('items')->onDelete('cascade');
+            $table->foreignId('item_id')->nullable()->constrained('item')->onDelete('cascade');
 
             $table->date('tanggal');
-            $table->dateTime('dipinjam');
-            $table->dateTime('dikembalikan')->nullable();
+            $table->timestamp('finished_at')->nullable();
+
+            $table->enum('status_tujuan', ['Pending', 'Approved', 'Rejected'] )->default('Pending');
             $table->enum('status_pinjaman',['dipinjam','selesai'])->default('dipinjam');
             $table->string('gambar_bukti');
-            $table->timestamps(); 
+            $table->json('jam_pembelajaran')->nullable();
+
+
+            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('rejected_at')->nullable();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+
         });
     }
 

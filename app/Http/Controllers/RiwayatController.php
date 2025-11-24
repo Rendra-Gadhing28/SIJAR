@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\slot_peminjaman;
 use Illuminate\Http\Request;
 
 class RiwayatController extends Controller
 {
     public function index(){
-        return view('user.riwayat');
+        // $slot_Peminjaman = slot_peminjaman::all();
+        // return view('user.riwayat');
     }
 
     public function show($id){

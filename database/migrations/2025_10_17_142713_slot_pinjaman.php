@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('peminjaman_id')->nullable()->constrained('peminjaman');
             $table->foreignId('waktu_pembelajaran_id')->nullable()->constrained('waktu_pembelajaran');
+             $table->timestamps(); 
         });
     }
 
