@@ -21,19 +21,19 @@
 @endif
     </header>
 
-    <main class="pt-28 px-6 md:px-12">
+    <main class="pt-28 px-6 md:px-12 py-36 scroll-py-36">
 
         {{-- SECTION STATISTIK --}}
         <section class="max-w-2xl mx-auto bg-white rounded-2xl shadow p-6 text-center">
-            <h2 class="text-2xl font-bold mb-6">Barang</h2>
+            <h2 class="text-2xl font-bold mb-6">Pinjaman</h2>
             <div class="flex justify-center gap-6">
 
-                <div class="bg-gray-100 rounded-lg p-4 w-32 text-center shadow">
+                <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
                     <p class="font-semibold">Dipinjam</p>
                     <p class="text-2xl font-bold">{{ $dipinjam }}</p>
                 </div>
 
-                <div class="bg-gray-100 rounded-lg p-4 w-32 text-center shadow">
+                <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
                     <p class="font-semibold">Dikembalikan</p>
                     <p class="text-2xl font-bold">{{ $selesai }}</p>
                 </div>
@@ -48,7 +48,7 @@
             @forelse ($peminjaman as $pinjam)
                 <div class="bg-white rounded-2xl shadow p-6 hover:shadow-lg transition mb-5">
 
-                    <div class="flex flex-col md:flex-row justify-between gap-5">
+                    <div class="flex flex-col  md:flex-row justify-between gap-5">
 
                         {{-- LEFT --}}
                         <div class="flex gap-5">
@@ -134,9 +134,9 @@
 
                                 {{-- Tombol Selesaikan --}}
                                 @if ($pinjam->status_pinjaman == 'dipinjam')
-                                    <form action="{{ route('peminjaman.selesai', $pinjam->id) }}" method="POST">
+                                    <form action="{{ route('peminjaman.selesai', $pinjam->id) }}" method="POST" class="relative mt-auto items-baseline">
                                         @csrf
-                                        <button class="mt-1 bg-green-600 text-white px-4 py-1 text-xs rounded-lg hover:bg-green-700">
+                                        <button id="btn1" type="submit" onclick="colors()" class="mt-2 lg:hover:bg-green-600 text-green-500 border-2 border-green-500 lg:hover:border-gray-400 px-2 py-2 text-lg rounded-lg lg:hover:text-white">
                                             Selesaikan
                                         </button>
                                     </form>
@@ -177,7 +177,13 @@
         </section>
 
     </main>
-
+    <script>
+        let btn = document.getElementById['btn1']
+        function colors(){
+            btn.addEventlistener({
+                btn.style.background = 'green'
+            })
+        }
+    </script>
 </body>
-
 </html>

@@ -16,8 +16,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware('auth')->group(function () {
-    // PEMINJAMAN - Resource Route (User & Admin bisa akses)
+Route::middleware(['auth'])->group(function () {
    
     
     // atau bisa juga ditulis lengkap seperti ini:
@@ -28,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
     Route::put('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
     Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
+    Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
     //home page
     Route::get('/homepage', [peminjamanController::class, 'beranda'])->name('user.homepage');
     // BARANG
@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::put('/password', [ProfileController::class, 'gantiPassw'])->name('password.update');
-});
+})->middleware('user');
 
 
 // ADMIN ROUTES
@@ -72,13 +72,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/peminjaman/{id}/reject', [AdminPeminjamanController::class, 'reject'])->name('peminjaman.reject'); // admin.peminjaman.reject
 
     // Pindahkan rute notifikasi ke sini, dan perbaiki penamaannya:
-    Route::prefix('notifications')->name('notifications.')->group(function () {
-        // Asumsi AdminPeminjamanController yang mengurus notifikasi
-        Route::get('/', [AdminPeminjamanController::class, 'notifications'])->name('index'); // admin.notifications.index
-        Route::post('/{id}/read', [AdminPeminjamanController::class, 'markAsRead'])->name('read'); // admin.notifications.read
-        Route::post('/mark-all-read', [AdminPeminjamanController::class, 'markAllAsRead'])->name('markAllRead'); // admin.notifications.markAllRead
+     Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [AdminPeminjamanController::class, 'notifications'])->name('index');
+        Route::post('/{id}/read', [AdminPeminjamanController::class, 'markAsRead'])->name('read');
+        Route::post('/mark-all-read', [AdminPeminjamanController::class, 'markAllAsRead'])->name('markAllRead');
     });
-});
+})->middleware('admin');
 
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
@@ -87,7 +86,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
         Route::put('/password', [ProfileController::class, 'gantiPassw'])->name('password.update');
     });
-
    
     // ... rute admin lainnya
 

@@ -11,9 +11,7 @@ use App\Models\Item;
 use App\Models\waktu_pembelajaran;
 use App\Models\peminjaman;
 use App\Models\slot_peminjaman;
-use App\Models\Kategori;
 use App\Notifications\PeminjamanBaruNotification;
-use Illuminate\Support\Facades\Notification;
 
 
 class peminjamanController extends Controller
@@ -52,6 +50,9 @@ class peminjamanController extends Controller
     if ($request->has('jenis') && $request->jenis !== '') {
         $itm->where('jenis_item', $request->jenis);
     }
+    if ($request->has('status') && $request->status !== '') {
+        $itm->where('status_item', $request->status);
+    }
     //pagination per halaman
         $items = $itm->with('kategori_jurusan')
         ->orderBy('created_at', 'desc')
@@ -63,19 +64,20 @@ class peminjamanController extends Controller
                         ->distinct()
                         ->pluck('jenis_item');
 
+        $status_item = Item::select('status_item')->distinct()->pluck('status_item');
+        // query dasar
+        $itm = Item::query();
+        // paginasi item
+    $items = $itm->paginate(9);
     // untuk waktu, kalau mau semua cukup ambil all(), atau paginate jika banyak
     $waktu = waktu_pembelajaran::orderBy('jam_ke')->get();
 
 
 
-    // kirim variabel sesuai nama yang digunakan blade (blade pakai $items & $waktu)
-    return view('user.pinjam', compact('items', 'waktu','jenis_items'));
+    // kirim variabel sesuai nama yang digunakan blade (blade pakai $items & $waktu)'
+    return view('user.pinjam', compact('items', 'waktu','jenis_items','status_item', 'items'));
 
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
 {
     $validated = $request->validate([
@@ -83,7 +85,7 @@ class peminjamanController extends Controller
         'item_id' => 'required|exists:item,id',
         'kode_unit' => 'nullable|string',
         'waktu_ids' => 'required|array|min:1',
-        'waktu_ids.*' => 'string',  // String JSON
+        'waktu_ids.*' => 'string',  // Array of JSON strings
         'bukti' => 'required|image|mimes:jpeg,png,jpg|max:2048',
     ], [
         'waktu_ids.required' => 'Pilih minimal 1 waktu pembelajaran',
@@ -95,15 +97,12 @@ class peminjamanController extends Controller
     
     try {
         // Upload bukti
-        $path = null;
-        if ($request->hasFile('bukti')) {
-            $path = $request->file('bukti')->store('bukti_peminjaman', 'public');
-        }
+        $path = $request->file('bukti')->store('bukti_peminjaman', 'public');
 
-        // Validasi dan siapkan array JSON untuk jam_pembelajaran
+        // Proses waktu_ids: Decode, validasi, dan siapkan array untuk jam_pembelajaran
         $jamPembelajaran = [];
         foreach ($validated['waktu_ids'] as $waktuJson) {
-            // Decode JSON
+            // Decode JSON string ke array
             $waktuData = json_decode($waktuJson, true);
             
             // Validasi struktur JSON
@@ -111,7 +110,7 @@ class peminjamanController extends Controller
                 throw new \Exception('Format waktu tidak valid: ' . $waktuJson);
             }
             
-            // Cari waktu di database berdasarkan data JSON untuk memastikan validitas
+            // Validasi apakah waktu ada di DB (opsional, tapi disarankan untuk keamanan)
             $waktu = waktu_pembelajaran::where('jam_ke', $waktuData['jam_ke'])
                 ->where('start_time', $waktuData['start_time'])
                 ->where('end_time', $waktuData['end_time'])
@@ -125,13 +124,12 @@ class peminjamanController extends Controller
             $jamPembelajaran[] = $waktuData;
         }
 
-        // Buat data peminjaman dengan jam_pembelajaran sebagai JSON
-        $peminjaman = Peminjaman::create([
+        // Buat peminjaman dengan jam_pembelajaran
+        $peminjaman = peminjaman::create([
             'keperluan' => $validated['keperluan'],
             'user_id' => Auth::id(),
             'item_id' => $validated['item_id'],
             'tanggal' => now()->toDateString(),
-            'finished_at' => null,
             'status_tujuan' => 'Pending',
             'status_pinjaman' => 'dipinjam',
             'gambar_bukti' => $path,
@@ -145,18 +143,18 @@ class peminjamanController extends Controller
         // Kirim notifikasi ke admin
         $admins = User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
-            Notification::send($admin,new PeminjamanBaruNotification($peminjaman));
+            $admin->notify(new PeminjamanBaruNotification($peminjaman));
         }
 
         DB::commit();
 
-        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil diajukan! Anda bisa melakukan peminjaman lagi.');
+        return redirect()->route('peminjaman.index')
+            ->with('success', 'Peminjaman berhasil diajukan! Menunggu persetujuan admin.');
         
     } catch (\Exception $e) {
         DB::rollBack();
         
-        // Hapus file jika ada error
-        if ($path) {
+        if (isset($path)) {
             Storage::disk('public')->delete($path);
         }
         
@@ -164,18 +162,23 @@ class peminjamanController extends Controller
     }
 }
 
-    public function selesai($id)
+
+    /**
+     * Store a newly created resource in storage.
+     */
+         public function selesai($id)
 {
     $peminjaman = peminjaman::findOrFail($id);
 
     // Update status peminjaman
     $peminjaman->update([
-        'status_pinjaman' => 'selesai'
+        'status_pinjaman' => 'selesai',
+        'finished_at' => now()
     ]);
 
     // Kembalikan barang menjadi tersedia
     $item = Item::find($peminjaman->item_id);
-    $item->update(['status' => 'tersedia']);
+    $item->update(['status_item' => 'tersedia']);
 
     return back()->with('success', 'Barang berhasil dikembalikan dan status diperbarui!');
 }
@@ -183,7 +186,7 @@ public function rusak($id)
 {
     $item = Item::findOrFail($id);
 
-    $item->update(['status' => 'rusak']);
+    $item->update(['status_item' => 'rusak']);
 
     return back()->with('success', 'Status barang diubah menjadi rusak.');
 }
@@ -201,6 +204,42 @@ public function rusak($id)
             
         return view('user.show', compact('peminjaman'));
     }
+
+    public function edit(Request $request, $id)
+{
+    $user = Auth::user();
+    if (!$user) {
+        // Redirect to login or show error if user is not authenticated
+        return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
+    }
+     $jurusan = $user->kategori_id;
+       //filter berdasarkan jurusan 
+    $itm = Item::where('kategori_jurusan_id', $jurusan);
+        //Filter Search
+         if ($request->has('search') && $request->search !== '') {
+        $itm->where('nama_item', 'like', '%' . $request->search . '%');
+    }
+    //Filter jenis item
+    if ($request->has('jenis') && $request->jenis !== '') {
+        $itm->where('jenis_item', $request->jenis);
+    }
+    //pagination per halaman
+        $items = $itm->with('kategori_jurusan')
+        ->orderBy('created_at', 'desc')
+        ->paginate(9)->withQueryString();
+
+        ///Daftar jenis barang
+        $jenis_items = Item::where('kategori_jurusan_id', $jurusan)
+                        ->select('jenis_item')
+                        ->distinct()
+                        ->pluck('jenis_item');
+
+    // untuk waktu, kalau mau semua cukup ambil all(), atau paginate jika banyak
+    $waktu = waktu_pembelajaran::orderBy('jam_ke')->get();
+    $peminjaman = peminjaman::find($id);
+    // kirim variabel sesuai nama yang digunakan blade (blade pakai $items & $waktu)
+    return view('user.editpinjam', compact('items', 'waktu','jenis_items','peminjaman'));
+}
 
     /**
      * Show the form for editing the specified resource.
@@ -260,6 +299,11 @@ public function rusak($id)
             'jam_pembelajaran' => json_encode($jamPembelajaran),
         ]);
 
+        $item = item::findOrFail($id);
+          $item->update([
+            'status_item' => 'dipinjam'
+        ]);
+
         DB::commit();
 
         return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil diperbarui!');
@@ -273,12 +317,13 @@ public function rusak($id)
     }
 }
 
-    public function beranda(){
+     public function beranda(){
+         $userId = Auth::id();
          $peminjaman = peminjaman::where("user_id", Auth::id())
                 ->with(["item"])
                 ->latest()
                 ->paginate(10);
-              $userId = Auth::id();
+             
 
 $dipinjam = Peminjaman::where('user_id', $userId)
             ->where('status_pinjaman', 'dipinjam')
@@ -292,9 +337,22 @@ $selesai = Peminjaman::where('user_id', $userId)
       return view('user.homepage', compact('peminjaman','dipinjam', 'selesai'));
     }
 
+    public function destroy($id){
+         $pinjam = Peminjaman::findOrFail($id);
+
+    // Jika ada file bukti, hapus juga
+    if ($pinjam->bukti && Storage::exists($pinjam->bukti)) {
+        Storage::delete($pinjam->bukti);
+    }
+
+    $pinjam->delete();
+
+    return redirect()->back()->with('success', 'Peminjaman berhasil dihapus.');
+}
+    }   
+
 
     /**
      * Update the specified resource in storage.
      */
     
-}

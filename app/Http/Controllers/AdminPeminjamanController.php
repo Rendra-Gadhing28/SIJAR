@@ -21,12 +21,20 @@ class AdminPeminjamanController extends Controller
      */
    public function dashboard()
     {
-        $notifications = peminjaman::get();
+        $admin = Auth::user()->kategori_id->nama_kategori;
+        $filter = peminjaman::join('user', 'peminjaman.user', '=', 'user.id')
+        ->where('user.kategori', $admin);
+        $notifications = peminjaman::with('user.kategori')->get();
         $totalPending = peminjaman::where('status_tujuan', 'Pending')->count();
         $totalApproved = peminjaman::where('status_tujuan', 'Approved')->count();
         $totalRejected = peminjaman::where('status_tujuan', 'Rejected')->count();
+        $totalDipinjam = peminjaman::where('status_pinjaman', 'dipinjam')->count();
+        $totalDikembalikan = peminjaman::where('status_pinjaman', 'selesai')->count();
         $totalItems = Item::count();
-        $itemTersedia = Item::where('status_item', 'tersedia')->count();
+        $totalriwayat = $totalDipinjam + $totalDikembalikan;
+
+
+       
         
         // Peminjaman terbaru (5 terakhir)
         $recentPeminjaman = peminjaman::with(['user', 'item'])
@@ -40,8 +48,10 @@ class AdminPeminjamanController extends Controller
             'totalApproved',
             'totalRejected',
             'totalItems',
-            'itemTersedia',
-            'recentPeminjaman'
+            'recentPeminjaman',
+            'totalDipinjam',
+            'totalDikembalikan',
+            'totalriwayat'
         ));
     }
      public function riwayat(Request $request)
@@ -97,11 +107,11 @@ class AdminPeminjamanController extends Controller
 
    public function index()
     {
-        $peminjaman = peminjaman::with(['user', 'item', 'slot_peminjaman.waktu'])
+        $peminjaman = peminjaman::with(['user', 'item'])
             ->latest()
-            ->get();
+            ->paginate(8);
         
-        return view('admin.peminjaman.index', compact('peminjaman'));
+        return view('admin.riwayat', compact('peminjaman'));
     }
 
     /**
@@ -109,10 +119,10 @@ class AdminPeminjamanController extends Controller
      */
  public function show($id)
     {
-        $peminjaman = peminjaman::with(['user', 'item', 'slot_peminjaman.waktu'])
+        $peminjaman = peminjaman::with(['user', 'item',])
             ->findOrFail($id);
         
-        return view('admin.peminjaman.show', compact('peminjaman'));
+        return view('admin.Notifikasi', compact('peminjaman'));
     }
 
 
@@ -127,12 +137,18 @@ class AdminPeminjamanController extends Controller
             return back()->withErrors('Peminjaman sudah diproses.');
         }
 
+         $item = Item::findOrFail($peminjaman->item_id);
+         // update status item
+    $item->update([
+        'status_item' => 'dipinjam'
+    ]);
+
         $peminjaman->update([
             'status_tujuan' => 'Approved',
             'approved_at' => now(),
             'status_pinjaman' => 'dipinjam'
         ]);
-          $peminjaman->user->notify(new PeminjamanApprovedNotification($peminjaman));
+        
 
         return back()->with('success', 'Peminjaman berhasil disetujui.');
     }
@@ -161,8 +177,6 @@ class AdminPeminjamanController extends Controller
             $item = Item::find($peminjaman->item_id);
             $item->update(['status' => 'tersedia']);
 
-             $peminjaman->user->notify(new PeminjamanRejectedNotification($peminjaman));
-
                 DB::commit();
 
         // Jika ada alasan, simpan di kolom tambahan (misalnya tambah kolom 'alasan_reject' di migrasi jika perlu)
@@ -172,15 +186,16 @@ class AdminPeminjamanController extends Controller
     }
 
      public function notifications()
-    {
-        $user = Auth::user()->get();
-        $notifications = $user->where('role','admim')
-            ->notifications()
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-        
-        return view('admin.notifikasi', compact('notifications'));
-    }
+{
+    $user = Auth::user();
+    
+    // Ambil notifications langsung dari user
+    $notifications = $user->notifications()
+        ->orderBy('created_at', 'desc')
+        ->paginate(15);
+    
+    return view('admin.Notifikasi', compact('notifications'));
+}   
 
     public function markAsRead($id)
     {

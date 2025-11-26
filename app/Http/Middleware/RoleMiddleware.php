@@ -24,10 +24,10 @@ class RoleMiddleware
         }
 
         // Redirect based on role
-        if ($user->role === 'admin') {
-             return view('admin.dashboard');
+        if ($user->role !== 'admin') {
+             return view('user.homepage');
         }
 
-        return redirect()->route('user.homepage')->with('error', 'Akses ditolak!');
+        return redirect()->route('admin.dashboard')->with('error', 'Akses ditolak!');
     }
 }

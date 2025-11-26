@@ -4,14 +4,16 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use App\Models\peminjaman;
+use Carbon\Carbon;
 
 class PeminjamanBaruNotification extends Notification
 {
-    use Queueable;
+    use Queueable,Notifiable;
 
-    protected $peminjaman;
+    protected Peminjaman $peminjaman;
 
     public function __construct(peminjaman $peminjaman)
     {
@@ -30,8 +32,7 @@ class PeminjamanBaruNotification extends Notification
             'peminjaman_id' => $this->peminjaman->id,
             'user_name' => $this->peminjaman->user->name,
             'item_name' => $this->peminjaman->item->nama_barang,
-            'keperluan' => $this->peminjaman->keperluan,
-            'tanggal' => $this->peminjaman->tanggal->format('d M Y'),
+            'tanggal' => Carbon::parse($this->peminjaman->tanggal)->format('d M Y'),
             'message' => "{$this->peminjaman->user->name} mengajukan peminjaman {$this->peminjaman->item->nama_barang}",
         ];
     }

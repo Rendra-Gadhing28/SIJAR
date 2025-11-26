@@ -36,7 +36,8 @@
                     </button>
                     </div>
                     <div class="flex flex-row justify-end items-end align-top mt-8">
-                    <button class="w-auto h-auto py-3 px-2 bg-[linear-gradient(145deg,#99E1FF,#31A6D7,#1683B1)] hover:bg-black rounded-lg font-bold"><a href="{{ route('admin.barang.create') }}">
+                    <button class="w-auto h-auto py-3 px-2 bg-[linear-gradient(145deg,#99E1FF,#31A6D7,#1683B1)] hover:bg-black rounded-lg font-bold">
+                        <a href="{{ route('admin.barang.create') }}">
                         Tambah Barang</a></button>
                     </div>
                     
@@ -49,10 +50,15 @@
                     </p>
                 @endif
 
-                <h2 class="text-4xl font-bold mb-4 text-center mt-4">Daftar Barang</h2>
-
+                <h2  class="text-4xl font-bold mb-4 text-center mt-4">Daftar Barang</h2>
+                <div class="relative py-4 bg-[#f5f5f5] rounded-lg shadow-[0_8px_25px_rgba(0,0,0,0.2)] mb-4">
+                <div class="ml-4">
                 <span class="text-2xl font-bold">Jurusan: {{ Auth::user()->kategori->nama_kategori }}</span>
-                <span class="text-xl font-bold block">Total: {{ $barangjurusan }}</span>
+                <span class="text-xl font-bold block text-slate-600">Total: {{ $barangjurusan }}</span>
+                <span class="text-xl font-bold block text-green-500">Barang Tersedia : {{ $itemTersedia }}</span>
+                <span class="text-xl font-bold block text-yellow-600">Barang Dipinjam : {{ $itemDipinjam }}</span>
+                </div>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
 

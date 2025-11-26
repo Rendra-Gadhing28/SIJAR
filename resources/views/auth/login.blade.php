@@ -39,11 +39,18 @@
                         placeholder="Masukkan email anda">
                 </div>
 
-                <div>
-                    <label for="password" class="block text-sm font-bold text-gray-800">Password</label>
+                <div class="w-auto flex flex-col justify-center items-end">
+                    <label for="password" class="block text-sm font-bold text-gray-800 self-start">Password</label>
+                        <div class="flex justify-end absolute mt-6 mx-4 z-50">
+                        <button id="btn" type="button" onclick="klik()" class="w-auto h-full px-2">
+                        <img src="{{ asset('images/eye.svg') }}" alt="ini gambar mata" class="object-cover hidden z-10 rounded text-[#B7DBFF]" id="on">
+                        <img src="{{ asset('images/eye-off.svg') }}" alt="ini gambar mata" class="object-cover z-10 rounded" id="off">
+                        </button>
+                        </div>
                     <input id="password" name="password" type="password" required
                         class="mt-1 block w-full rounded-md bg-gradient-to-r from-[#B7DBFF] via-[#8FADCA] to-[#3F4F5F] px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-0 focus:border-transparent shadow-inner"
                         placeholder="Masukkan password">
+
                 </div>
 
                 <div class="flex items-center space-x-2">
@@ -71,7 +78,29 @@
         </div>
     </div>
     </main>
+    <script>
+        const button = document.getElementById['btn'];
+        const eye = document.getElementById['on'];
+        const eye_Off = document.getElementById['off']
+        const password = document.getElementById['password']
 
+        function klik(){
+            button.addEventListener('click', ()=>{
+                if(password.type === 'password'){
+                    password.type = 'text'
+                    eye.style.display ='inline'
+                    eye_Off.style.display = 'none'
+                }
+
+                else{
+                    eye.style.display = 'none'
+                    eye_Off.style.display = 'inline'
+                    password.type = 'password'
+                }
+            })
+        }
+        
+    </script>
 </body>
 
 </html>

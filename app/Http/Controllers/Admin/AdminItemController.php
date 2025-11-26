@@ -54,10 +54,11 @@ class AdminItemController extends Controller
                 'search' => $request->search,
                 'kategori_jurusan_id' => $request->kategori_jurusan_id
             ]);
-
+         $itemTersedia = Item::where('status_item', 'tersedia')->count();
+         $itemDipinjam = Item::where('status_item', 'dipinjam')->count();
         // Dropdown kategori
         $kategoris = Kategori::orderBy('nama_kategori')->get();
-        return view('admin.listbarang', compact('data', 'kategoris', 'kategori','barangjurusan'));
+        return view('admin.listbarang', compact('data', 'kategoris', 'kategori','barangjurusan','itemTersedia', 'itemDipinjam'));
     }
 
     /**

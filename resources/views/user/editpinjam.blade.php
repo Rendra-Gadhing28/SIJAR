@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Peminjaman Barang</title>
+    <title>Edit Peminjaman Barang</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('/images/logo_sijar.png') }}">
     @vite('resources/css/app.css')
 
@@ -47,7 +47,7 @@
 <main class="pt-28 px-6 md:px-12 pb-12">
     <section class="max-w-6xl mx-auto">
 
-        <h2 class="text-2xl font-bold mb-6 text-center">Form Peminjaman Barang</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center">Edit Peminjaman Barang</h2>
 
         {{-- ALERT --}}
         @if(session('success'))
@@ -69,52 +69,90 @@
         <div class="grid md:grid-cols-3 gap-6">
 
             {{-- LEFT SIDE FORM --}}
-            <div class="bg-white p-6 rounded-2xl shadow md:col-span-1">
-                <form action="{{ route('peminjaman.store') }}" method="POST" enctype="multipart/form-data" id="formPeminjaman">
-                    @csrf
+           <div class="bg-white p-6 rounded-2xl shadow md:col-span-1 space-y-6">
+    <form action="{{ route('peminjaman.update', $peminjaman->id) }}" method="POST" enctype="multipart/form-data" id="formPeminjaman">
+        @csrf
+        @method('PUT')
 
-                    {{-- ITEM DISPLAY --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold mb-2">Barang yang Dipilih</label>
-                        <input type="text" id="selected_item_display" readonly class="w-full px-4 py-2 bg-gray-100 border rounded-lg" placeholder="Pilih barang dari daftar →">
-                        <input type="hidden" name="item_id" id="item_id" required>
-                        <input type="hidden" name="kode_unit" id="kode_unit">
-                        <p class="text-xs text-gray-500 mt-1">Klik card barang di sebelah kanan</p>
-                    </div>
+        {{-- Selected Item Display --}}
+        <div>
+            <label for="selected_item_display" class="block text-sm font-semibold mb-2">Barang yang Dipilih</label>
+            <input 
+                type="text" 
+                id="selected_item_display" 
+                readonly 
+                class="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed" 
+                placeholder="Pilih barang dari daftar →" 
+                value="{{ $peminjaman->item->nama_item ?? '' }} (ID: {{ $peminjaman->item_id }})"
+            >
+            <input type="hidden" name="item_id" id="item_id" value="{{ $peminjaman->item_id }}" required>
+            <input type="hidden" name="kode_unit" id="kode_unit" value="{{ $peminjaman->item->kode_unit ?? '' }}">
+            <p class="text-xs text-gray-500 mt-1">Klik card barang di sebelah kanan/bawah untuk mengubah pilihan</p>
+        </div>
 
-                    {{-- KEPERLUAN --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold mb-2">Keperluan</label>
-                        <textarea name="keperluan" rows="3" class="w-full px-4 py-2 border rounded-lg" required>{{ old('keperluan') }}</textarea>
-                    </div>
+        {{-- Keperluan --}}
+        <div>
+            <label for="keperluan" class="block text-sm font-semibold mb-2">Keperluan</label>
+            <textarea 
+                name="keperluan" 
+                id="keperluan" 
+                rows="4" 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none"
+                required
+            >{{ old('keperluan', $peminjaman->keperluan) }}</textarea>
+        </div>
 
-                    {{-- MULTIPLE JAM --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold mb-2">Jam Pembelajaran (Multiple)</label>
-                        <select name="waktu_ids[]" id="waktu_ids" multiple class="w-full">
-                            @foreach ($waktu as $wkt)
-                                <option value="{{ json_encode(['jam_ke' => $wkt->jam_ke, 'start_time' => $wkt->start_time, 'end_time' => $wkt->end_time]) }}">
-                                    Jam {{ $wkt->jam_ke }}. {{ $wkt->start_time }} - {{ $wkt->end_time }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+        {{-- Jam Pembelajaran --}}
+        <div>
+            <label for="waktu_ids" class="block text-sm font-semibold mb-2">Jam Pembelajaran (Pilih lebih dari satu)</label>
+            <select 
+                name="waktu_ids[]" 
+                id="waktu_ids" 
+                multiple 
+                class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            >
+                @foreach ($waktu as $wkt)
+                    @php
+                        $jsonVal = json_encode(['jam_ke' => $wkt->jam_ke, 'start_time' => $wkt->start_time, 'end_time' => $wkt->end_time]);
+                        $selectedJam = json_decode($peminjaman->jam_pembelajaran, true) ?? [];
+                        $isSelected = collect($selectedJam)->contains(function($item) use ($wkt) {
+                            return $item['jam_ke'] == $wkt->jam_ke &&
+                                   $item['start_time'] == $wkt->start_time &&
+                                   $item['end_time'] == $wkt->end_time;
+                        });
+                    @endphp
+                    <option value="{{ $jsonVal }}" {{ $isSelected ? 'selected' : '' }}>
+                        Jam {{ $wkt->jam_ke }}. {{ $wkt->start_time }} - {{ $wkt->end_time }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-                    {{-- BUKTI --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold mb-2">Bukti Peminjaman</label>
-                        <input type="file" name="bukti" accept="image/*" class="w-full border rounded-lg px-4 py-2" required>
-                    </div>
+        {{-- Bukti Peminjaman --}}
+        <div>
+            <label for="bukti" class="block text-sm font-semibold mb-2">Bukti Peminjaman (Opsional - Upload jika ingin mengganti)</label>
+            @if($peminjaman->gambar_bukti)
+                <img src="{{ asset('storage/'.$peminjaman->gambar_bukti) }}" alt="Bukti Lama" class="w-full rounded mb-3 shadow-sm border border-gray-200">
+            @endif
+            <input 
+                type="file" 
+                name="bukti" 
+                id="bukti" 
+                accept="image/*" 
+                class="w-full border border-gray-300 rounded-lg px-3 py-2"
+            >
+        </div>
 
-                    <button class="w-full bg-blue-600 text-white py-3 font-semibold rounded-lg hover:bg-blue-700 transition">
-                        Kirim Peminjaman
-                    </button>
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 font-semibold rounded-lg hover:bg-blue-700 transition-all mt-4">
+            Update Peminjaman
+        </button>
 
-                    <a href="{{ route('peminjaman.index') }}" class="w-full mt-3 block text-center bg-gray-300 py-3 rounded-lg hover:bg-gray-400 text-gray-700 font-semibold">
-                        Lihat Riwayat
-                    </a>
-                </form>
-            </div>
+        <a href="{{ route('peminjaman.index') }}" 
+           class="block mt-4 text-center bg-gray-300 py-3 rounded-lg hover:bg-gray-400 text-gray-700 font-semibold">
+            Lihat Riwayat
+        </a>
+    </form>
+</div>
 
             {{-- RIGHT SIDE ITEMS --}}
             <div class="bg-white p-6 rounded-2xl shadow md:col-span-2">
@@ -136,13 +174,6 @@
                           
                         @endforeach
                     </select>
-                    <select name="jenis" class="px-4 py-2 border rounded-lg w-full md:w-1/3">
-                        @foreach($status_item as $status)
-                            <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : 'tidak ada yang rusak/dipinjam' }}>
-                                {{ ucfirst($status) }}
-                          
-                        @endforeach
-                    </select>
 
                     <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                         Filter
@@ -153,7 +184,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[600px] overflow-y-auto pr-2">
 
                     @forelse ($items as $item)
-                        <div class="item-card border p-4 rounded-xl"
+                        <div class="item-card border p-4 rounded-xl {{ $item->id == $peminjaman->item_id ? 'selected' : '' }}"
                              data-id="{{ $item->id }}"
                              data-nama="{{ $item->nama_item }}"
                              data-kode="{{ $item->kode_unit }}">
@@ -162,7 +193,7 @@
                             <div class="flex justify-end mb-1">
                                 <span class="px-2 py-1 text-xs rounded
                                     @if ($item->status_item == 'tersedia') bg-green-100 text-green-600
-                                    @elseif ($item->status_item == 'dipinjam') bg-yellow-100 text-yellow-600
+                                    @elseif ($item->status_item == 'tidak tersedia') bg-red-100 text-red-600
                                     @else bg-gray-200 text-gray-600
                                     @endif">
                                     {{ $item->status_item }}

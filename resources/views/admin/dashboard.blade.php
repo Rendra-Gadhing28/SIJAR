@@ -15,23 +15,51 @@
         @include('layouts.navigationadmin')  <!-- Navigation utama (sama seperti user, tapi bisa tambah menu admin jika perlu) -->
     </header>
     
-    <main class="pt-28 px-6 md:px-12">
+    <main class="pt-28 px-6 md:px-12 pb-16">
         <section class="max-w-2xl mx-auto bg-white rounded-2xl shadow p-6 text-center">
             <h2 class="text-2xl font-bold mb-6">Dashboard Admin</h2>
-            <div class="flex justify-center gap-6">
-                <div class="bg-gray-100 rounded-lg p-4 w-32 text-center shadow">
-                    <p class="font-semibold">Pending</p>
-                    <p class="text-2xl font-bold">{{ $totalPending }}</p>
-                </div>
-                <div class="bg-gray-100 rounded-lg p-4 w-32 text-center shadow">
-                    <p class="font-semibold">Approved</p>
-                    <p class="text-2xl font-bold">{{ $totalApproved }}</p>
-                </div>
-                <div class="bg-gray-100 rounded-lg p-4 w-32 text-center shadow">
-                    <p class="font-semibold">Rejected</p>
-                    <p class="text-2xl font-bold">{{ $totalRejected }}</p>
-                </div>
-            </div>
+           <div class="flex flex-col items-center mx-auto justify-center gap-6">
+
+    <!-- Baris atas (3 kotak) -->
+    <div class="grid grid-cols-3 mx-auto gap-6">
+        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+            <p class="font-semibold text-yellow-500">Pending</p>
+            <p class="text-2xl font-bold text-yellow-500">{{ $totalPending }}</p>
+        </div>
+
+        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+            <p class="font-semibold text-green-500">Approved</p>
+            <p class="text-2xl font-bold text-green-500">{{ $totalApproved }}</p>
+        </div>
+
+        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+            <p class="font-semibold text-red-500">Rejected</p>
+            <p class="text-2xl font-bold text-red-500">{{ $totalRejected }}</p>
+        </div>
+    </div>
+
+    <!-- Baris bawah (2 kotak, center) -->
+    <div class="flex justify-center gap-6 w-full max-w-xl">
+        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+            <p class="font-semibold text-sky-500">Dipinjam</p>
+            <p class="text-2xl font-bold text-sky-500">{{ $totalDipinjam }}</p>
+        </div>
+
+        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+            <p class="font-semibold text-indigo-500">Dikembalikan</p>
+            <p class="text-2xl font-bold text-indigo-500">{{ $totalDikembalikan }}</p>
+        </div>
+    </div>
+
+    <div class="flex justify-center gap-6 w-full max-w-xl">
+         <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+            <p class="font-semibold text-slate-500">Total Riwayat</p>
+            <p class="text-2xl font-bold text-slate-500">{{ $totalriwayat }}</p>
+        </div>
+    </div>
+
+</div>
+
         </section>
         
         <section class="max-w-2xl mx-auto mt-8 bg-white rounded-2xl shadow p-6">
@@ -50,7 +78,7 @@
                                     @endforeach
                                 </div>
                             </div>
-                            <a href="{{ route('admin.peminjaman.show', $pinjam->id) }}" class="text-blue-600 text-sm hover:underline">Lihat Detail</a>
+                            <a href="{{ route('admin.notifications.index', $pinjam->id) }}" class="text-blue-600 text-sm hover:underline">Lihat Detail</a>
                         </div>
                     @endforeach
                 @else

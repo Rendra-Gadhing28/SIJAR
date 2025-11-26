@@ -47,9 +47,4 @@ class Peminjaman extends Model
     {
         return $this->belongsTo(Item::class);
     }
-
-    public function slot_peminjaman()
-    {
-        return $this->hasMany(slot_peminjaman::class);
-    }
 }

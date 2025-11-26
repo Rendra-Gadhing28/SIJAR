@@ -103,16 +103,24 @@
                                 
                                 <div>
                                     @if($pinjam->status_tujuan == 'Approved')
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold mb-2
                                             @if($pinjam->status_pinjaman == 'dipinjam') bg-blue-100 text-blue-700
                                             @else bg-gray-100 text-gray-700
                                             @endif">
                                             {{ ucfirst($pinjam->status_pinjaman) }}
                                         </span>
+                                        <div class="mt-2">
+                                        <p class="text-xs text-green-600">
+                                            Disetujui pada {{ $pinjam->approved_at?->format('d M Y, H:i') }}
+                                        </p>
+                                        <p class="text-xs text-indigo-600">
+                                            Dikembalikan pada {{ $pinjam->finished_at?->format('d M Y, H:i') }}
+                                        </p>
+                                        </div>
                                     @endif
 
                                     @if($pinjam->status_tujuan == 'Rejected')
-                                        <p class="text-xs text-gray-500">
+                                        <p class="text-xs text-red-500">
                                             Ditolak pada {{ $pinjam->rejected_at?->format('d M Y, H:i') }}
                                         </p>
                                     @endif
@@ -122,10 +130,9 @@
                                     @if($pinjam->status_tujuan == 'Approved' && $pinjam->status_pinjaman == 'dipinjam')
                                         <form action="{{ route('peminjaman.selesai', $pinjam->id) }}" method="POST">
                                             @csrf
-                                            <button
-                                                class="bg-green-600 text-white px-4 py-1.5 text-xs rounded-lg hover:bg-green-700 font-medium">
-                                                Selesaikan
-                                            </button>
+                                             <button id="btn1" type="submit" class="mt-2 lg:hover:bg-[#f5f5f5] bg-green-500 text-white border-2 border-gray-500 lg:hover:border-green-400 px-2 py-2 text-lg rounded-lg lg:hover:text-green-500">
+                                            Selesaikan
+                                        </button>
                                         </form>
                                     @endif
 
