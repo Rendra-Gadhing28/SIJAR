@@ -16,6 +16,45 @@
 
     <main class="pt-28 px-6 md:px-12 pb-20 max-w-6xl mx-auto">
         <h1 class="text-4xl font-bold text-center mb-8 mt-4">Riwayat Peminjaman Siswa</h1>
+      <form method="GET" class="flex items-center justify-end gap-2 mb-4">
+         
+                <!-- Filter Kelas -->
+                <div class="flex flex-col">
+                    <select name="kelas" id="kelas" class="form-control rounded-lg shadow-sm shadow-sky-300">
+                        <option value="">-- Semua Kelas --</option>
+                        @foreach($kelasList as $kelas)
+                            <option value="{{ $kelas }}" 
+                                {{ request('kelas') == $kelas ? 'selected' : '' }}>
+                                Kelas {{ $kelas }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Filter Status -->
+                <div class="flex flex-col">
+                    <select name="status_tujuan" id="status_tujuan" class="form-control rounded-lg shadow-sm shadow-sky-300">
+                        <option value="">-- Semua Status --</option>
+                        <option value="Pending" {{ request('status_tujuan') == 'Pending' ? 'selected' : '' }}>
+                            Pending
+                        </option>
+                        <option value="Approved" {{ request('status_tujuan') == 'Approved' ? 'selected' : '' }}>
+                            Approved
+                        </option>
+                        <option value="Rejected" {{ request('status_tujuan') == 'Rejected' ? 'selected' : '' }}>
+                            Rejected
+                        </option>
+                    </select>
+                </div>
+
+    <button type="submit"
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        Filter
+    </button>
+
+</form>
+
+
        @if ($peminjaman->count() > 0)
     <div class="space-y-5">
         @foreach ($peminjaman as $pinjam)
@@ -38,6 +77,13 @@
 
                         {{-- INFO --}}
                         <div>
+                            <h2 class="font-bold text-lg">
+                                {{ $pinjam->user->name ?? '-' }}
+                            </h2>
+                            <h2 class="font-bold text-lg">
+                                {{ $pinjam->user->kategori->nama_kategori ?? '-' }}
+                            </h2>
+
                             <h3 class="font-bold text-lg">
                                 {{ $pinjam->item->nama_item ?? '-' }}
                             </h3>

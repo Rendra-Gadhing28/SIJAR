@@ -7,6 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('/images/logo_sijar.png') }}">
     <title>Beranda SIJAR</title>
     @vite('resources/css/app.css')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/gsap.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
@@ -17,7 +18,6 @@
     @include('layouts.navigationadmin')
 @else
     @include('layouts.navigation')
-    @include('layouts.navmobile')
 @endif
     </header>
 
@@ -178,6 +178,8 @@
 
     </main>
     <script>
+        
+        let currentRoute = '{{ Route::currentRouteName() }}';
         let btn = document.getElementById['btn1']
         function colors(){
             btn.addEventlistener({

@@ -13,7 +13,6 @@ use App\Notifications\PeminjamanRejectedNotification;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Auth;
 
-
 class AdminPeminjamanController extends Controller
 {
     /**
@@ -21,23 +20,46 @@ class AdminPeminjamanController extends Controller
      */
    public function dashboard()
     {
-        $admin = Auth::user()->kategori_id->nama_kategori;
-        $filter = peminjaman::join('user', 'peminjaman.user', '=', 'user.id')
-        ->where('user.kategori', $admin);
-        $notifications = peminjaman::with('user.kategori')->get();
-        $totalPending = peminjaman::where('status_tujuan', 'Pending')->count();
-        $totalApproved = peminjaman::where('status_tujuan', 'Approved')->count();
-        $totalRejected = peminjaman::where('status_tujuan', 'Rejected')->count();
-        $totalDipinjam = peminjaman::where('status_pinjaman', 'dipinjam')->count();
-        $totalDikembalikan = peminjaman::where('status_pinjaman', 'selesai')->count();
-        $totalItems = Item::count();
-        $totalriwayat = $totalDipinjam + $totalDikembalikan;
-
-
-       
+        $admin = Auth::user();
+        $adminKategoriId = $admin->kategori_id;
         
-        // Peminjaman terbaru (5 terakhir)
-        $recentPeminjaman = peminjaman::with(['user', 'item'])
+        // Filter notifikasi: hanya peminjaman yang kategori_jurusan_id item-nya sama dengan kategori admin
+        $notifications = Peminjaman::with(['user', 'item.kategori_jurusan'])
+            ->whereHas('item', function($query) use ($adminKategoriId) {
+                $query->where('kategori_jurusan_id', $adminKategoriId);
+            })
+            ->latest()
+            ->get();
+        
+        // Filter statistik berdasarkan kategori_jurusan_id item
+        $totalPending = Peminjaman::whereHas('item', function($query) use ($adminKategoriId) {
+            $query->where('kategori_jurusan_id', $adminKategoriId);
+        })->where('status_tujuan', 'Pending')->count();
+        
+        $totalApproved = Peminjaman::whereHas('item', function($query) use ($adminKategoriId) {
+            $query->where('kategori_jurusan_id', $adminKategoriId);
+        })->where('status_tujuan', 'Approved')->count();
+        
+        $totalRejected = Peminjaman::whereHas('item', function($query) use ($adminKategoriId) {
+            $query->where('kategori_jurusan_id', $adminKategoriId);
+        })->where('status_tujuan', 'Rejected')->count();
+        
+        $totalDipinjam = Peminjaman::whereHas('item', function($query) use ($adminKategoriId) {
+            $query->where('kategori_jurusan_id', $adminKategoriId);
+        })->where('status_pinjaman', 'dipinjam')->count();
+        
+        $totalDikembalikan = Peminjaman::whereHas('item', function($query) use ($adminKategoriId) {
+            $query->where('kategori_jurusan_id', $adminKategoriId);
+        })->where('status_pinjaman', 'selesai')->count();
+        
+        $totalItems = Item::where('kategori_jurusan_id', $adminKategoriId)->count();
+        $totalriwayat = $totalDipinjam + $totalDikembalikan;
+        
+        // Peminjaman terbaru (5 terakhir) berdasarkan kategori_jurusan_id item
+        $recentPeminjaman = Peminjaman::with(['user', 'item'])
+            ->whereHas('item', function($query) use ($adminKategoriId) {
+                $query->where('kategori_jurusan_id', $adminKategoriId);
+            })
             ->latest()
             ->take(5)
             ->get();
@@ -54,82 +76,136 @@ class AdminPeminjamanController extends Controller
             'totalriwayat'
         ));
     }
-     public function riwayat(Request $request)
+
+    public function riwayat(Request $request)
     {
-        $query = peminjaman::with(['item', 'user']);
+        $admin = Auth::user();
+        $adminKategoriId = $admin->kategori_id;
         
-        // Filter berdasarkan kategori_jurusan (jika dipilih)
-        if ($request->has('kategori_jurusan') && $request->kategori_jurusan !== '') {
+        $query = Peminjaman::with(['item.kategori_jurusan', 'user.kategori'])
+            ->whereHas('item', function($q) use ($adminKategoriId) {
+                $q->where('kategori_jurusan_id', $adminKategoriId);
+            });
+
+        // Filter berdasarkan kelas (X, XI, XII)
+        if ($request->filled('kelas')) {
             $query->whereHas('user', function ($q) use ($request) {
-                $q->where('kategori_id', $request->kategori_jurusan);
+                $q->where('kelas', $request->kelas);
             });
         }
-        
-        // Filter status
-        if ($request->has('status') && $request->status !== '') {
-            $query->where('status_tujuan', $request->status);
+
+        // Filter status pinjaman (status_tujuan)
+        if ($request->filled('status_tujuan')) {
+            $query->where('status_tujuan', $request->status_tujuan);
         }
+
+        // Filter search (nama peminjam / nama item / kode unit)
+        if ($request->filled('search')) {
+            $keyword = $request->search;
+
+            $query->where(function ($q) use ($keyword) {
+                $q->whereHas('user', function ($u) use ($keyword) {
+                    $u->where('name', 'LIKE', "%$keyword%");
+                })
+                ->orWhereHas('item', function ($i) use ($keyword) {
+                    $i->where('nama_item', 'LIKE', "%$keyword%")
+                      ->orWhere('kode_unit', 'LIKE', "%$keyword%");
+                });
+            });
+        }
+
+        $peminjaman = $query->latest()
+            ->paginate(10)
+            ->appends($request->all());
+
+        $kategori = Kategori::all();
         
-        $peminjaman = $query->latest()->paginate(10);
-        $kategori = Kategori::all();  // Untuk dropdown filter jurusan
-        
-        return view('admin.riwayat', compact('peminjaman', 'kategori'));
+        // Data kelas untuk dropdown
+        $kelasList = ['X', 'XI', 'XII'];
+
+        return view('admin.riwayat', compact('peminjaman', 'kategori', 'kelasList'));
     }
+
     public function createBarang()
     {
-        $kategori = Kategori::all();  // Untuk dropdown kategori
+        $kategori = Kategori::all();
         return view('admin.barang.create', compact('kategori'));
     }
 
-    public function storeBarang(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'nama_item' => 'required|string|max:255',
             'jenis_item' => 'required|string|max:255',
-            'kode_unit' => 'required|string|max:255',
             'kategori_jurusan_id' => 'required|exists:kategori,id',
             'foto_barang' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'status_item' => 'required|in:tersedia,tidak_tersedia',
         ]);
-        // Upload foto
+
+        $kategori = Kategori::find($validated['kategori_jurusan_id']);
+        $prefix = strtoupper(substr($kategori->nama_kategori, 0, 3));
+
+        $lastItem = Item::where('kategori_jurusan_id', $validated['kategori_jurusan_id'])
+                        ->where('kode_unit', 'like', $prefix . '%')
+                        ->orderBy('kode_unit', 'desc')
+                        ->first();
+
+        if ($lastItem) {
+            $lastNumber = (int) substr($lastItem->kode_unit, strlen($prefix));
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        $kodeUnit = $prefix . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
         $path = $request->file('foto_barang')->store('items', 'public');
-        
+
         Item::create([
             'nama_item' => $validated['nama_item'],
             'jenis_item' => $validated['jenis_item'],
-            'kode_unit' => $validated['kode_unit'],
+            'kode_unit' => $kodeUnit,
             'kategori_jurusan_id' => $validated['kategori_jurusan_id'],
             'foto_barang' => $path,
-            'status_item' => $validated['status_item'],
-        ]);
-        return redirect()->route('admin.dashboard')->with('success', 'Barang berhasil ditambahkan.');
-    }
-
-   public function index()
-    {
-        $peminjaman = peminjaman::with(['user', 'item'])
-            ->latest()
-            ->paginate(8);
+            'status_item' => 'tersedia',
+        ]);   
         
-        return view('admin.riwayat', compact('peminjaman'));
+        return redirect()->route('admin.barang.index')
+            ->with('success', 'Barang berhasil ditambahkan dengan kode: ' . $kodeUnit);
     }
 
-    /**
-     * Display the specified resource (Detail peminjaman).
-     */
- public function show($id)
+    public function index(Request $request)
     {
-        $peminjaman = peminjaman::with(['user', 'item',])
-            ->findOrFail($id);
+        $admin = Auth::user();
+        $adminKategoriId = $admin->kategori_id;
+        $item = 
         
-        return view('admin.Notifikasi', compact('peminjaman'));
+        $kategori = Kategori::all();
+        $query = Peminjaman::with(['item.kategori_jurusan', 'user.kategori'])
+            ->whereHas('item', function($q) use ($adminKategoriId) {
+                $q->where('kategori_jurusan_id', $adminKategoriId);
+            });
+
+        // Filter berdasarkan kelas
+        if ($request->filled('kelas')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('kelas', $request->kelas);
+            });
+        }
+
+        // Filter berdasarkan status
+        if ($request->filled('status_tujuan')) {
+            $query->where('status_tujuan', $request->status_tujuan);
+        }
+
+        $peminjaman = $query->latest()
+                            ->paginate(10)
+                            ->appends($request->all());
+
+        $kelasList = ['X', 'XI', 'XII'];
+
+        return view('admin.riwayat', compact('peminjaman', 'kategori', 'kelasList'));
     }
 
-
-    /**
-     * Approve peminjaman.
-     */
-    public function approve($id)
+     public function approve($id)
     {
         $peminjaman = peminjaman::findOrFail($id);
 
@@ -175,7 +251,7 @@ class AdminPeminjamanController extends Controller
 
         // Kembalikan status item
             $item = Item::find($peminjaman->item_id);
-            $item->update(['status' => 'tersedia']);
+            $item->update(['status_item' => 'tersedia']);
 
                 DB::commit();
 
@@ -236,7 +312,7 @@ class AdminPeminjamanController extends Controller
             // Kembalikan status item
             $item = Item::find($peminjaman->item_id);
             if ($item) {
-                $item->update(['status' => 'tersedia']);
+                $item->update(['status_item' => 'tersedia']);
             }
 
             DB::commit();
@@ -248,7 +324,4 @@ class AdminPeminjamanController extends Controller
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
-
-
-    // Tambahkan metode lain jika perlu, seperti destroy untuk hapus peminjaman
 }

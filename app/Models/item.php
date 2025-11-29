@@ -16,11 +16,12 @@ class Item extends Model
     protected $fillable = [
         'id',
         'nama_item',
-        'kode_unit',
         'jenis_item',
+        'kode_unit',
         'kategori_jurusan_id',
-        'status_item',
         'foto_barang',
+        'status_item',
+     
     ];
 
     public static function getItem()

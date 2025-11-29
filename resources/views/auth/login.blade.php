@@ -13,7 +13,6 @@
 <body class="bg-gradient-to-b from-gray-200 to-white min-h-screen font-['Poppins'] overflow-y-auto">
     <header>
     @include('layouts.navigation')
-    @include('layouts.navmobile')
     </header>
     <main class="w-screen h-screen mt-28">
     <div class="flex flex-col items-center justify-center flex-grow mt-36 md:mt-40 lg:mt-48 px-4">
@@ -79,10 +78,10 @@
     </div>
     </main>
     <script>
-        const button = document.getElementById['btn'];
-        const eye = document.getElementById['on'];
-        const eye_Off = document.getElementById['off']
-        const password = document.getElementById['password']
+        const button = document.getElementById['btn'].value;
+        const eye = document.getElementById['on'].value;
+        const eye_Off = document.getElementById['off'].value;
+        const password = document.getElementById['password'].value
 
         function klik(){
             button.addEventListener('click', ()=>{

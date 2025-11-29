@@ -19,7 +19,7 @@
             <div class="w-full max-w-4xl bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 rounded-2xl shadow-2xl p-8">
                 
                 <!-- Header -->
-                <div class="flex items-center gap-4 ">
+                <div class="flex items-center gap-4">
                     <a href="{{ route('admin.barang.index') }}" class="text-blue-700 hover:text-blue-900">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -27,6 +27,7 @@
                     </a>
                 </div>
                 <h1 class="text-3xl font-bold text-gray-800 self-center text-center mb-4">Tambah Barang</h1>
+                
                 <!-- Alert Errors -->
                 @if($errors->any())
                     <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r-lg" role="alert">
@@ -43,77 +44,95 @@
                 <form action="{{ route('admin.barang.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
 
-                    <div class="">
-                        <!-- Nama Barang -->
-                        <div class="relative mb-4">
-                            <label for="nama_barang" class="block font-bold text-lg text-gray-800 mb-2">
-                                Nama Barang <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" 
-                                   name="nama_barang" 
-                                   id="nama_barang" 
-                                   value="{{ old('nama_barang') }}"
-                                   class="w-full px-4 py-3 bg-gradient-to-r from-[#B2C7DC] via-[#8FADCA] to-[#5882AC] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600 text-gray-900 font-medium"
-                                   placeholder="Contoh: Proyektor Epson EB-X41" 
-                                   required>
-                        </div>
+                    <!-- Nama Barang -->
+                    <div class="relative">
+                        <label for="nama_item" class="block font-bold text-lg text-gray-800 mb-2">
+                            Nama Barang <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               name="nama_item" 
+                               id="nama_item" 
+                               value="{{ old('nama_item') }}"
+                               class="w-full px-4 py-3 bg-gradient-to-r from-[#B2C7DC] via-[#8FADCA] to-[#5882AC] border {{ $errors->has('nama_item') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600 text-gray-900 font-medium"
+                               placeholder="Contoh: Proyektor Epson EB-X41" 
+                               required>
+                        @error('nama_item')
+                            <p class="text-red-600 text-sm mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <!-- Kategori Jurusan -->
-                        <div class="mb-4">
-                            <label for="kategori_jurusan_id" class="block font-bold text-lg text-gray-800 mb-2">
-                                Kategori Jurusan <span class="text-red-500">*</span>
-                            </label>
-                            <select name="kategori_jurusan_id" 
-                                    id="kategori_jurusan_id" 
-                                    class="w-full px-4 py-3 bg-[#B2C7DC] from-[#B2C7DC] via-[#8FADCA] to-[#5882AC] rounded-lg text-gray-900 font-medium  focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                    required>
-                                @forelse ($kategori as $kategoris)
-                                    <option value="{{ $kategoris->id }}" class="rounded-lg border-collapse ring-0 ">
-                                        {{ $kategoris->nama_kategori }}
-                                    </option>
-                                @empty
-                                    <option disabled>Tidak ada kategori</option>
-                                @endforelse
-                            </select>
-                            <p class="text-xs text-gray-600 mt-1">Kode unit akan digenerate otomatis</p>
-                        </div>
+                    <!-- Kategori Jurusan -->
+                    <div>
+                        <label for="kategori_jurusan_id" class="block font-bold text-lg text-gray-800 mb-2">
+                            Kategori Jurusan <span class="text-red-500">*</span>
+                        </label>
+                        <select name="kategori_jurusan_id" 
+                                id="kategori_jurusan_id" 
+                                class="w-full px-4 py-3 bg-[#B2C7DC] rounded-lg text-gray-900 font-medium {{ $errors->has('kategori_jurusan_id') ? 'border-2 border-red-500' : '' }} focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                required>
+                            <option value="">-- Pilih Kategori Jurusan --</option>
+                            @forelse ($kategori as $kategoris)
+                                <option value="{{ $kategoris->id }}" 
+                                        {{ old('kategori_jurusan_id') == $kategoris->id ? 'selected' : '' }}>
+                                    {{ $kategoris->nama_kategori }}
+                                </option>
+                            @empty
+                                <option disabled>Tidak ada kategori</option>
+                            @endforelse
+                        </select>
+                        @error('kategori_jurusan_id')
+                            <p class="text-red-600 text-sm mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-gray-600 mt-1">Kode unit akan digenerate otomatis</p>
+                    </div>
 
-                        <!-- Jenis Barang -->
-                     
-                            <label for="jenis_barang" class="block font-bold text-lg text-gray-800 mb-2">
-                                Jenis Barang <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" placeholder="Alat Praktik, Alat Kesehatan, Alat Elektronik dll." class="w-full px-4 py-3 bg-gradient-to-r from-[#B2C7DC] via-[#8FADCA] to-[#5882AC] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600 text-gray-900 font-medium">
-                            
-                        </div>
+                    <!-- Jenis Barang -->
+                    <div>
+                        <label for="jenis_item" class="block font-bold text-lg text-gray-800 mb-2">
+                            Jenis Barang <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="jenis_item" 
+                               id="jenis_item"
+                               value="{{ old('jenis_item') }}" 
+                               placeholder="Alat Praktik, Alat Kesehatan, Alat Elektronik dll." 
+                               class="w-full px-4 py-3 bg-gradient-to-r from-[#B2C7DC] via-[#8FADCA] to-[#5882AC] border {{ $errors->has('jenis_item') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600 text-gray-900 font-medium"
+                               required>
+                        @error('jenis_item')
+                            <p class="text-red-600 text-sm mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <!-- Foto Barang -->
-                        <div>
-                            <label for="foto_barang" class="block font-bold text-lg text-gray-800 mb-2">
-                                Foto Barang <span class="text-red-500">*</span>
-                            </label>
-                            <input type="file" 
-                                   name="foto_barang" 
-                                   id="foto_barang" 
-                                   accept="image/*"
-                                   class="w-full px-4 py-3 bg-gradient-to-r from-[#B2C7DC] via-[#8FADCA] to-[#5882AC] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-sky-300 file:via-sky-500 file:to-sky-600 file:text-white file:cursor-pointer hover:file:bg-blue-700"
-                                   onchange="previewImage(event)"
-                                   required>
-                            <p class="text-xs text-gray-600 mt-1">JPG, PNG, JPEG. Max 2MB</p>
-                        </div>
+                    <!-- Foto Barang -->
+                    <div>
+                        <label for="foto_barang" class="block font-bold text-lg text-gray-800 mb-2">
+                            Foto Barang <span class="text-red-500">*</span>
+                        </label>
+                        <input type="file" 
+                               name="foto_barang" 
+                               id="foto_barang" 
+                               accept="image/*"
+                               class="w-full px-4 py-3 bg-gradient-to-r from-[#B2C7DC] via-[#8FADCA] to-[#5882AC] border {{ $errors->has('foto_barang') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-sky-300 file:via-sky-500 file:to-sky-600 file:text-white file:cursor-pointer hover:file:bg-blue-700"
+                               onchange="previewImage(event)"
+                               required>
+                        @error('foto_barang')
+                            <p class="text-red-600 text-sm mt-1 font-semibold">{{ $message }}</p>
+                        @enderror
+                        <p class="text-xs text-gray-600 mt-1">JPG, PNG, JPEG. Max 2MB</p>
+                    </div>
 
-                        <!-- Preview Foto -->
-                        <div id="preview-container" class="hidden">
-                            <label class="block font-bold text-lg text-gray-800 mb-2">Preview Foto</label>
-                            <div class="relative">
-                                <img id="preview-image" src="" alt="Preview" class="max-w-full h-48 object-cover rounded-lg shadow-lg border-4 border-white">
-                                <button type="button" onclick="removePreview()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
+                    <!-- Preview Foto -->
+                    <div id="preview-container" class="hidden">
+                        <label class="block font-bold text-lg text-gray-800 mb-2">Preview Foto</label>
+                        <div class="relative">
+                            <img id="preview-image" src="" alt="Preview" class="max-w-full h-48 object-cover rounded-lg shadow-lg border-4 border-white">
+                            <button type="button" onclick="removePreview()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
                         </div>
+                    </div>
 
                     <!-- Info Box -->
                     <div class="bg-blue-100 border-l-4 border-blue-500 p-4 rounded-r-lg">
@@ -124,7 +143,7 @@
                             <div class="text-sm text-blue-800">
                                 <p class="font-bold mb-1">Kode Unit Otomatis</p>
                                 <p>Sistem akan generate kode unit secara otomatis berdasarkan kategori jurusan yang dipilih.</p>
-                                <p class="font-semibold mt-1">Contoh: RPL001, TKJ002, MM003</p>
+                                <p class="font-semibold mt-1">Contoh: PPL001, TKJ002, DKV003</p>
                             </div>
                         </div>
                     </div>
@@ -187,4 +206,4 @@
         });
     </script>
 </body>
-</html
+</html>

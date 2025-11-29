@@ -1,146 +1,261 @@
-<!DOCTYPE html>
-<html lang="en">
+{{-- File: resources/views/layouts/navmobile.blade.php --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/gsap.min.js"></script>
+<style>
+    body {
+        padding-bottom: 120px;
+    }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .nav-item {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .nav-item.active .icon-container {
-            transform: translateY(-8px);
-            background: linear-gradient(135deg, #7dd3fc, #2563eb);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
-        
-        .nav-item.active .icon {
-            color: white;
-            transform: scale(1.1);
-        }
-        
-        .nav-item .label {
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .nav-item.active .label {
-            opacity: 1;
-            transform: translateY(0);
-            color: #1e40af;
-            font-weight: 600;
-        }
-        
-        .icon {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .icon-container {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .nav-item:not(.active):hover .icon-container {
-            background: #dbeafe;
-            transform: translateY(-2px);
-        }
-        
-        .nav-item:not(.active):hover .icon {
-            color: #7dd3fc;
-        }
-    </style>
-</head>
+    #navbarContainer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 80px;
+        z-index: 50;
+    }
 
-<body class="bg-gray-50 min-h-screen pb-32">
+    #navbar {
+        width: 100%;
+        height: 80px;
+        background: linear-gradient(90deg, #99E1FF,#31A6D7,#1683B1);
+        position: absolute;
+        border-radius: 25px 25px 0 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-    <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 left-0 right-0 w-screen h-28 p-4 shadow-lg z-50 md:hidden bg-gradient-to-r from-sky-300 to-sky-600 rounded-t-3xl py-6 px-6">
-        <div class="relative">
-            <div class="flex justify-around items-center">
-                
-                <!-- Home -->
-                <a href="{{ route('user.homepage') }}" class="nav-item active relative flex flex-col items-center group" data-nav="home">
-                    <div class="icon-container bg-gray-100 rounded-full p-3">
-                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                        class="icon w-6 h-6 text-gray-600">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                        </svg>
-                    </div>
-                    <span class="label text-xs mt-1 text-gray-600">Beranda</span>
-                </a>
+    #bubbleWrapper {
+        position: absolute;
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        bottom: 35px;
+        z-index: 2;
+    }
 
-                <!-- Items -->
-                <a href="{{ route('barang.index') }}" class="nav-item relative flex flex-col items-center group" data-nav="items">
-                    <div class="icon-container bg-gray-100 rounded-full p-3">
-                        <svg class="icon w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                    </div>
-                    <span class="label text-xs mt-1 text-gray-600">Barang</span>
-                </a>
+    .bubble {
+        background-color: #D9D9D9;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform: translateY(120%);
+        box-shadow: none;
+    }
 
-                <!-- Add -->
-                <a href="{{ route('peminjaman.create') }}" class="nav-item relative flex flex-col items-center group" data-nav="add">
-                    <div class="icon-container bg-gray-100 rounded-full p-3">
-                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                            class="icon w-6 h-6 text-gray-600">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                    </div>
-                    <span class="label text-xs mt-1 text-gray-600">Pinjam</span>
-                </a>
-                <!-- History -->
-                <a href="{{ route('peminjaman.index') }}" class="nav-item relative flex flex-col items-center group" data-nav="history">
-                    <div class="icon-container bg-gray-100 rounded-full p-3">
-                        <svg class="icon w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <span class="label text-xs mt-1 text-gray-600">Riwayat</span>
-                </a>
+    .bubble svg {
+        width: 24px;
+        height: 24px;
+        opacity: 0;
+        color: #636CCB;
+    }
 
-                <!-- Profile -->
-                <a href="{{ route('profile.index') }}" class="nav-item relative flex flex-col items-center group" data-nav="profile">
-                    <div class="icon-container bg-gray-100 rounded-full p-3">
-                        <svg class="icon w-6 h-6 text-gray-600" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </div>
-                    <span class="label text-xs mt-1 text-gray-600">Profil</span>
-                </a>
+    .bubble.active {
+        transform: translateY(0%);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .bubble.active svg {
+        opacity: 0.8;
+    }
+
+    #bgWrapper {
+        filter: url(#goo);
+        width: 100%;
+        height: 100px;
+        position: absolute;
+        bottom: 80px;
+        pointer-events: none;
+    }
+
+    #bg {
+        width: 120%;
+        height: 100%;
+        margin-left: -10%;
+    }
+
+    #bgBubble {
+        position: absolute;
+        background-color: #636CCB;
+        width: 4em;
+        height: 4em;
+        border-radius: 50%;
+        bottom: -50px;
+        left: 10%;
+        transform: translateX(-50%);
+    }
+
+    #menuWrapper {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        bottom: 20px;
+    }
+
+    .menuElement {
+        opacity: 0.4;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        padding: 10px;
+        position: relative;
+    }
+
+    .menuElement:hover {
+        opacity: 0.6;
+    }
+
+    .menuElement svg {
+        width: 2remx;
+        height: 2rem;
+        color: #64748b;
+    }
+
+    .label {
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        color: #64748b;
+        white-space: nowrap;
+        font-weight: 500;
+    }
+
+    /* Hide on desktop */
+    @media (min-width: 768px) {
+        #navbarContainer {
+            display: none;
+        }
+    }
+</style>
+
+<!-- Bottom Navigation -->
+<div id="navbarContainer">
+    <div id="navbar">
+        <div id="bubbleWrapper">
+            <div id="bubble1" class="bubble active">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+            </div>
+            <div id="bubble2" class="bubble">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+            </div>
+            <div id="bubble3" class="bubble">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </div>
+            <div id="bubble4" class="bubble">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div id="bubble5" class="bubble">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
             </div>
         </div>
-    </nav>
+        <div id="menuWrapper">
+            <div class="menuElement" data-route="user.homepage" data-url="{{ route('user.homepage') }}" data-id="1" data-position="10%">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                <span class="label">Beranda</span>
+            </div>
+            <div class="menuElement" data-route="barang.index" data-url="{{ route('barang.index') }}" data-id="2" data-position="30%">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <span class="label">Barang</span>
+            </div>
+            <div class="menuElement" data-route="peminjaman.create" data-url="{{ route('peminjaman.create') }}" data-id="3" data-position="50%">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <span class="label">Pinjam</span>
+            </div>
+            <div class="menuElement" data-route="peminjaman.index" data-url="{{ route('peminjaman.index') }}" data-id="4" data-position="70%">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="label">Riwayat</span>
+            </div>
+            <div class="menuElement" data-route="profile.index" data-url="{{ route('profile.index') }}" data-id="5" data-position="90%">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="label">Profil</span>
+            </div>
+        </div>
+    </div>
+    <div id="bgWrapper">
+        <div id="bg"></div>
+        <div id="bgBubble"></div>
+    </div>
+</div>
 
-    <script>
-        // Get all nav items
-        const navItems = document.querySelectorAll('.nav-item');
+<svg width="0" height="0">
+    <defs>
+        <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+        </filter>
+    </defs>
+</svg>
+
+<script>
+    // Current route dari Laravel
+    let currentRoute = '{{ Route::currentRouteName() }}';
+
+    function move(id, position) {
+        var tl = gsap.timeline();
+        tl.to("#bgBubble", {duration: 0.15, bottom: "-30px", ease: "power2.out"}, 0)
+          .to(".bubble", {duration: 0.1, y: "120%", boxShadow: 'none', ease: "power2.out"}, 0)
+          .to(".bubble svg", {duration: 0.05, opacity: 0, ease: "power2.out"}, 0)
+          .to("#bgBubble", {duration: 0.2, left: position, ease: "power2.inOut"}, 0.1)
+          .to("#bgBubble", {duration: 0.15, bottom: "-50px", ease: "power2.out"}, '-=0.2')
+          .to(`#bubble${id}`, {duration: 0.15, y: "0%", opacity: 1, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', ease: "power2.out"}, '-=0.1')
+          .to(`#bubble${id} svg`, {duration: 0.15, opacity: 0.8, ease: "power2.out"}, '-=0.1');
         
-        // Add click event to each nav item
-        navItems.forEach(item => {
-            item.addEventListener('click', function(e) {
+        // Remove active class from all bubbles
+        document.querySelectorAll('.bubble').forEach(b => b.classList.remove('active'));
+        // Add active class to current bubble
+        document.getElementById(`bubble${id}`).classList.add('active');
+    }
+
+    // Set active state on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuElements = document.querySelectorAll('.menuElement');
+        
+        menuElements.forEach(element => {
+            const route = element.getAttribute('data-route');
+            const id = element.getAttribute('data-id');
+            const position = element.getAttribute('data-position');
+            const targetUrl = element.getAttribute('data-url');
+            
+            // Set initial active state
+            if (route === currentRoute) {
+                move(id, position);
+            }
+            
+            // Add click event
+            element.addEventListener('click', function(e) {
                 e.preventDefault();
+                move(id, position);
                 
-                // Remove active class from all items
-                navItems.forEach(navItem => {
-                    navItem.classList.remove('active');
-                });
-                
-                // Add active class to clicked item
-                this.classList.add('active');
+                // Navigate after animation
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 300);
             });
         });
-    </script>
-
-</body>
-
-</html>
+    });
+</script>

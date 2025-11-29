@@ -41,7 +41,6 @@
 
 <header>
     @include('layouts.navigation')
-    @include('layouts.navmobile')
 </header>
 
 <main class="pt-28 px-6 md:px-12 pb-12">

@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kategori;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Item;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
 
 class AdminItemController extends Controller
 {
@@ -14,53 +17,64 @@ class AdminItemController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $admin = Auth::user();
-        $jurusan = $admin->kategori_id;
+{
+    $admin = Auth::user();
+    $jurusan = $admin->kategori_id;
 
-        $item = Item::where('kategori_jurusan_id', $jurusan);
+    // Query utama berdasarkan kategori admin
+    $query = Item::where('kategori_jurusan_id', $jurusan);
 
-        // Inisialisasi kategori default
-        $kategori = $jurusan;
-        // Filter berdasarkan kategori (jika user memilih dropdown)
-        if ($request->filled('kategori_jurusan_id')) {
+    // Inisialisasi kategori default
+    $kategori = $admin->kategori->nama_kategori ?? 'Semua Kategori';
 
-            $item->where('kategori_jurusan_id', $request->kategori_jurusan_id);
-
-            $kategoriObj = Kategori::find($request->kategori_jurusan_id);
-            if ($kategoriObj) {
-                $kategori = $kategoriObj->nama_kategori;
-            }
-        }
-        if ($request->search) {
-            $keyword = $request->search;
-
-            $item->where(function ($q) use ($keyword) {
-                $q->where('nama_item', 'LIKE', "%$keyword%")
-                    ->orWhere('kode_unit', 'LIKE', "%$keyword%");
-            });
-        }
-
-        $barangjurusan = $item->count();
-
-        // Filter hanya barang yang tersedia
-        $item->where('status_item', 'tersedia');
-
-        // Ambil data lengkap dengan relasi kategori
-        $data = $item->with('kategori_jurusan')
-            ->orderBy('created_at', 'desc')
-            ->paginate(9)
-            ->appends([
-                'search' => $request->search,
-                'kategori_jurusan_id' => $request->kategori_jurusan_id
-            ]);
-         $itemTersedia = Item::where('status_item', 'tersedia')->count();
-         $itemDipinjam = Item::where('status_item', 'dipinjam')->count();
-        // Dropdown kategori
-        $kategoris = Kategori::orderBy('nama_kategori')->get();
-        return view('admin.listbarang', compact('data', 'kategoris', 'kategori','barangjurusan','itemTersedia', 'itemDipinjam'));
+ // Filter status
+    if ($request->has('status_item') && $request->status_item != '') {
+        $query->where('status_item', $request->status_item);
     }
 
+    // Filter search (nama item atau kode unit)
+    if ($request->filled('search')) {
+        $keyword = $request->search;
+        
+        $query->where(function ($q) use ($keyword) {
+            $q->where('nama_item', 'LIKE', "%$keyword%")
+              ->orWhere('kode_unit', 'LIKE', "%$keyword%");
+        });
+    }
+
+    // Hitung total barang yang sesuai filter (SEBELUM filter status)
+    $barangjurusan = $query->count();
+
+    // Clone query untuk statistik berdasarkan status
+    $itemTersedia = (clone $query)->where('status_item', 'tersedia')->count();
+    $itemDipinjam = (clone $query)->where('status_item', 'dipinjam')->count();
+    $itemRusak = (clone $query)->where('status_item', 'rusak')->count();
+
+    // Filter hanya barang yang tersedia untuk ditampilkan di list
+  
+
+    // Ambil data lengkap dengan relasi kategori
+    $data = $query->with('kategori_jurusan')
+        ->orderBy('created_at', 'desc')
+        ->paginate(9)
+        ->appends([
+            'search' => $request->search,
+            'kategori_jurusan_id' => $request->kategori_jurusan_id
+        ]);
+
+    // Dropdown kategori
+    $kategoris = Kategori::orderBy('nama_kategori')->get();
+
+    return view('admin.listbarang', compact(
+        'data', 
+        'kategoris', 
+        'kategori', 
+        'barangjurusan',
+        'itemTersedia', 
+        'itemDipinjam',
+        'itemRusak'
+    ));
+}
     /**
      * Show the form for creating a new resource.
      */
@@ -70,33 +84,77 @@ class AdminItemController extends Controller
         return view('admin.create', compact('kategori'));
     }
 
+    public function store(Request $request)
+{
+    // Validasi input
+    $validated = $request->validate([
+        'nama_item' => 'required|string|max:255',
+        'jenis_item' => 'required|string|max:255',
+        'kategori_jurusan_id' => 'required|exists:kategori_jurusan,id',
+        'foto_barang' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+    ]);
+
+    // Ambil kategori
+   // Ambil kategori (misal: PPLG)
+$kategori = Kategori::find($validated['kategori_jurusan_id']);
+$LK = strtoupper(substr($kategori->nama_kategori, 0, 4)); // PPLG
+
+// Buat prefix dari nama item (ambil huruf saja)
+$prefix = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $validated['nama_item']), 0, 4)); 
+// PROY dari PROYEKTOR
+
+// Cari item terakhir sesuai kategori & prefix
+$lastItem = Item::where('kategori_jurusan_id', $validated['kategori_jurusan_id'])
+    ->where('kode_unit', 'like', "$LK-$prefix-%")
+    ->orderBy('kode_unit', 'desc')
+    ->first();
+
+if ($lastItem) {
+    // Ambil angka di belakang
+    $parts = explode('-', $lastItem->kode_unit); 
+    $lastNumber = intval(end($parts));
+    $newNumber = $lastNumber + 1;
+} else {
+    $newNumber = 1;
+}
+
+// Format akhir → PPLG-PROY-0001
+$kodeUnit = sprintf('%s-%s-%04d', $LK, $prefix, $newNumber);
+
+    // Ambil isi file asli
+$content = file_get_contents($request->file('foto_barang')->getRealPath());
+
+// Ambil ekstensi asli file
+$extension = $request->file('foto_barang')->getClientOriginalExtension();
+
+// Nama file dengan hash
+$encrypt = hash('sha256', $content . time()) . '.' . $extension;
+
+// Simpan file ke folder encrypted
+Storage::disk('public')->put('encrypted/' . $encrypt, $content);
+
+
+
+
+   
+
+    // Simpan ke database
+    Item::create([
+        'nama_item' => $validated['nama_item'],
+        'jenis_item' => $validated['jenis_item'],
+        'kode_unit' => $kodeUnit,
+        'kategori_jurusan_id' => $validated['kategori_jurusan_id'],
+        'foto_barang' => $encrypt,
+        'status_item' => 'tersedia',
+    ]);   
+    return redirect()->route('admin.barang.index')
+        ->with('success', 'Barang berhasil ditambahkan dengan kode: ' . $kodeUnit);
+}
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama_item' => 'required',
-            'jenis_item' => 'required',
-            'kode_unit' => 'required',
-            'kategori_jurusan_id' => 'required',
-            'foto_barang' => 'required|image',
-            'status_item' => 'required',
-        ]);
-
-        $foto = $request->file('foto_barang')->store('items', 'public');
-
-        Item::create([
-            'nama_item' => $request->nama_item,
-            'jenis_item' => $request->jenis_item,
-            'kode_unit' => $request->kode_unit,
-            'kategori_jurusan_id' => $request->kategori_jurusan_id,
-            'foto_barang' => $foto,
-            'status_item' => $request->status_item,
-        ]);
-
-        return redirect()->route('admin.listbarang')->with('success', 'Barang ditambah.');
-    }
+   
 
     /**
      * Display the specified resource.
@@ -129,4 +187,39 @@ class AdminItemController extends Controller
     {
         //
     }
+
+    public function setTersedia($id){
+        try{
+            $barang = Item::findOrFail($id);
+            if($barang->status_item == 'dipinjam'){
+                return redirect()->back()->with('barang masih dipinjam, tidak bisa diupdate');
+            }
+
+            $barang->status_item = 'tersedia';
+            $barang->save();
+            return redirect()->back()->with('success', "Barang '{$barang->nama_item}' berhasil diubah menjadi tersedia");
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Gagal mengubah status: ' . $e->getMessage());
+        }
+    }
+    public function setRusak($id)
+{
+    try {
+        $barang = Item::findOrFail($id);
+        
+        // Cek apakah barang sedang dipinjam
+        if ($barang->status_item == 'dipinjam') {
+            return redirect()->back()->with('error', 'Barang sedang dipinjam, tidak bisa diubah menjadi rusak!');
+        }
+
+        $barang->status_item = 'rusak';
+        $barang->save();
+
+        return redirect()->back()->with('success', "Barang '{$barang->nama_item}' berhasil ditandai sebagai rusak");
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Gagal mengubah status: ' . $e->getMessage());
+    }
+}
+
+    
 }

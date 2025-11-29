@@ -72,6 +72,10 @@
                                 <p class="font-semibold">{{ $pinjam->user->name ?? 'Unknown' }} - {{ $pinjam->item->nama_item ?? 'Unknown' }}</p>
                                 <p class="text-sm text-gray-500">Status: {{ $pinjam->status_tujuan }} | {{ $pinjam->created_at->diffForHumans() }}</p>
                                 {{-- Waktu Pembelajaran --}}
+                                <div class="flex self-center text-center">
+                                <img src="{{ asset( '/storage/'.$pinjam->gambar_bukti) }}" alt="gambar_bukti" class="object-cover h-32 w-32 bg-cover">
+                                </div>
+
                                 <div class="mt-1">
                                     @foreach(json_decode($pinjam->jam_pembelajaran, true) ?? [] as $waktuData)
                                         <span class="px-2 py-1 bg-blue-100 text-xs rounded">{{ $waktuData['jam_ke'] }}. {{ $waktuData['start_time'] }} - {{ $waktuData['end_time'] }}</span>

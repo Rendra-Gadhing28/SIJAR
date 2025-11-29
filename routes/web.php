@@ -36,9 +36,6 @@ Route::middleware(['auth'])->group(function () {
     // RIWAYAT
     Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
 
-    // Route::get('/peminjaman', [PeminjamanController::class, 'create'])
-    // ->name('peminjaman.create');
-
     // PROFILE
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -48,24 +45,20 @@ Route::middleware(['auth'])->group(function () {
 })->middleware('user');
 
 
-// ADMIN ROUTES
-// Admin Panel
+
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
    // Dashboard
     Route::get('/dashboard', [AdminPeminjamanController::class, 'dashboard'])->name('dashboard'); // admin.dashboard
-
-    // Kelola Barang
-    // Hapus ' admin.admin.' yang berlebihan
     Route::get('/barang', [AdminItemController::class, 'index'])->name('barang.index'); // admin.barang.index
     Route::get('/barang/create', [AdminItemController::class, 'create'])->name('barang.create'); // admin.barang.create
     Route::post('/barang', [AdminItemController::class, 'store'])->name('barang.store'); // admin.barang.store
     Route::get('/barang/{id}/edit', [AdminItemController::class, 'edit'])->name('barang.edit'); // admin.barang.edit
     Route::put('/barang/{id}', [AdminItemController::class, 'update'])->name('barang.update'); // admin.barang.update
     Route::delete('/barang/{id}', [AdminItemController::class, 'destroy'])->name('barang.destroy'); // admin.barang.destroy
+    Route::put('/barang/{id}/tersedia',[AdminItemController::class, 'setTersedia'])->name('barang.setTersedia');
+    Route::put('/barang/{id}/rusak',[AdminItemController::class, 'setRusak'])->name('barang.setRusak');
 
-    // Kelola Peminjaman User
-    // Hapus ' admin.admin.' yang berlebihan
     Route::get('/peminjaman', [AdminPeminjamanController::class, 'index'])->name('peminjaman.index'); // admin.peminjaman.index
     Route::get('/peminjaman/{id}', [AdminPeminjamanController::class, 'show'])->name('peminjaman.show'); // admin.peminjaman.show
     Route::post('/peminjaman/{id}/approve', [AdminPeminjamanController::class, 'approve'])->name('peminjaman.approve'); // admin.peminjaman.approve
@@ -87,7 +80,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::put('/password', [ProfileController::class, 'gantiPassw'])->name('password.update');
     });
    
-    // ... rute admin lainnya
 
     
 

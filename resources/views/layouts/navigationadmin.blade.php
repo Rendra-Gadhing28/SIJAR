@@ -49,7 +49,7 @@
             </a>
             <a href="{{ route('profile.index') }}"
                 class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('profile*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
-                Logout
+                Profil
             </a>
         @else
         @endif       

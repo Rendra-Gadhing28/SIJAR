@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="{{ asset('/images/logo_sijar.png') }}">
     <title>List Barang</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/gsap.min.js"></script>
     @vite('resources/css/app.css')
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,7 +14,6 @@
 <body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins'] pb-32 md:pb-0 lg:pb-0">
     <header>
     @include('layouts.navigation')
-    @include('layouts.navmobile')
     </header>
     
     <main class="pt-28 px-6 md:px-12">

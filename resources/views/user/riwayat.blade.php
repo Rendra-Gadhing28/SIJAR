@@ -12,7 +12,7 @@
 
 <body class="bg-gray-100 min-h-screen font-['Poppins']">
     @include('layouts.navigation')
-    @include('layouts.navmobile')
+   
 
     <main class="pt-28 px-6 md:px-12 pb-20 max-w-6xl mx-auto">
 

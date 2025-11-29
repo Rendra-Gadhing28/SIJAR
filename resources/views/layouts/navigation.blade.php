@@ -31,7 +31,7 @@
             </a>
         </div>
 
-        <button id="hamburgerBtn" class="hidden lg:hidden md:block text-white focus:outline-none z-50">
+        <button id="hamburgerBtn" class="block lg:hidden  text-white focus:outline-none z-50">
             <svg id="hamburgerIcon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
                 </path>
