@@ -14,11 +14,6 @@ class UserSeeder extends Seeder
      */
 public function run(): void
     {
-
-        // $kategoriAdmin = Kategori::firstOrCreate(['nama_kategori' => '']);
-        // $kategoriAdmin = Kategori::get('nama_kategori');
-
-        // $jurusanid = Jurusan::get('nama_jurusan')->where('nama_jurusan','');
         $jurusanAdmin =[
             'Admin PPLG' =>[
                 'nama' => 'Admin PPLG',

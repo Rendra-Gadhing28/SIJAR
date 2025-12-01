@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Kategori;
 
 class KategoriSeeder extends Seeder
 {
@@ -12,17 +13,16 @@ class KategoriSeeder extends Seeder
      */
     public function run(): void
     {
-        $kategori = [
+              $kategori = [
         ['nama_kategori' => 'PPLG', 'role' => 'user'],
         ['nama_kategori' => 'LK', 'role' => 'user'],
         ['nama_kategori' => 'TJKT', 'role' => 'user'],
         ['nama_kategori' => 'DKV', 'role' => 'user'],
         ['nama_kategori' => 'PS', 'role' => 'user'],
-        ['nama_kategori' => 'admin', 'role' => 'admin'],
     ];
 
         foreach ($kategori as $kat) {
-            \DB::table('kategori_jurusan')->insert([
+            Kategori::firstOrCreate([
                 'nama_kategori' => $kat['nama_kategori'],
                 'role' => $kat['role'],
                 'created_at' => now(),

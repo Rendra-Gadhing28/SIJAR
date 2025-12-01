@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Item;
 use App\Models\waktu_pembelajaran;
 use App\Models\peminjaman;
+use App\Models\Kategori;
 use App\Models\slot_peminjaman;
 use App\Notifications\PeminjamanBaruNotification;
 
@@ -33,52 +34,68 @@ class peminjamanController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
-    {
-        $user = Auth::user();
-        if (!$user) {
-            // Redirect to login or show error if user is not authenticated
-            return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
-        }
-        $jurusan = $user->kategori_id;
-        //filter berdasarkan jurusan 
-        $itm = Item::where('kategori_jurusan_id', $jurusan);
-        //Filter Search
-        if ($request->has('search') && $request->search !== '') {
-            $itm->where('nama_item', 'like', '%' . $request->search . '%');
-        }
-        //Filter jenis item
-        if ($request->has('jenis') && $request->jenis !== '') {
-            $itm->where('jenis_item', $request->jenis);
-        }
-        if ($request->has('status') && $request->status !== '') {
-            $itm->where('status_item', $request->status);
-        }
-        //pagination per halaman
-        $items = $itm->with('kategori_jurusan')
-            ->orderBy('created_at', 'desc')
-            ->paginate(9)->withQueryString();
-
-        ///Daftar jenis barang
-        $jenis_items = Item::where('kategori_jurusan_id', $jurusan)
-            ->select('jenis_item')
-            ->distinct()
-            ->pluck('jenis_item');
-
-        $status_item = Item::select('status_item')->distinct()->pluck('status_item');
-        // query dasar
-        $itm = Item::query();
-        // paginasi item
-        $items = $itm->paginate(9);
-        // untuk waktu, kalau mau semua cukup ambil all(), atau paginate jika banyak
-        $waktu = waktu_pembelajaran::orderBy('jam_ke')->get();
-
-
-
-        // kirim variabel sesuai nama yang digunakan blade (blade pakai $items & $waktu)'
-        return view('user.pinjam', compact('items', 'waktu', 'jenis_items', 'status_item', 'items'));
-
+ public function create(Request $request)
+{
+    $user = Auth::user();
+    if (!$user) {
+        return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
     }
+
+    $jurusan_user = $user->kategori_nama_kategori;
+
+    // DEFAULT: tampilkan SEMUA item
+    $itm = Item::query();
+
+    // FILTER: Search
+    if ($request->filled('search')) {
+        $searchTerm = $request->search;
+        $itm->where('nama_item', 'like', '%' . $searchTerm . '%');
+    }
+
+    // FILTER: Jenis
+    if ($request->filled('jenis')) {
+        $itm->where('jenis_item', $request->jenis);
+    }
+
+    // FILTER: Status
+    if ($request->filled('status')) {
+        $itm->where('status_item', $request->status);
+    }
+
+    // FILTER: Jurusan berdasarkan nama_kategori
+    if ($request->filled('jurusan')) {
+        $itm->join('kategori_jurusan as kj', 'item.kategori_jurusan_id', '=', 'kj.id')
+            ->where('kj.nama_kategori', $request->jurusan)
+            ->select('item.*');
+    }
+
+    $itm->orderBy('created_at', 'desc');
+
+    $items = $itm->paginate(12)->withQueryString();
+
+    // Data untuk dropdown filter
+    $jenis_items = Item::select('jenis_item')->distinct()->pluck('jenis_item');
+    $status_item = Item::select('status_item')->distinct()->pluck('status_item');
+    
+    // Ambil semua kategori jurusan untuk dropdown
+    $jurusan = Kategori::select('id', 'nama_kategori')
+        ->distinct()
+        ->orderBy('nama_kategori')
+        ->get();
+
+    $waktu = waktu_pembelajaran::orderBy('jam_ke')->get();
+
+    return view('user.pinjam', compact(
+        'items', 
+        'waktu', 
+        'jenis_items', 
+        'status_item', 
+        'jurusan',
+        'jurusan_user'
+    ));
+}
+
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -244,6 +261,7 @@ class peminjamanController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(9)->withQueryString();
 
+
         ///Daftar jenis barang
         $jenis_items = Item::where('kategori_jurusan_id', $jurusan)
             ->select('jenis_item')
@@ -254,7 +272,7 @@ class peminjamanController extends Controller
         $waktu = waktu_pembelajaran::orderBy('jam_ke')->get();
         $peminjaman = peminjaman::find($id);
         // kirim variabel sesuai nama yang digunakan blade (blade pakai $items & $waktu)
-        return view('user.editpinjam', compact('items', 'waktu', 'jenis_items', 'peminjaman'));
+        return view('user.editpinjam', compact('items', 'waktu', 'jenis_items', 'peminjaman', 'jurusan', 'jrsn'));
     }
 
     /**

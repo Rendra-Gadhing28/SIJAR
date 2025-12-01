@@ -122,6 +122,7 @@
 
                 {{-- SEARCH + FILTER --}}
                 <form method="GET" class="flex flex-col md:flex-row gap-4 mb-5">
+                    @csrf
 
                     {{-- Search --}}
                     <input name="search" type="text" value="{{ request('search') }}" placeholder="Cari barang..."
@@ -129,13 +130,27 @@
 
                     {{-- Filter Jenis --}}
                     <select name="jenis" class="px-4 py-2 border rounded-lg w-full md:w-1/3">
+                          <option value="">Semua Jenis</option>
                         @foreach($jenis_items as $jenis)
                             <option value="{{ $jenis }}" {{ request('jenis') == $jenis ? 'selected' : '' }}>
                                 {{ ucfirst($jenis) }}
                           
                         @endforeach
                     </select>
-                    <select name="jenis" class="px-4 py-2 border rounded-lg w-full md:w-1/3">
+
+                 {{-- Filter Jurusan --}}
+<select name="jurusan" class="px-4 py-2 border rounded-lg w-full md:w-1/3">
+    <option value="">Semua Jurusan</option>
+    @foreach($jurusan as $jrs)
+        <option value="{{ $jrs->nama_kategori }}" 
+            {{ request('jurusan') == $jrs->nama_kategori ? 'selected' : '' }}>
+            {{ strtoupper($jrs->nama_kategori) }}
+        </option>
+    @endforeach
+</select>
+
+                    <select name="status" class="px-4 py-2 border rounded-lg w-full md:w-1/3">
+                          <option value="">Semua Status</option>
                         @foreach($status_item as $status)
                             <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : 'tidak ada yang rusak/dipinjam' }}>
                                 {{ ucfirst($status) }}
@@ -143,7 +158,7 @@
                         @endforeach
                     </select>
 
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                         Filter
                     </button>
                 </form>

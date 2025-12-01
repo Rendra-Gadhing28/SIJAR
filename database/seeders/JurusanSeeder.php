@@ -35,8 +35,10 @@ class JurusanSeeder extends Seeder
         ];
 
       foreach ($jurusans as $jurusan) {
-        $kategori = Kategori::firstOrCreate(['nama_kategori' => $jurusan['nama_kategori']]);
-        Jurusan::create(['nama_jurusan' => $jurusan['nama_jurusan'], 'kategori_id' => $kategori->id]);
+        $kategori = Kategori::where(['nama_kategori' => $jurusan['nama_kategori']])->firstOrCreate();
+        Jurusan::create([
+            'nama_jurusan' => $jurusan['nama_jurusan'],
+            'kategori_id' => $kategori->id]);
         }
     }
 }

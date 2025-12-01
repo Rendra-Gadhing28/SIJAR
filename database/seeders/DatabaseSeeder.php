@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             KategoriSeeder::class,
             JurusanSeeder::class,
             UserSeeder::class,
-            KategoriSeeder::class,
             itemDKV::class,
             itemLK::class,
             itemPPLG::class,

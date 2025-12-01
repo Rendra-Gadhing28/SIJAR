@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
-use app\Models\Item;
+use App\Models\Item;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Kategori extends Model
 {
