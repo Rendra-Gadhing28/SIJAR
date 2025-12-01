@@ -33,20 +33,41 @@ class User extends Authenticatable
         'profile'
     ];
 
-    public static function users(){
+    public static function users()
+    {
         return DB::table('users')->get();
     }
 
-    public function peminjaman(){
+    public function notifications()
+    {
+        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable');
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->notifications()->whereNull('read_at');
+    }
+
+
+    public function peminjaman()
+    {
         return $this->hasMany(peminjaman::class);
     }
 
-    public function jurusan(){
+    public function jurusan()
+    {
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
     }
-    public function kategori(){
+    public function kategori()
+    {
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

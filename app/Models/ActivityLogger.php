@@ -10,7 +10,7 @@ class ActivityLogger extends Model
     protected $fillable = [
         'user_id',
         'role',
-        'ip_adress',
+        'ip_address',
         'user_agents',
         'url',
         'model',
@@ -25,5 +25,17 @@ class ActivityLogger extends Model
 
     public function user():BelongsTo {
         return $this->belongsTo(User::class);
+    }
+
+    public function getActionBadgeColor(): string
+{
+    return match($this->action) {
+        'created' => 'success',
+        'updated' => 'warning',
+        'deleted' => 'danger',
+        'login' => 'info',
+        'logout' => 'secondary',
+        default => 'primary'
+    };
     }
 }

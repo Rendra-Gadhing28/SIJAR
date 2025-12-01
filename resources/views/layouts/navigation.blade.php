@@ -8,30 +8,8 @@
             style="background-image: linear-gradient(90deg, #444DCD 0%, #2D3492 61%, #171C59 100%)">
             SIJAR
         </h1>
-        <div class="hidden lg:flex items-center gap-1">
-            <a href="{{ route('user.homepage') }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('homepage*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
-                Beranda
-            </a>
-            <a href="{{ route('barang.index') }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('barang*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
-                Barang
-            </a>
-            <a href="{{ route("peminjaman.create") }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman/create*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
-                Pinjam
-            </a>
-            <a href="{{ route('peminjaman.index') }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('peminjaman*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
-                Riwayat
-            </a>
-            <a href="{{ route('profile.index') }}"
-                class="nav-link px-4 py-2 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('profile*') ? 'bg-sky-800 border-b-4 border-sky-900' : '' }}">
-                Profil
-            </a>
-        </div>
-
-        <button id="hamburgerBtn" class="block lg:hidden  text-white focus:outline-none z-50">
+        {{-- Use hamburger menu for all screen sizes to keep navigation consistent --}}
+        <button id="hamburgerBtn" class="block text-white focus:outline-none z-50">
             <svg id="hamburgerIcon" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
                 </path>
@@ -40,9 +18,11 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
+
+
     </div>
 
-    <div id="mobileMenu" class="xl:hidden hidden mt-4 space-y-2 pb-2">
+    <div id="mobileMenu" class="hidden mt-4 space-y-2 pb-2">
         <a href="{{ route('user.homepage') }}"
             class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('homepage*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Beranda
@@ -55,7 +35,6 @@
             class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 nav-link {{ request()->routeIs('peminjaman.create') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Pinjam
         </a>
-      
         <a href="{{ route('peminjaman.index') }}"
             class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 nav-link {{ request()->routeIs('peminjaman.index') || request()->routeIs('peminjaman.show') || request()->routeIs('peminjaman.edit') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Riwayat
@@ -64,6 +43,12 @@
             class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('profile*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
             Profil
         </a>
+        @if(auth()->check() && auth()->user()->isAdmin())
+            <a href="{{ route('admin.activitylogger.index') }}"
+                class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('admin/activitylogger*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
+                <i class="fas fa-history me-2"></i>Activity Logger
+            </a>
+        @endif
     </div>
 </nav>
 

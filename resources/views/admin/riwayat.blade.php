@@ -7,6 +7,7 @@
     <title>Riwayat Peminjaman</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('/images/logo_sijar.png') }}">
     @vite('resources/css/app.css')
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body class="bg-gray-100 min-h-screen font-['Poppins']">

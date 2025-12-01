@@ -17,16 +17,21 @@
    
     <main class="pt-28 px-6 md:px-12 pb-12">
         <section class="max-w-8xl mx-auto">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h2 class="text-2xl font-bold">Notifikasi Admin</h2>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <a href="{{ route('admin.notifications.trashed') }}" 
+                       class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition text-sm font-medium">
+                        🗑️ Trash Bin
+                    </a>
+                    
                     @if(auth()->user()->unreadNotifications->count() > 0)
                         <span class="text-sm text-gray-600">
                             {{ auth()->user()->unreadNotifications->count() }} belum dibaca
                         </span>
                         <form action="{{ route('admin.notifications.markAllRead') }}" method="POST">
                             @csrf
-                            <button type="submit" class="text-sm text-blue-600 hover:underline">
+                            <button type="submit" class="text-sm text-blue-600 hover:underline font-medium">
                                 Tandai semua dibaca
                             </button>
                         </form>
@@ -110,6 +115,17 @@
                             </div>
 
                             <div class="flex flex-col items-end gap-2">
+                                <!-- Delete Button -->
+                                <form action="{{ route('admin.notifications.destroy', $notification->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus notifikasi ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-gray-400 hover:text-red-600 transition-colors" title="Hapus Notifikasi">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </form>
+
                                 @if(!$notification->read_at)
                                     <form action="{{ route('admin.notifications.read', $notification->id) }}" method="POST">
                                         @csrf
@@ -120,29 +136,28 @@
                                 @else
                                     <span class="text-xs text-gray-400">✓ Dibaca</span>
                                 @endif
-                                <form action="{{ route('admin.peminjaman.approve', $notification->data['peminjaman_id']) }}" method="POST">
-                                    @csrf
+                                
                                 @if(isset($notification->data['peminjaman_id']))
-                                    <button type="submit" class="text-xs bg-green-600 text-white h-10 px-3 py-3 rounded lg:hover:bg-green-700 transition-all lg:hover:duration-500 lg:hover:-translate-y-1">
-                                        Approved
+                                    <form action="{{ route('admin.peminjaman.approve', $notification->data['peminjaman_id']) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-xs bg-green-600 text-white h-10 px-3 py-3 rounded lg:hover:bg-green-700 transition-all lg:hover:duration-500 lg:hover:-translate-y-1">
+                                            Approved
                                         </button>
-                                   
+                                    </form>
+                                    
+                                    <form action="{{ route('admin.peminjaman.reject', $notification->data['peminjaman_id']) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="text-xs bg-red-600 text-white h-10 px-3 py-3 rounded lg:hover:bg-red-700 transition-all lg:hover:duration-500 lg:hover:-translate-y-1">
+                                            Rejected
+                                        </button>    
+                                    </form>
                                 @endif
-                                </form>
-                                <form action="{{ route('admin.peminjaman.reject', $notification->data['peminjaman_id']) }} " method="POST">
-                                    @csrf
-                                @if(isset($notification->data['peminjaman_id']))
-                                <button type="submit" class="text-xs bg-red-600 text-white h-10 px-3 py-3 rounded lg:hover:bg-red-700   transition-all lg:hover:duration-500 lg:hover:-translate-y-1">
-                                    Rejected
-                                    </button>    
-                                @endif
-                                </form>
                             </div>
                         </div>
                     </div>
                 @empty
                   
-                    <div class="bg-white rounded-2xl shadow p-12 text-center">
+                    <div class="bg-white rounded-2xl shadow p-12 text-center col-span-full">
                         <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                         </svg>

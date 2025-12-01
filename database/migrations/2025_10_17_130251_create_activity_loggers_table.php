@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId("user_id")->nullable()->constrained("users")->onDelete("cascade");
             $table->string("role")->nullable();
-            $table->string("ip_adress");
-            $table->string("user_agents");
+            $table->string("ip_address");
+            $table->text("user_agents");
             $table->string("url")->nullable();
             $table->string("model")->nullable();
             $table->unsignedBigInteger("model_id")->nullable();
@@ -27,6 +27,7 @@ return new class extends Migration
             $table->index(["model", "model_id"])->nullable();
             $table->index("action");
             $table->index("user_id");
+            $table->index("created_at");
         });
     }
 
