@@ -170,8 +170,8 @@
                     <div class="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow duration-300">
                         <!-- Image -->
                         <div class="relative h-48 bg-gray-100">
-                            <img src="{{ asset('storage/' . $item->foto_barang) }}" 
-                                 class="w-full h-full object-cover" 
+                            <img src="{{ asset('storage/encrypted/' . $item->foto_barang) }}" 
+                                 class="w-full h-full object-cover p-4" 
                                  alt="{{ $item->nama_item }}">
                             
                             <!-- Status Badge -->

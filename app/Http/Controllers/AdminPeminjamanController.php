@@ -129,46 +129,6 @@ class AdminPeminjamanController extends Controller
         return view('admin.barang.create', compact('kategori'));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'nama_item' => 'required|string|max:255',
-            'jenis_item' => 'required|string|max:255',
-            'kategori_jurusan_id' => 'required|exists:kategori,id',
-            'foto_barang' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        $kategori = Kategori::find($validated['kategori_jurusan_id']);
-        $prefix = strtoupper(substr($kategori->nama_kategori, 0, 3));
-
-        $lastItem = Item::where('kategori_jurusan_id', $validated['kategori_jurusan_id'])
-            ->where('kode_unit', 'like', $prefix . '%')
-            ->orderBy('kode_unit', 'desc')
-            ->first();
-
-        if ($lastItem) {
-            $lastNumber = (int) substr($lastItem->kode_unit, strlen($prefix));
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
-
-        $kodeUnit = $prefix . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-        $path = $request->file('foto_barang')->store('items', 'public');
-
-        Item::create([
-            'nama_item' => $validated['nama_item'],
-            'jenis_item' => $validated['jenis_item'],
-            'kode_unit' => $kodeUnit,
-            'kategori_jurusan_id' => $validated['kategori_jurusan_id'],
-            'foto_barang' => $path,
-            'status_item' => 'tersedia',
-        ]);
-
-        return redirect()->route('admin.barang.index')
-            ->with('success', 'Barang berhasil ditambahkan dengan kode: ' . $kodeUnit);
-    }
-
     public function index(Request $request)
     {
         $admin = Auth::user();

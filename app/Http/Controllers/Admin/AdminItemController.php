@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Item;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ActivityLoggerService;
 
 
 class AdminItemController extends Controller
@@ -139,7 +140,7 @@ Storage::disk('public')->put('encrypted/' . $encrypt, $content);
    
 
     // Simpan ke database
-    Item::create([
+    $item = Item::create([
         'nama_item' => $validated['nama_item'],
         'jenis_item' => $validated['jenis_item'],
         'kode_unit' => $kodeUnit,
@@ -147,6 +148,7 @@ Storage::disk('public')->put('encrypted/' . $encrypt, $content);
         'foto_barang' => $encrypt,
         'status_item' => 'tersedia',
     ]);   
+    ActivityLoggerService::logCreated('Item', $item->id, $item->toArray());
     return redirect()->route('admin.barang.index')
         ->with('success', 'Barang berhasil ditambahkan dengan kode: ' . $kodeUnit);
 }
@@ -197,6 +199,13 @@ Storage::disk('public')->put('encrypted/' . $encrypt, $content);
 
             $barang->status_item = 'tersedia';
             $barang->save();
+
+             ActivityLoggerService::logUpdated(
+                'Item',
+                $barang->id,
+                ['status_Item' => 'rusak'],
+                ['status_Item' => 'tersedia']
+            );
             return redirect()->back()->with('success', "Barang '{$barang->nama_item}' berhasil diubah menjadi tersedia");
     } catch (\Exception $e) {
         return redirect()->back()->with('error', 'Gagal mengubah status: ' . $e->getMessage());
@@ -214,7 +223,12 @@ Storage::disk('public')->put('encrypted/' . $encrypt, $content);
 
         $barang->status_item = 'rusak';
         $barang->save();
-
+        ActivityLoggerService::logUpdated(
+                'Item',
+                $barang->id,
+                ['status_Item' => 'tersedia'],
+                ['status_Item' => 'rusak']
+            );
         return redirect()->back()->with('success', "Barang '{$barang->nama_item}' berhasil ditandai sebagai rusak");
     } catch (\Exception $e) {
         return redirect()->back()->with('error', 'Gagal mengubah status: ' . $e->getMessage());

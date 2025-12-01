@@ -18,6 +18,7 @@ class ActivityLoggerService
         ?array $old_values = null,
         ?array $new_values = null
     ): ActivityLogger {
+        
         $user = Auth::user();
 
         return ActivityLogger::create([

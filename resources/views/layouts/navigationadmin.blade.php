@@ -40,10 +40,6 @@
                     class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('admin/barang*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
                     Barang
                 </a>
-                <a href="{{ route('admin.barang.create') }}"
-                    class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('admin/barang/create*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
-                    Tambah Barang
-                </a>
                 <a href="{{ route('admin.peminjaman.index') }}"
                     class="block px-4 py-3 rounded-lg text-white font-semibold transition-all duration-300 hover:bg-sky-700/50 {{ Request::is('admin/peminjaman*') ? 'bg-sky-800 border-l-4 border-sky-900' : '' }}">
                     Kelola Peminjaman

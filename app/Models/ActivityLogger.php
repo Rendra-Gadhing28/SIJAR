@@ -15,7 +15,9 @@ class ActivityLogger extends Model
         'url',
         'model',
         'model_id',
-        'action'
+        'action',
+        'old_values',
+        'new_values',
     ];
 
     protected $casts = [
