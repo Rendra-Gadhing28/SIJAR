@@ -22,11 +22,12 @@ class peminjamanController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
+    {   //membuat variabel peminjaman yang berisi data dari table peminjaman
+        //data peminjaman yang diambil hanya milik user yang sedang login
         $peminjaman = peminjaman::where("user_id", Auth::id())
-            ->with(["item"])
-            ->latest()
-            ->paginate(10);
+            ->with("item")//relasi table item
+            ->latest()// mengambil data yang terbaru
+            ->paginate(10);//menampilkan 10 data per halaman
 
         return view('user.riwayat', compact("peminjaman"));
     }
@@ -272,7 +273,7 @@ class peminjamanController extends Controller
         $waktu = waktu_pembelajaran::orderBy('jam_ke')->get();
         $peminjaman = peminjaman::find($id);
         // kirim variabel sesuai nama yang digunakan blade (blade pakai $items & $waktu)
-        return view('user.editpinjam', compact('items', 'waktu', 'jenis_items', 'peminjaman', 'jurusan', 'jrsn'));
+        return view('user.editpinjam', compact('items', 'waktu', 'jenis_items', 'peminjaman', 'jurusan'));
     }
 
     /**

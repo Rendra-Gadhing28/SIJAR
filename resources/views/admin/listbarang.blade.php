@@ -10,12 +10,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body class="bg-gray-50 min-h-screen font-sans antialiased">
+<body class="bg-gray-50 h-auto min-h-full font-sans antialiased">
     <header>
         @include('layouts.navigationadmin')
     </header>
 
-    <main class="pt-24 px-4 md:px-8 pb-16 max-w-7xl mx-auto mt-8">
+    <main class="pt-24 px-4 md:px-8 pb-16 max-w-7xl h-full mx-auto mt-8 scroll-m-28">
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
             <div>

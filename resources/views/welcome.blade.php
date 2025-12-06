@@ -31,17 +31,17 @@
     </header>
     <main class="w-screen h-screen ">
 
-        <section class="text-center mt-28 sm:text-wrap lg:mt-40">
+        <section class="text-center mt-28 sm:text-wrap lg:mt-32">
             <h1 class="mt-4 text-5xl font-extrabold bg-gradient-to-r from-[--c1] via-[#2D3492] to-[#171C59] text-transparent bg-clip-text inline-block lg:text-7xl"
                 style="font-family: 'Roboto Slab';
                     text-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); ">
                 Welcome to SIJAR
             </h1>
 
-            <div class="relative mt-8 flex items-center justify-center lg:mt-20">
+            <div class="relative mt-8 flex items-center justify-center lg:mt-12">
                 <picture>
                     <img class=" w-screen object-cover opacity-50 rounded-sm lg:h-[50vh] md:h-[50vh]"
-                        src="/images/snapan.jpg" alt="ini gambar smk8">
+                        src="/images/smk8n.jpeg" alt="ini gambar smk8">
                 </picture>
 
                 <!-- Background transparan overlay -->
@@ -63,7 +63,7 @@
             </div>
 
 
-            <div class="flex justify-center items-center mt-16 lg:mt-28">
+            <div class="flex justify-center items-center mt-8 lg:mt-12">
                 <a href="{{ route('login') }}" class="w-1/4 h-[3rem] text-black font-semibold rounded-full text-sm px-6 py-3 text-center shadow-md lg:h-
             bg-gradient-to-b from-[#99E1FF] via-[#31A6D7] to-[#1683B1]
             hover:brightness-110 transition duration-300 inline-block">

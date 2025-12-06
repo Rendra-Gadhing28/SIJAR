@@ -14,7 +14,7 @@
         @include('layouts.navigationadmin')
     </header>
 
-    <main class="pt-32 pb-12 px-6">
+    <main class="pt-32 pb-12 px-6 max-h-2xl h-full ">
         <div class="flex flex-col justify-center items-center">
             <div class="w-full max-w-4xl bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 rounded-2xl shadow-2xl p-8">
                 
@@ -123,7 +123,7 @@
 
                     <!-- Preview Foto -->
                     <div id="preview-container" class="hidden">
-                        <label class="block font-bold text-lg text-gray-800 mb-2">Preview Foto</label>
+                        <span class="block font-bold text-lg text-gray-800 mb-2">Preview Foto</span>
                         <div class="relative">
                             <img id="preview-image" src="" alt="Preview" class="max-w-full h-48 object-cover rounded-lg shadow-lg border-4 border-white">
                             <button type="button" onclick="removePreview()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600">
@@ -151,16 +151,16 @@
                     <!-- Buttons -->
                     <div class="flex gap-4 pt-4">
                         <button type="submit" 
-                                class="flex-1 bg-gradient-to-r from-sky-300 via-sky-500 to-sky-600 text-white font-bold py-4 rounded-lg hover:from-sky-700 hover:to-sky-800 transition shadow-lg hover:shadow-xl transform hover:transition-all hover:duration-300 hover:-translate-y-1">
+                                class="flex-1 h-16 bg-gradient-to-r from-sky-300 via-sky-500 to-sky-600 text-white font-bold py-4 rounded-lg hover:from-sky-700 hover:to-sky-800 transition shadow-lg hover:shadow-xl transform hover:transition-all hover:duration-300 hover:-translate-y-1">
                             <span class="flex items-center justify-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
-                                Simpan Barang
+                                Tambah
                             </span>
                         </button>
                         <a href="{{ route('admin.barang.index') }}" 
-                           class="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 text-white font-bold py-4 rounded-lg hover:from-gray-500 hover:to-gray-600 transition shadow-lg hover:shadow-xl text-center transform hover:transition-all hover:duration-300 hover:-translate-y-1">
+                           class="flex-1 h-16 bg-gradient-to-r from-gray-400 to-gray-500 text-white font-bold py-5 rounded-lg hover:from-gray-500 hover:to-gray-600 transition shadow-lg hover:shadow-xl text-center transform hover:transition-all hover:duration-300 hover:-translate-y-1">
                             <span class="flex items-center justify-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

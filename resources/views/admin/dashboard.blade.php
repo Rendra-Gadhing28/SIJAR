@@ -16,44 +16,45 @@
     </header>
     
     <main class="pt-28 px-6 md:px-12 pb-16">
-        <section class="max-w-2xl mx-auto bg-white rounded-2xl shadow p-6 text-center">
+        <section class="max-w-4xl mx-auto w-full bg-white rounded-2xl shadow p-6 text-center">
             <h2 class="text-2xl font-bold mb-6">Dashboard Admin</h2>
-           <div class="flex flex-col items-center mx-auto justify-center gap-6">
+           <div class="flex flex-col items-center mx-auto justify-center gap-6 self-center">
 
     <!-- Baris atas (3 kotak) -->
-    <div class="grid grid-cols-3 mx-auto gap-6">
-        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+    <div class="grid grid-cols-2 mx-auto gap-6 md:grid-cols-3 place-items-center text-center">
+        <div class="bg-gray-100 rounded-lg p-4 w-auto text-center shadow text-xs sm:w-40 sm:text-lg">
             <p class="font-semibold text-yellow-500">Pending</p>
             <p class="text-2xl font-bold text-yellow-500">{{ $totalPending }}</p>
         </div>
 
-        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+        <div class="bg-gray-100 rounded-lg p-4 w-auto text-center shadow text-xs sm:w-40 sm:text-lg">
             <p class="font-semibold text-green-500">Approved</p>
             <p class="text-2xl font-bold text-green-500">{{ $totalApproved }}</p>
         </div>
+ 
 
-        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
+        <div class=" bg-gray-100 rounded-lg p-4 w-auto text-center shadow mx-auto col-span-2 md:col-span-1 self-center text-sm sm:w-40 sm:text-lg">
             <p class="font-semibold text-red-500">Rejected</p>
             <p class="text-2xl font-bold text-red-500">{{ $totalRejected }}</p>
         </div>
     </div>
 
     <!-- Baris bawah (2 kotak, center) -->
-    <div class="flex justify-center gap-6 w-full max-w-xl">
-        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
-            <p class="font-semibold text-sky-500">Dipinjam</p>
+    <div class="flex justify-center gap-6 w-full">
+        <div class="bg-gray-100 rounded-lg p-4 w-auto text-center shadow text-xs sm:w-40 sm:text-lg">
+            <p class="font-semibold text-sky-500 text-center">Dipinjam</p>
             <p class="text-2xl font-bold text-sky-500">{{ $totalDipinjam }}</p>
         </div>
 
-        <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
-            <p class="font-semibold text-indigo-500">Dikembalikan</p>
+        <div class="bg-gray-100 rounded-lg px-[0.6em] py-4  w-auto text-center shadow text-xs sm:w-40 sm:text-lg">
+            <p class="font-semibold text-indigo-500 text-center">Dikembalikan</p>
             <p class="text-2xl font-bold text-indigo-500">{{ $totalDikembalikan }}</p>
         </div>
     </div>
 
-    <div class="flex justify-center gap-6 w-full max-w-xl">
-         <div class="bg-gray-100 rounded-lg p-4 w-36 text-center shadow">
-            <p class="font-semibold text-slate-500">Total Riwayat</p>
+    <div class="flex justify-center">
+         <div class="bg-gray-100 rounded-lg p-4 w-auto text-center shadow text-xs sm:w-40 sm:text-lg">
+            <p class="font-semibold text-slate-500 text-center">Total Riwayat</p>
             <p class="text-2xl font-bold text-slate-500">{{ $totalriwayat }}</p>
         </div>
     </div>

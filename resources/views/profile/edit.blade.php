@@ -15,7 +15,6 @@
         @include('layouts.navigationadmin')
     @else
         @include('layouts.navigation')
-        @include('layouts.navmobile')
     @endif
 
  

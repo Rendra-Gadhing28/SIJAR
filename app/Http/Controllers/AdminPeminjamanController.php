@@ -17,10 +17,12 @@ class AdminPeminjamanController extends Controller
      */
     public function dashboard()
     {
+        //mengambil akun admin yang sedang login
         $admin = Auth::user();
+        //mengambil kategori jurusan admin
         $adminKategoriId = $admin->kategori_id;
 
-        // Filter notifikasi: hanya peminjaman yang kategori_jurusan_id item-nya sama dengan kategori admin
+        // Filter notifikasi berdasarkan kategori_jurusan_id item
         $notifications = Peminjaman::with(['user', 'item.kategori_jurusan'])
             ->whereHas('item', function ($query) use ($adminKategoriId) {
                 $query->where('kategori_jurusan_id', $adminKategoriId);
@@ -28,10 +30,12 @@ class AdminPeminjamanController extends Controller
             ->latest()
             ->get();
 
-        // Filter statistik berdasarkan kategori_jurusan_id item
+        // table peminjaman yang memiliki relasi item, dengan menggunakan function yang berisi parameter query, dan menggunakan variabel $adminKategoriId
         $totalPending = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
+            //mengambil data kategori_jurusan_id yang sesuai dengan kategori admin
             $query->where('kategori_jurusan_id', $adminKategoriId);
-        })->where('status_tujuan', 'Pending')->count();
+        })//filter status tujuan
+        ->where('status_tujuan', 'Pending')->count();
 
         $totalApproved = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
             $query->where('kategori_jurusan_id', $adminKategoriId);
@@ -49,7 +53,10 @@ class AdminPeminjamanController extends Controller
             $query->where('kategori_jurusan_id', $adminKategoriId);
         })->where('status_pinjaman', 'selesai')->count();
 
+
+        //hitung item yang ada sesuai jurusan admin
         $totalItems = Item::where('kategori_jurusan_id', $adminKategoriId)->count();
+        //menghitung total riwayat peminjaman
         $totalriwayat = $totalDipinjam + $totalDikembalikan;
 
         // Peminjaman terbaru (5 terakhir) berdasarkan kategori_jurusan_id item
