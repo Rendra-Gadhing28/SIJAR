@@ -18,7 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth','user'])->group(function () {
+Route::middleware(['auth','role:user'])->group(function () {
     // atau bisa juga ditulis lengkap seperti ini:
     Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
@@ -45,7 +45,7 @@ Route::middleware(['auth','user'])->group(function () {
 
 
 
-Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth','role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [AdminPeminjamanController::class, 'dashboard'])->name('dashboard'); // admin.dashboard

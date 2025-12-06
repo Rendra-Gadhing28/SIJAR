@@ -21,7 +21,7 @@
          
                 <!-- Filter Kelas -->
                 <div class="flex flex-col">
-                    <select name="kelas" id="kelas" class="form-control rounded-lg shadow-sm shadow-sky-300">
+                    <select name="kelas" id="kelas" class="form-control rounded-lg shadow-sm shadow-sky-300 w-32 sm:w-40">
                         <option value="">-- Semua Kelas --</option>
                         @foreach($kelasList as $kelas)
                             <option value="{{ $kelas }}" 
@@ -34,7 +34,7 @@
 
                 <!-- Filter Status -->
                 <div class="flex flex-col">
-                    <select name="status_tujuan" id="status_tujuan" class="form-control rounded-lg shadow-sm shadow-sky-300">
+                    <select name="status_tujuan" id="status_tujuan" class="form-control rounded-lg shadow-sm shadow-sky-300 w-32 sm:w-40">
                         <option value="">-- Semua Status --</option>
                         <option value="Pending" {{ request('status_tujuan') == 'Pending' ? 'selected' : '' }}>
                             Pending
@@ -130,7 +130,7 @@
                 </div>
 
                 {{-- RIGHT STATUS --}}
-                <div class=" flex flex-col justify-start items-end  gap-3 text-right mt-4">
+                <div class=" flex flex-col align-top  justify-end items-end  gap-3 text-right mt-4">
 
                     {{-- STATUS APPROVAL --}}
                     <span class="px-4 py-2 rounded-full text-sm font-semibold
