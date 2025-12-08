@@ -279,86 +279,118 @@ class peminjamanController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function update(Request $request, $id)
-    {
-        $peminjaman = Peminjaman::where('user_id', Auth::id())
-            ->where('status_tujuan', 'Pending')
-            ->findOrFail($id);
+   public function update(Request $request, $id)
+{
+    $peminjaman = Peminjaman::where('user_id', Auth::id())
+        ->where('status_tujuan', 'Pending')
+        ->findOrFail($id);
 
-        $validated = $request->validate([
-            'keperluan' => 'required|string|max:255',
-            'item_id' => 'required|exists:item,id',
-            'kode_unit' => 'nullable|string',
-            'waktu_ids' => 'required|array|min:1',
-            'waktu_ids.*' => 'string',
-            'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',  // Nullable untuk update
-        ], [
-            'waktu_ids.required' => 'Pilih minimal 1 waktu pembelajaran',
-            'waktu_ids.array' => 'Format waktu tidak valid',
-        ]);
+    $validated = $request->validate([
+        'keperluan' => 'required|string|max:255',
+        'item_id' => 'required|exists:item,id', 
+        'kode_unit' => 'nullable|string',
+        'waktu_ids' => 'required|array|min:1',
+        'waktu_ids.*' => 'string',
+        'bukti' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    ], [
+        'waktu_ids.required' => 'Pilih minimal 1 waktu pembelajaran',
+        'waktu_ids.array' => 'Format waktu tidak valid',
+        'item_id.exists' => 'Item yang dipilih tidak tersedia',
+    ]);
 
-        DB::beginTransaction();
+    DB::beginTransaction();
 
-        try {
-            // Upload bukti baru jika ada
-            $path = $peminjaman->gambar_bukti;  // Gunakan yang lama jika tidak ada upload baru
-            if ($request->hasFile('bukti')) {
-                if ($path) {
-                    Storage::disk('public')->delete($path);  // Hapus yang lama
-                }
-                $path = $request->file('bukti')->store('bukti_peminjaman', 'public');
-            }
+    try {
+        // Simpan data lama untuk activity log SEBELUM update
+        $oldData = [
+            'keperluan' => $peminjaman->keperluan,
+            'item_id' => $peminjaman->item_id
+        ];
 
-            // Validasi dan siapkan array JSON untuk jam_pembelajaran (sama seperti store)
-            $jamPembelajaran = [];
-            foreach ($validated['waktu_ids'] as $waktuJson) {
-                $waktuData = json_decode($waktuJson, true);
-                if (!is_array($waktuData) || !isset($waktuData['jam_ke'], $waktuData['start_time'], $waktuData['end_time'])) {
-                    throw new \Exception('Format waktu tidak valid: ' . $waktuJson);
-                }
-                $waktu = waktu_pembelajaran::where('jam_ke', $waktuData['jam_ke'])
-                    ->where('start_time', $waktuData['start_time'])
-                    ->where('end_time', $waktuData['end_time'])
-                    ->first();
-                if (!$waktu) {
-                    throw new \Exception('Waktu pembelajaran tidak ditemukan: Jam ' . $waktuData['jam_ke'] . ', ' . $waktuData['start_time'] . ' - ' . $waktuData['end_time']);
-                }
-                $jamPembelajaran[] = $waktuData;
-            }
+        // Validasi item baru (gunakan $validated['item_id'], bukan $id)
+        $newItem = Item::find($validated['item_id']);
+        if (!$newItem) {
+            throw new \Exception('Item tidak ditemukan');
+        }
 
-            // Update peminjaman
-            $peminjaman->update([
-                'keperluan' => $validated['keperluan'],
-                'item_id' => $validated['item_id'],
-                'gambar_bukti' => $path,
-                'jam_pembelajaran' => json_encode($jamPembelajaran),
-            ]);
+        // Cek jika menggunakan soft delete
+        if (method_exists($newItem, 'trashed') && $newItem->trashed()) {
+            throw new \Exception('Item sudah tidak aktif');
+        }
 
-            $item = item::findOrFail($id);
-            $item->update([
-                'status_item' => 'dipinjam'
-            ]);
+        // Cek apakah item berbeda dan status item lama perlu dikembalikan
+        $itemBerubah = $peminjaman->item_id != $validated['item_id'];
+        $oldItemId = $peminjaman->item_id;
 
-            // Log the update action
-            ActivityLoggerService::logUpdated(
-                'Peminjaman',
-                $peminjaman->id,
-                ['keperluan' => $peminjaman->getOriginal('keperluan'), 'item_id' => $peminjaman->getOriginal('item_id')],
-                ['keperluan' => $validated['keperluan'], 'item_id' => $validated['item_id']]
-            );
-
-            DB::commit();
-
-            return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil diperbarui!');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            if ($path && $path !== $peminjaman->gambar_bukti) {
+        // Upload bukti baru jika ada
+        $path = $peminjaman->gambar_bukti;
+        if ($request->hasFile('bukti')) {
+            if ($path) {
                 Storage::disk('public')->delete($path);
             }
-            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])->withInput();
+            $path = $request->file('bukti')->store('bukti_peminjaman', 'public');
         }
+
+        // Validasi dan siapkan array JSON untuk jam_pembelajaran
+        $jamPembelajaran = [];
+        foreach ($validated['waktu_ids'] as $waktuJson) {
+            $waktuData = json_decode($waktuJson, true);
+            if (!is_array($waktuData) || !isset($waktuData['jam_ke'], $waktuData['start_time'], $waktuData['end_time'])) {
+                throw new \Exception('Format waktu tidak valid: ' . $waktuJson);
+            }
+            $waktu = waktu_pembelajaran::where('jam_ke', $waktuData['jam_ke'])
+                ->where('start_time', $waktuData['start_time'])
+                ->where('end_time', $waktuData['end_time'])
+                ->first();
+            if (!$waktu) {
+                throw new \Exception('Waktu pembelajaran tidak ditemukan: Jam ' . $waktuData['jam_ke'] . ', ' . $waktuData['start_time'] . ' - ' . $waktuData['end_time']);
+            }
+            $jamPembelajaran[] = $waktuData;
+        }
+
+        // Update peminjaman
+        $peminjaman->update([
+            'keperluan' => $validated['keperluan'],
+            'item_id' => $validated['item_id'],
+            'gambar_bukti' => $path,
+            'jam_pembelajaran' => json_encode($jamPembelajaran),
+        ]);
+
+        // Update status item
+        if ($itemBerubah) {
+            // Kembalikan status item lama ke 'tersedia'
+            if ($oldItem = Item::find($oldItemId)) {
+                $oldItem->update(['status_item' => 'tersedia']);
+            }
+            
+            // Set status item baru ke 'dipinjam'
+            $newItem->update(['status_item' => 'dipinjam']);
+        } else {
+            // Jika item sama, pastikan statusnya 'dipinjam'
+            $newItem->update(['status_item' => 'dipinjam']);
+        }
+
+        // Log the update action dengan data lama yang sudah disimpan
+        ActivityLoggerService::logUpdated(
+            'Peminjaman',
+            $peminjaman->id,
+            $oldData,
+            ['keperluan' => $validated['keperluan'], 'item_id' => $validated['item_id']]
+        );
+
+        DB::commit();
+
+        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil diperbarui!');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        // Hapus file yang baru diupload jika ada error
+        if (isset($path) && $path && $path !== $peminjaman->gambar_bukti) {
+            Storage::disk('public')->delete($path);
+        }
+        return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])->withInput();
     }
+}
 
     public function beranda()
     {

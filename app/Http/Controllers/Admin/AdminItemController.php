@@ -194,8 +194,12 @@ Storage::disk('public')->put('encrypted/' . $encrypt, $content);
         try{
             $barang = Item::findOrFail($id);
             if($barang->status_item == 'dipinjam'){
-                return redirect()->back()->with('barang masih dipinjam, tidak bisa diupdate');
+                return redirect()->back()->with('error', 'Barang masih dipinjam, tidak bisa diupdate');
             }
+            elseif($barang->status_item == 'tersedia'){
+                return redirect()->back()->with('error', 'Barang sudah dalam status tersedia!');
+            }
+
 
             $barang->status_item = 'tersedia';
             $barang->save();
@@ -219,6 +223,9 @@ Storage::disk('public')->put('encrypted/' . $encrypt, $content);
         // Cek apakah barang sedang dipinjam
         if ($barang->status_item == 'dipinjam') {
             return redirect()->back()->with('error', 'Barang sedang dipinjam, tidak bisa diubah menjadi rusak!');
+        }
+        elseif($barang->status_item == 'rusak'){
+            return redirect()->back()->with('error', 'Barang sudah dalam status rusak!');
         }
 
         $barang->status_item = 'rusak';
