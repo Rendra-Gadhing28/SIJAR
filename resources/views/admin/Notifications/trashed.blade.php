@@ -16,7 +16,7 @@
         @include('layouts.navigationadmin')
     </header>
    
-    <main class="pt-24 px-4 md:px-8 lg:px-12 pb-8">
+    <main class="pt-24 px-4 md:px-8 lg:px-12 pb-8 mt-8">
         <div class="max-w-7xl mx-auto">
             <!-- Header Section -->
             <div class="mb-8">

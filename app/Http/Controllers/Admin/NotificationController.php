@@ -132,6 +132,7 @@ class NotificationController extends Controller
         return back()->with('success', 'Notifikasi dipindahkan ke trash.');
     }
     
+    
     /**
      * Restore notification from trash.
      */

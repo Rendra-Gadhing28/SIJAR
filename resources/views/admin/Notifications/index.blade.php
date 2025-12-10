@@ -20,6 +20,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h2 class="text-2xl font-bold">Notifikasi Admin</h2>
                 <div class="flex items-center gap-3 flex-wrap">
+
                     <a href="{{ route('admin.notifications.trashed') }}" 
                        class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition text-sm font-medium">
                         🗑️ Trash Bin
