@@ -40,12 +40,6 @@
 
                 <div class="w-auto flex flex-col justify-center items-end">
                     <label for="password" class="block text-sm font-bold text-gray-800 self-start">Password</label>
-                        <div class="flex justify-end absolute mt-6 mx-4 z-50">
-                        <button id="btn" type="button" onclick="klik()" class="w-auto h-full px-2">
-                        <img src="{{ asset('images/eye.svg') }}" alt="ini gambar mata" class="object-cover hidden z-10 rounded text-[#B7DBFF]" id="on">
-                        <img src="{{ asset('images/eye-off.svg') }}" alt="ini gambar mata" class="object-cover z-10 rounded" id="off">
-                        </button>
-                        </div>
                     <input id="password" name="password" type="password" required
                         class="mt-1 block w-full rounded-md bg-gradient-to-r from-[#B7DBFF] via-[#8FADCA] to-[#3F4F5F] px-3 py-2 text-white placeholder-gray-300 focus:outline-none focus:ring-0 focus:border-transparent shadow-inner"
                         placeholder="Masukkan password">
@@ -57,6 +51,7 @@
                     <input id="remember" name="remember" type="checkbox"
                         class="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500">
                 </div>
+
 
                 <button type="submit"
                     class="w-3/4 sm:w-1/2 mx-auto block bg-gradient-to-r from-[#99E1FF] via-[#31A6D7] to-[#1683B1] text-black font-bold py-2 rounded-lg shadow-md hover:shadow-lg transition duration-300 text-center">

@@ -14,14 +14,11 @@
 <body class="bg-gradient-to-b from-gray-200 to-white flex flex-col min-h-screen font-['Poppins']">
 
     <header>
-       @if(Auth::user()->role === 'admin')
-    @include('layouts.navigationadmin')
-@else
     @include('layouts.navigation')
-@endif
     </header>
 
     <main class="pt-28 px-6 md:px-12 py-36 scroll-py-36">
+        @csrf
 
         {{-- SECTION STATISTIK --}}
         <section class="max-w-2xl mx-auto bg-white rounded-2xl shadow p-6 text-center">

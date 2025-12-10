@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(\App\Http\Middleware\HandleInertiaRequests::class);
         $middleware->alias([
-            'admin' => \App\Http\Middleware\IsAdmin::class,
+            'admin' => \App\Http\Middleware\RoleMiddleware::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class
         ]);
     })
