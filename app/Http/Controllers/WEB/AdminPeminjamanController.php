@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\WEB;
 
 use App\Models\peminjaman;
 use App\Models\Kategori;
+use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Services\ActivityLoggerService;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class AdminPeminjamanController extends Controller
                 $query->where('kategori_jurusan_id', $adminKategoriId);
             })
             ->latest()
-            ->get();
+            ->lazy();
 
         // table peminjaman yang memiliki relasi item, dengan menggunakan function yang berisi parameter query, dan menggunakan variabel $adminKategoriId
         $totalPending = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
@@ -66,7 +67,7 @@ class AdminPeminjamanController extends Controller
             })
             ->latest()
             ->take(5)
-            ->get();
+            ->lazy();
 
         return view('admin.dashboard', compact(
             'notifications',
@@ -122,7 +123,7 @@ class AdminPeminjamanController extends Controller
             ->paginate(10)
             ->appends($request->all());
 
-        $kategori = Kategori::all();
+        $kategori = Kategori::lazy();
 
         // Data kelas untuk dropdown
         $kelasList = ['X', 'XI', 'XII'];
@@ -132,7 +133,7 @@ class AdminPeminjamanController extends Controller
 
     public function createBarang()
     {
-        $kategori = Kategori::all();
+        $kategori = Kategori::lazy();
         return view('admin.barang.create', compact('kategori'));
     }
 
@@ -142,7 +143,7 @@ class AdminPeminjamanController extends Controller
         $adminKategoriId = $admin->kategori_id;
         $item =
 
-            $kategori = Kategori::all();
+            $kategori = Kategori::lazy();
         $query = Peminjaman::with(['item.kategori_jurusan', 'user.kategori'])
             ->whereHas('item', function ($q) use ($adminKategoriId) {
                 $q->where('kategori_jurusan_id', $adminKategoriId);

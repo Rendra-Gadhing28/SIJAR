@@ -11,10 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->append(\App\Http\Middleware\HandleInertiaRequests::class);
         $middleware->alias([
-            'admin' => \App\Http\Middleware\RoleMiddleware::class,
-            'role' => \App\Http\Middleware\RoleMiddleware::class
+            'isAdmin' => \App\Http\Middleware\IsAdminMiddleware::class,
+             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class, // Ada session
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+
+        $middleware->api([
+             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -1,6 +1,5 @@
 <?php
-
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\WEB;
 
 use Illuminate\Http\Request;
 use App\Models\Item;
@@ -8,6 +7,7 @@ use App\Models\Kategori;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class adminController extends Controller
 {

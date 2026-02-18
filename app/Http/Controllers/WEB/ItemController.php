@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\WEB;
 
 use App\Models\Item;
 use App\Models\Kategori;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -104,5 +105,23 @@ public function index(Request $request)
         } catch (\Exception $e) {
             return response()->file(public_path('images/placeholder.png'));
         }
+    }
+    public function Home(){
+        
+    if (Auth::check()) {
+        $user = Auth::user();
+        return match ($user->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'user' => redirect()->route('user.homepage'),
+            default => redirect()->route('login'),
+        };
+    }
+        $brg = Item::with('kategori_jurusan')->
+        where('status_item', 'tersedia')
+        ->orderBy('created_at', 'desc')
+        ->limit(3)
+        ->get();
+
+        return view('welcome', compact('brg'));
     }
 }

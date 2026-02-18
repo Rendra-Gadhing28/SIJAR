@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\WEB;
 
 use App\Models\User;
+use App\Http\Controllers\Controller;
 use App\Services\ActivityLoggerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -160,10 +161,12 @@ class peminjamanController extends Controller
             $item->update(['status' => 'tidak_tersedia']);
 
             // Kirim notifikasi ke admin
-            $admins = User::where('role', 'admin')->get();
+            $admins = User::where('role', 'admin')->lazy();
             foreach ($admins as $admin) {
                 $admin->notify(new PeminjamanBaruNotification($peminjaman));
             }
+
+            
 
             // Log the creation action
             ActivityLoggerService::logCreated(

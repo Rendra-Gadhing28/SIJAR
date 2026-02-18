@@ -14,8 +14,16 @@ class IsAdmin
      */
  public function handle(Request $request, Closure $next)
     {
-        if (auth()->check() && auth()->user()->role === 'admin') {
+
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        if (auth()->user()->role === 'admin') {
             return $next($request);
+        }
+        elseif(auth()->user()->role === 'user'){
+            return redirect()->route('user.homepage');
         }
 
         return redirect('/')->with('error', 'Anda tidak memiliki akses.');

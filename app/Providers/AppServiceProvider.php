@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use Doctrine\DBAL\Logging\Middleware;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useTailwind();
+       
+
+        Route::middleware('api')->prefix('api')->group(function () {
+                require base_path('routes/api.php');
+        });
 
         // Register Blade components
         Blade::component('app-admin', 'layouts.app-admin');
