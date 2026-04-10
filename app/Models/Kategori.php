@@ -20,7 +20,7 @@ class Kategori extends Model
     }
      public function items()
     {
-        return $this->hasMany(Item::class, 'kategori_jurusan_id');
+        return $this->hasMany(Item::class);
     }
     public static function getKategoriById($id){
         return DB::table('kategori_jurusan')->where('id', $id)->first();

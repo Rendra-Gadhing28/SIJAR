@@ -28,7 +28,7 @@ public function index(Request $request)
     $jurusan = $user->kategori_id;
 
     // Mulai dengan query builder (TANPA get)
-    $item = Item::where('kategori_jurusan_id', $jurusan);
+    $item = Item::where('kategori_jurusan_id',);
 
     // Inisialisasi kategori default
     $kategori = $jurusan;
@@ -68,9 +68,25 @@ public function index(Request $request)
 
     // Dropdown kategori
     $kategoris = Kategori::orderBy('nama_kategori')->get();
-
-    return view('user.listbarang', compact('data', 'kategoris', 'kategori','barangjurusan'));
+    $dataLengkap = [$data, $kategori, $kategoris, $barangjurusan];
+    return response()->json([
+        "status" => true,
+        "message" => "berhasil mengambil data",
+        "data" => $dataLengkap,
+    ], 200) ;
 }
+
+    public function getBarang(){
+        $item = Item::with('kategori_jurusan')
+        ->lazy();
+
+        return response()->json([
+            "status" => true,
+            "message" => "Data item berhasil diambil",
+            "data" => $item,
+        ], 200);
+        
+    }
 
     /**
      * Menampilkan gambar yang terenkripsi
@@ -119,9 +135,13 @@ public function index(Request $request)
         $brg = Item::with('kategori_jurusan')->
         where('status_item', 'tersedia')
         ->orderBy('created_at', 'desc')
-        ->limit(3)
+        ->limit(6)
         ->get();
 
-        return view('welcome', compact('brg'));
+        return response()->json([
+            "status" => true,
+            "message" => "data untuk landing page",
+            "data" => $brg
+        ], 200);
     }
 }

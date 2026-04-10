@@ -63,11 +63,7 @@
                     {{ session('success') }}
                 </div>
             @endif
-            @if($errors->any())
-                <div class="text-red-600 font-bold mt-2 text-center">
-                    {{ $errors->first() }}
-                </div>
-            @endif
+           
 
         </div>
     </div>

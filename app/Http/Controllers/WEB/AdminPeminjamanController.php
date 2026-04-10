@@ -69,17 +69,13 @@ class AdminPeminjamanController extends Controller
             ->take(5)
             ->lazy();
 
-        return view('admin.dashboard', compact(
-            'notifications',
-            'totalPending',
-            'totalApproved',
-            'totalRejected',
-            'totalItems',
-            'recentPeminjaman',
-            'totalDipinjam',
-            'totalDikembalikan',
-            'totalriwayat'
-        ));
+            $dataLengkap = [$notifications, $totalPending, $totalApproved, $totalRejected, $totalItems, $recentPeminjaman,$totalDipinjam, $totalDikembalikan, $totalriwayat];
+
+        return response()->json([
+            "status" => true,
+            "message" => "data berhasil diambil",
+            "data" => $dataLengkap,
+        ], 200);
     }
 
     public function riwayat(Request $request)
@@ -128,13 +124,23 @@ class AdminPeminjamanController extends Controller
         // Data kelas untuk dropdown
         $kelasList = ['X', 'XI', 'XII'];
 
-        return view('admin.riwayat', compact('peminjaman', 'kategori', 'kelasList'));
+        $dataLengkap = [$peminjaman, $kategori, $kelasList];
+
+        return response()->json([
+            "status" => true,
+            "message" => "data berhasil diambil",
+            "data" => $dataLengkap,
+        ], 200);
     }
 
     public function createBarang()
     {
         $kategori = Kategori::lazy();
-        return view('admin.barang.create', compact('kategori'));
+        return response()->json([
+            "status" => true,
+            "message" => "membuat barang jurusan",
+            "data" => $kategori,
+        ], 201);
     }
 
     public function index(Request $request)
@@ -166,18 +172,20 @@ class AdminPeminjamanController extends Controller
             ->appends($request->all());
 
         $kelasList = ['X', 'XI', 'XII'];
-
-        return view('admin.riwayat', compact('peminjaman', 'kategori', 'kelasList'));
+        $dataLengkap = [$peminjaman, $kategori, $kelasList, $item];
+        return response()->json([
+            "status" => true,
+            "message" => "data berhasil diambil",
+            "data" => $dataLengkap,
+        ], 200);
     }
 
 public function approve($id)
     {
         $peminjaman = peminjaman::findOrFail($id);
-        
         if ($peminjaman->status_tujuan !== 'Pending') {
             return back()->withErrors('Peminjaman sudah diproses.');
         }
-        
         DB::beginTransaction();
         try {
             $item = Item::findOrFail($peminjaman->item_id);

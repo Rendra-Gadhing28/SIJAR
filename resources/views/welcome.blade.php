@@ -230,7 +230,7 @@
             </a>
             <!-- Hamburger -->
             <button id="hamburger" class="md:hidden p-2 rounded-xl" style="color:var(--blue-primary)">
-                <svg id="ham-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                
             </button>
         </div>
     </div>
@@ -238,11 +238,11 @@
     <!-- Mobile menu -->
     <div id="mobile-menu" class="md:hidden max-h-0 opacity-0 overflow-hidden px-2 pb-0">
         <div class="bg-white rounded-2xl mt-2 p-4 flex flex-col gap-3 shadow-lg border border-blue-50">
-            <a href="#home"    class="nav-link text-sm py-1">Beranda</a>
-            <a href="#tentang" class="nav-link text-sm py-1">Tentang</a>
-            <a href="#jurusan" class="nav-link text-sm py-1">Jurusan</a>
-            <a href="#barang"  class="nav-link text-sm py-1">Barang</a>
-            <a href="#kontak"  class="nav-link text-sm py-1">Kontak</a>
+                <a href="#home"    class="nav-link text-sm py-1">Beranda</a>
+                <a href="#tentang" class="nav-link text-sm py-1">Tentang</a>
+                <a href="#jurusan" class="nav-link text-sm py-1">Jurusan</a>
+                <a href="#barang"  class="nav-link text-sm py-1">Barang</a>
+                <a href="#kontak"  class="nav-link text-sm py-1">Kontak</a>
             <a href="{{ route('login') }}" class="btn-primary text-sm justify-center mt-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"></svg>
                 Login

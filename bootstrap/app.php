@@ -13,7 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'isAdmin' => \App\Http\Middleware\IsAdminMiddleware::class,
-             'role' => \App\Http\Middleware\RoleMiddleware::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class, // Ada session
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
@@ -22,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api([
              \Illuminate\Routing\Middleware\SubstituteBindings::class,
+             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

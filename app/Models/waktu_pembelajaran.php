@@ -20,7 +20,4 @@ class waktu_pembelajaran extends Model
     public static function pembelajaran(){
         return DB::table('waktu_pembelajaran')->get();
     }
-    public function slotPeminjaman(){
-        return $this->hasMany(slot_peminjaman::class,'waktu_pembelajaran_id');
-    }
 }

@@ -17,19 +17,35 @@ class ProfileController extends Controller
 {
 
     public function index(){
-         $user = Auth::user();
+        $user = Auth::user();
         // $user->where('role' != 'Admin')->get();
-        $data = User::get();
-        return view('user.profile',compact('user',));
+        $data = User::lazy();
+         return response()->json([
+            "status" => true,
+            "message" => "data peminjaman berhasil diambil",
+            "data" => $data
+        ], 200);
+
+        if(!$data){
+            return response()->json([
+            "status" => false,
+            "message" => "data tidak ada",
+            "data" => $data
+        ], 400);
+        }
     }
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request)
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = $request->user();
+
+         return response()->json([
+            "status" => true,
+            "message" => "data peminjaman berhasil diambil",
+            "data" => $user
+        ], 200);
     }
 
     /**
