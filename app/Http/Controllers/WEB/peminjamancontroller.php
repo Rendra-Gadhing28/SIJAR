@@ -430,7 +430,7 @@ class PeminjamanController extends Controller
         $peminjaman = peminjaman::where("user_id", Auth::id())
             ->with(["item"])
             ->latest()
-            ->paginate(10);
+            ->limit(6);
 
 
         $dipinjam = Peminjaman::where('user_id', $userId)

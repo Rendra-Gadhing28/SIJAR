@@ -13,17 +13,18 @@ class KategoriSeeder extends Seeder
      */
     public function run(): void
     {
-              $kategori = [
-        ['nama_kategori' => 'PPLG', 'role' => 'user'],
-        ['nama_kategori' => 'LK', 'role' => 'user'],
-        ['nama_kategori' => 'TJKT', 'role' => 'user'],
-        ['nama_kategori' => 'DKV', 'role' => 'user'],
-        ['nama_kategori' => 'PS', 'role' => 'user'],
-    ];
+        $kategori = [
+            ['nama_kategori' => 'PPLG', 'role' => 'user', 'icon' => 'pplg.png',], 
+            ['nama_kategori' => 'LK', 'role' => 'user', 'icon' => 'lk1.png',],
+            ['nama_kategori' => 'TJKT', 'role' => 'user', 'icon' => 'tjkt.png'],
+            ['nama_kategori' => 'DKV', 'role' => 'user', 'icon' => 'dkv.png'],
+            ['nama_kategori' => 'PS', 'role' => 'user', 'icon' => 'ps.png'],
+        ];
 
         foreach ($kategori as $kat) {
             Kategori::firstOrCreate([
                 'nama_kategori' => $kat['nama_kategori'],
+                'icon' => $kat['icon'],
                 'role' => $kat['role'],
                 'created_at' => now(),
                 'updated_at' => now(),

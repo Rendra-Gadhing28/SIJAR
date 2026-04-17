@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori_jurusan', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_kategori', 50);
-            $table->string('role');
-            $table->timestamps();
+        Schema::table('kategori_jurusan', function (Blueprint $table) {
+            $table->string('icon')->nullable()->after('nama_kategori');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        
+        Schema::table('jurusan', function (Blueprint $table) {
+            //
+        });
     }
 };

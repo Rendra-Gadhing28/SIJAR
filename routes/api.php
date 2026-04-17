@@ -23,12 +23,13 @@ Route::prefix('test')->group( function () {
     Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
     Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
     //home page
-    Route::get('/', [PeminjamanController::class, 'beranda'])->name('user.homepage');
+    Route::get('/homepage', [PeminjamanController::class, 'beranda'])->name('user.homepage');
     Route::get('/waktu', [waktuPembelajaran::class, 'index'])->name('waktu.pembelajaran');
     Route::get('/jurusan', [UserController::class, 'getKategori'])->name('kategori.jurusan');
-
     Route::get('/barang', [ItemController::class, 'getBarang'])->name('barang.index');
 
+    //landing page
+    Route::get('/landing', [ItemController::class, 'LandingPage']);
     // PROFILE
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');

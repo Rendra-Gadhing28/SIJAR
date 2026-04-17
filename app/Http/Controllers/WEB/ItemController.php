@@ -122,26 +122,24 @@ public function index(Request $request)
             return response()->file(public_path('images/placeholder.png'));
         }
     }
-    public function Home(){
-        
-    if (Auth::check()) {
-        $user = Auth::user();
-        return match ($user->role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'user' => redirect()->route('user.homepage'),
-            default => redirect()->route('login'),
-        };
-    }
+    public function LandingPage(){
         $brg = Item::with('kategori_jurusan')->
         where('status_item', 'tersedia')
         ->orderBy('created_at', 'desc')
         ->limit(6)
         ->get();
 
+        $jurusan = Kategori::get();
+
+        $dataLandingpage = [
+            'barang' => $brg,
+            'jurusan' => $jurusan
+        ];
+
         return response()->json([
             "status" => true,
             "message" => "data untuk landing page",
-            "data" => $brg
+            "data" => $dataLandingpage
         ], 200);
     }
 }

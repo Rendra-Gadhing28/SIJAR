@@ -18,7 +18,7 @@ class Kategori extends Model
     public static function getKategori(){
         return DB::table('kategori_jurusan')->get();
     }
-     public function items()
+     public function Items()
     {
         return $this->hasMany(Item::class);
     }
@@ -29,9 +29,5 @@ class Kategori extends Model
     public function user()
     {
         return $this->hasMany(User::class);
-    }
-    public function item()
-    {
-        return $this->hasMany(Item::class);
     }
 }
