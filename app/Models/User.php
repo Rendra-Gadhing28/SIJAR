@@ -26,14 +26,18 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
-        'jurusan_id',
-        'kategori_id',
-        'kelas',
         'telepon',
-        'profile'
+        'alamat',
+        'role',
+        'kategori_id',
+        'jurusan_id',
+        'profile', 
+        'kelas',
     ];
 
+    protected $casts = [
+        'telepon' => 'string', // Cast ke string biar 0 di depan tidak hilang
+    ];
     public static function users()
     {
         return DB::table('users')->get();

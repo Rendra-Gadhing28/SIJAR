@@ -25,8 +25,10 @@ class PeminjamanController extends Controller
     public function index(Request $request)
     {   //membuat variabel peminjaman yang berisi data dari table peminjaman
         //data peminjaman yang diambil hanya milik user yang sedang login
-        $peminjaman = peminjaman::where("user_id", Auth::id())
-            ->with("item")//relasi table item
+        $user = User::find(8);
+        $peminjaman = peminjaman:://where("user_id", $user)
+        //     ->
+            with("item")//relasi table item
             ->latest()// mengambil data yang terbaru
             ->paginate(10);//menampilkan 10 data per halaman
 
@@ -50,7 +52,7 @@ class PeminjamanController extends Controller
      */
  public function create(Request $request)
 {
-    $user = Auth::user();
+    $user = User::find(27);
     if (!$user) {
         return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
     }
@@ -255,13 +257,22 @@ class PeminjamanController extends Controller
      */
     public function show($id)
     {
-        $peminjaman = Peminjaman::with(['barang', 'slotPeminjaman.waktu', 'user'])
-            ->where('user_id', Auth::id())
+        $user = User::find(8);
+        $peminjaman = Peminjaman::with(['item', 'user'])
+            // ->where('user_id', auth()->id()) // Ganti dengan Auth::id() untuk pengguna yang sedang login
+            ->where('user_id', $user->id)
             ->findOrFail($id);
 
+            if (!$peminjaman) {
+             return response()->json([
+            "status" => false,
+            "message" => "data peminjaman dengan ID {$id} tidak ditemukan",
+            "data" => null
+        ], 404);
+        }
          return response()->json([
             "status" => true,
-            "message" => "data peminjaman berhasil diambil",
+            "message" => "data peminjaman dengan ID {$id} berhasil diambil",
             "data" => $peminjaman
         ], 200);
     }

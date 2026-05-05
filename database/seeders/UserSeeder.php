@@ -77,8 +77,7 @@ public function run(): void
             $name = $kls.' '.$jrs->nama_jurusan;
                 User::create([
                     'name' => $name,//X PPLG 3
-                    'email' => strtoupper(str_replace(' ', '', $name)) . '@gmail.com',//XPPLG3@gmail.com
-                    //sijar_xpplg3
+                    'kode' => 'sijar'.strtoupper(str_replace(' ', '', $name)),//sijarxpplg3
                     'password' => bcrypt( str_replace(' ', '', strtolower($name))),
                     'role' => 'user',
                     'jurusan_id' => $jrs->id,

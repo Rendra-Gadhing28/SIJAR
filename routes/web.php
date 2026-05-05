@@ -11,7 +11,7 @@ use App\Http\Controllers\Admin\AdminItemController;
 use App\Http\Controllers\Admin\ActivityLoggerController;
 use App\Http\Controllers\Admin\NotificationController; 
 
-Route::get('/', [ItemController::class, 'Home'])->name('home');
+// Route::get('/', [ItemController::class, 'Home'])->name('home');
 
 Route::middleware(['auth','role:user'])->group(function () {
     // atau bisa juga ditulis lengkap seperti ini:

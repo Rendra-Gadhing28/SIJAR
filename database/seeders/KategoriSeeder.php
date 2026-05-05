@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
+
 use App\Models\Kategori;
 
 class KategoriSeeder extends Seeder
@@ -14,11 +16,11 @@ class KategoriSeeder extends Seeder
     public function run(): void
     {
         $kategori = [
-            ['nama_kategori' => 'PPLG', 'role' => 'user', 'icon' => 'pplg.png',], 
-            ['nama_kategori' => 'LK', 'role' => 'user', 'icon' => 'lk1.png',],
-            ['nama_kategori' => 'TJKT', 'role' => 'user', 'icon' => 'tjkt.png'],
-            ['nama_kategori' => 'DKV', 'role' => 'user', 'icon' => 'dkv.png'],
-            ['nama_kategori' => 'PS', 'role' => 'user', 'icon' => 'ps.png'],
+            ['nama_kategori' => 'PPLG', 'role' => 'user', 'icon' => 'icon/pplg.png',], 
+            ['nama_kategori' => 'LK', 'role' => 'user', 'icon' => 'icon/lk1.png',],
+            ['nama_kategori' => 'TJKT', 'role' => 'user', 'icon' => 'icon/tjkt.png'],
+            ['nama_kategori' => 'DKV', 'role' => 'user', 'icon' => 'icon/dkv.png'],
+            ['nama_kategori' => 'PS', 'role' => 'user', 'icon' => 'icon/ps.png'],
         ];
 
         foreach ($kategori as $kat) {
