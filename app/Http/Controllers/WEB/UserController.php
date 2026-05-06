@@ -36,20 +36,7 @@ class UserController extends Controller
     }
 
     public function login(Request $request){
-        if(!Auth::attempt($request->only('email', 'password'))){
-                return response()->json([
-                    "message" => "login gagal",
-                ],401);
-        }
-
-        $user = Auth::user();
-        $token = $user->createToken("token",['*'], 
-        now())->plainTextToken;
-
-        return response()->json([
-            "token" => $token,
-            "user" => $user,
-        ], 200);
+        
     }
 
     public function getKategori(){

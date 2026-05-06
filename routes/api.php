@@ -1,5 +1,7 @@
 <?php
 use App\Http\Controllers\Admin\UnduLaporan;
+use App\Http\Controllers\api\auth\LoginController;
+use App\Http\Controllers\api\auth\LogoutController;
 use App\Http\Controllers\WEB\UserController;
 use App\Http\Controllers\WEB\waktuPembelajaran;
 use Illuminate\Support\Facades\Route;
@@ -25,7 +27,7 @@ Route::prefix('test')->group( function () {
     Route::get('/homepage', [PeminjamanController::class, 'beranda'])->name('user.homepage');
     Route::get('/waktu', [waktuPembelajaran::class, 'index'])->name('waktu.pembelajaran');
     Route::get('/jurusan', [UserController::class, 'getKategori'])->name('kategori.jurusan');
-    Route::get('/barang', [ItemController::class, 'index'])->name('barang.index');
+    Route::get('/barang', [ItemController::class, 'index'])->name('barang.index')->middleware('auth:sanctum');
 
     //landing page
     Route::get('/landing', [ItemController::class, 'LandingPage']);
@@ -36,12 +38,13 @@ Route::prefix('test')->group( function () {
     Route::delete('/profile/destroy/{id}', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::put('/password', [ProfileController::class, 'gantiPassw'])->name('password.update');
 
-    Route::middleware(['throttle:5,1'])->group( function () {
-        Route::post('/login', [UserController::class, 'login']);
-    });
-    
-
-
+    Route::prefix('auth')->group( function () {
+        Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('api.login');
+        Route::post('/logout', [LogoutController::class, 'destroy'])->name('api.logout');
+    })->middleware('web');;
+    // Route::middleware(['throttle:5,1'])->group( function () {
+    //     Route::post('/login', [UserController::class, 'login']);
+    // });
 });
 
 

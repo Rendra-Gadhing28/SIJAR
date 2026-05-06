@@ -21,13 +21,13 @@ public function index(Request $request)
     $user = Auth::user();
     // $user = User::find(8)
     // ->with('kategori')->first();
-    // if (!$user) {
-    //     // Redirect to login or show error if user is not authenticated
-    //     return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
-    // }
-
-
-    
+    if (!$user) {
+    return response()->json([
+        "status" => false,
+        "message" => "Unauthenticated. Silakan login terlebih dahulu.",
+    ], 401);
+}
+    $user->load('kategori');
     $jurusan = $user->kategori_id;
     $jurusanNama = $user->kategori->nama_kategori ?? 'Semua Jurusan';
 
@@ -76,7 +76,10 @@ public function index(Request $request)
     return response()->json([
         "status" => true,
         "message" => "berhasil mengambil data untuk jurusan ".$jurusanNama,
-        "data" => $dataLengkap,
+        "data" => $dataLengkap[0],
+        "kategori" => $dataLengkap[1],
+        "Totalbarangjurusan" => $dataLengkap[3],
+        "jurusanNama" => $dataLengkap[4],
     ], 200) ;
 }
 
