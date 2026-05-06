@@ -32,7 +32,7 @@ public function index(Request $request)
     $jurusanNama = $user->kategori->nama_kategori ?? 'Semua Jurusan';
 
     // Mulai dengan query builder (TANPA get)
-    $item = Item::where('kategori_jurusan_id', $jurusan);
+    $item = Item::with('kategori_jurusan');
 
     // Inisialisasi kategori default
     $kategori = $jurusan;
@@ -56,19 +56,21 @@ public function index(Request $request)
         });
     }
     
-    $barangjurusan = $item->count();
+    
    
     // Filter hanya barang yang tersedia
     $item->where('status_item', 'tersedia');
+    $barangjurusan = $item->count();
 
     // Ambil data lengkap dengan relasi kategori
    $data = $item->with('kategori_jurusan')
         ->orderBy('created_at', 'desc')
-        ->paginate(9)
-        ->appends([
-            'search' => $request->search,
-            'kategori_jurusan_id' => $request->kategori_jurusan_id
-        ]);
+        ->paginate(9)->appends($request->only(['search', 'kategori_jurusan_id']));;
+        // ->appends([
+        //     'search' => $request->search,
+        //     'kategori_jurusan_id' => $request->kategori_jurusan_id
+        // ]);
+    $AllDataJurusan = Item::with('kategori_jurusan')->orderBy('created_at', 'desc')->paginate(9);
 
     // Dropdown kategori
     $kategoris = Kategori::orderBy('nama_kategori')->get();
