@@ -5,6 +5,7 @@ namespace App\Http\Controllers\WEB;
 use App\Models\Item;
 use App\Models\Kategori;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -17,18 +18,21 @@ class ItemController extends Controller
      */
 public function index(Request $request)
 {
-    $user = Auth::user();
-    if (!$user) {
-        // Redirect to login or show error if user is not authenticated
-        return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
-    }
+    // $user` = Auth::user();
+    $user = User::find(8)
+    ->with('kategori')->first();
+    // if (!$user) {
+    //     // Redirect to login or show error if user is not authenticated
+    //     return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
+    // }
 
 
     
     $jurusan = $user->kategori_id;
+    $jurusanNama = $user->kategori->nama_kategori ?? 'Semua Jurusan';
 
     // Mulai dengan query builder (TANPA get)
-    $item = Item::where('kategori_jurusan_id',);
+    $item = Item::where('kategori_jurusan_id', $jurusan);
 
     // Inisialisasi kategori default
     $kategori = $jurusan;
@@ -68,10 +72,10 @@ public function index(Request $request)
 
     // Dropdown kategori
     $kategoris = Kategori::orderBy('nama_kategori')->get();
-    $dataLengkap = [$data, $kategori, $kategoris, $barangjurusan];
+    $dataLengkap = [$data, $kategori, $kategoris, $barangjurusan, $jurusanNama];
     return response()->json([
         "status" => true,
-        "message" => "berhasil mengambil data",
+        "message" => "berhasil mengambil data untuk jurusan ".$jurusanNama,
         "data" => $dataLengkap,
     ], 200) ;
 }

@@ -25,7 +25,7 @@ Route::prefix('test')->group( function () {
     Route::get('/homepage', [PeminjamanController::class, 'beranda'])->name('user.homepage');
     Route::get('/waktu', [waktuPembelajaran::class, 'index'])->name('waktu.pembelajaran');
     Route::get('/jurusan', [UserController::class, 'getKategori'])->name('kategori.jurusan');
-    Route::get('/barang', [ItemController::class, 'getBarang'])->name('barang.index');
+    Route::get('/barang', [ItemController::class, 'index'])->name('barang.index');
 
     //landing page
     Route::get('/landing', [ItemController::class, 'LandingPage']);
