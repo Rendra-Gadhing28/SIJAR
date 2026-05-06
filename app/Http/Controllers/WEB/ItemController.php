@@ -18,9 +18,9 @@ class ItemController extends Controller
      */
 public function index(Request $request)
 {
-    // $user` = Auth::user();
-    $user = User::find(8)
-    ->with('kategori')->first();
+    $user = Auth::user();
+    // $user = User::find(8)
+    // ->with('kategori')->first();
     // if (!$user) {
     //     // Redirect to login or show error if user is not authenticated
     //     return redirect()->route('login')->withErrors('Anda harus login terlebih dahulu.');
