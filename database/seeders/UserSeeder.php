@@ -57,7 +57,7 @@ public function run(): void
              $adminJurusan = Jurusan::where('nama_jurusan', $jurusan['nama'])->first();
                 User::create([
                 'name' => $adm,
-                'email' => strtolower(str_replace(' ', '', $jurusan['nama'])).'@gmail.com',
+                'kode' => strtolower(str_replace(' ', '', $jurusan['nama'])),
                 'password' => bcrypt($jurusan['Password']),
                 'role' => $jurusan['role'],
                 'jurusan_id' => $adminJurusan->id,

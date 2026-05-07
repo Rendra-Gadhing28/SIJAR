@@ -17,7 +17,7 @@ use App\Http\Controllers\Admin\NotificationController;
 Route::prefix('test')->group( function () {
     Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
-    Route::post('/peminjaman-kirim', [PeminjamanController::class, 'store'])->name('peminjaman.store')->middleware('throttle:60,1');
+    Route::post('/peminjaman/store', [PeminjamanController::class, 'store'])->name('peminjaman.store')->middleware('throttle:60,1');
     Route::get('/peminjaman/{id}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
     Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
     Route::put('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
@@ -42,6 +42,8 @@ Route::prefix('test')->group( function () {
         Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('api.login');
         Route::post('/logout', [LogoutController::class, 'destroy'])->name('api.logout');
     })->middleware('web');;
+
+    Route::post('/item/image', [ItemController::class, 'showImage'])->name('item.image');
     // Route::middleware(['throttle:5,1'])->group( function () {
     //     Route::post('/login', [UserController::class, 'login']);
     // });
@@ -75,7 +77,7 @@ Route::middleware(['auth:sanctum','role:user'])->group(function () {
 
 
 
-Route::middleware(['auth:sanctum','role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [AdminPeminjamanController::class, 'dashboard'])->name('dashboard'); // admin.dashboard

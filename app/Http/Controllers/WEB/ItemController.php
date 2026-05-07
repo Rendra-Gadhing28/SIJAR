@@ -100,14 +100,16 @@ public function index(Request $request)
     /**
      * Menampilkan gambar yang terenkripsi
      */
-    public function showImage($filename)
+    public function showImage(Request $req)
     {
+        $filename = $req->input('filename');
         try {
             // Cek apakah filename sudah terenkripsi atau masih path biasa
             // Jika foto_barang berisi path file (bukan encrypted data)
             if (Storage::exists('encrypted/' . $filename)) {
                 $encryptedImage = Storage::get('encrypted/' . $filename);
                 $decryptedImage = Crypt::decrypt($encryptedImage);
+
             }
             // Jika foto_barang berisi encrypted data langsung di database
             else {
@@ -122,7 +124,8 @@ public function index(Request $request)
             // Return response dengan cache
             return response($decryptedImage)
                 ->header('Content-Type', $mimeType)
-                ->header('Cache-Control', 'public, max-age=3600');
+                ->header('Cache-Control', 'public, max-age=3600')
+                ->header('Access-Control-Allow-Origin', 'http://localhost:5173'); 
 
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             // Jika gagal decrypt, kembalikan placeholder

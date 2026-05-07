@@ -89,8 +89,8 @@ Route::prefix('profile')->name('profile.')->group(function () {
 });
 
 // ITEM IMAGES (Public access untuk menampilkan gambar)
-Route::get('/item/image/{filename}', [ItemController::class, 'showImage'])->name('item.image');
-Route::get('/item-image/{filename}', [ItemController::class, 'showImage'])->name('image.show');
+
+// Route::get('/item-image/{filename}', [ItemController::class, 'showImage'])->name('image.show');
 
 // ITEM (jika berbeda dengan barang)
 Route::get('/item', [ItemController::class, 'index'])->name('items.index');

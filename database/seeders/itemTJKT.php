@@ -17,11 +17,11 @@ class itemTJKT extends Seeder
     public function run(): void
     {
         $barang_TJKT = [  'TJKT' => [
-                ['nama' => 'HDMI Converter', 'stok' => 4, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Webcam', 'stok' => 4, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Roll Kabel', 'stok' => 5, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Lan USB Adapter', 'stok' => 4, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Obeng', 'stok' => 4, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
+                ['nama' => 'HDMI Converter', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Webcam', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Roll Kabel', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Lan USB Adapter', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Obeng', 'stok' => 2, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
             ]];
 
              foreach($barang_TJKT as $TJKT =>$list){

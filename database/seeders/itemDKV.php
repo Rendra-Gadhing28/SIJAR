@@ -17,9 +17,9 @@ class itemDKV extends Seeder
     public function run(): void
     {
         $barang_DKV =[ 'DKV' => [
-                ['nama' => 'Kamera', 'stok' => 3, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Tripod', 'stok' => 3, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
-                ['nama' => 'Camera Panggung', 'stok' => 1, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Kamera', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Tripod', 'stok' => 2, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
+                ['nama' => 'Camera Panggul', 'stok' => 1, 'jenis' => 'Elektronik','status' => 'tersedia'],
                 ['nama' => 'Perangkat Alat Streaming', 'stok' => 1, 'jenis' => 'Elektronik','status' => 'tersedia'],
                 ['nama' => 'Pensil Warna 1 Set', 'stok' => 1, 'jenis' => 'Alat Tulis','status' => 'tersedia'],
                 ['nama' => 'Pensil Gambar 1 Set', 'stok' => 1, 'jenis' => 'Alat Tulis','status' => 'tersedia'],
@@ -29,8 +29,8 @@ class itemDKV extends Seeder
                 ['nama' => 'Alat Press Mug', 'stok' => 1, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
                 ['nama' => 'Alat Press Pin', 'stok' => 1, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
                 ['nama' => 'Press Sablon Kaos Full Set', 'stok' => 2, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
-                ['nama' => 'Pen Tablet', 'stok' => 8, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
-                ['nama' => 'Pen Display', 'stok' => 30, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
+                ['nama' => 'Pen Tablet', 'stok' => 2, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
+                ['nama' => 'Pen Display', 'stok' => 2, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
             ]];
 
               foreach($barang_DKV as $DKV =>$list){

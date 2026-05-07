@@ -16,13 +16,13 @@ class itemPPLG extends Seeder
     public function run(): void
     {
         $barang_barang =  ['PPLG' => [
-                ['nama' => 'Proyektor', 'stok' => 5, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Kabel VGA', 'stok' => 20, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Converter HDMI', 'stok' => 10, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Keyboard', 'stok' => 20, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Mouse', 'stok' => 20, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'VR Oculus', 'stok' => 3, 'jenis' => 'Elektronik','status' => 'tersedia'],
-                ['nama' => 'Set Obeng', 'stok' => 3, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
+                ['nama' => 'Proyektor', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Kabel VGA', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Converter HDMI', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Keyboard', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Mouse', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'VR Oculus', 'stok' => 2, 'jenis' => 'Elektronik','status' => 'tersedia'],
+                ['nama' => 'Set Obeng', 'stok' => 2, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
                 ['nama' => 'Lan Tester', 'stok' => 3, 'jenis' => 'Alat Praktik','status' => 'tersedia'],
             ]];
 
