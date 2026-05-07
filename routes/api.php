@@ -41,7 +41,7 @@ Route::prefix('test')->group( function () {
     Route::prefix('auth')->group( function () {
         Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('api.login');
         Route::post('/logout', [LogoutController::class, 'destroy'])->name('api.logout');
-    })->middleware('web');;
+    });;
 
     Route::post('/item/image', [ItemController::class, 'showImage'])->name('item.image');
     // Route::middleware(['throttle:5,1'])->group( function () {

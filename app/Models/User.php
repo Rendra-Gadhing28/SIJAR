@@ -24,7 +24,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
+        'kode',
         'password',
         'telepon',
         'alamat',
@@ -37,6 +37,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'telepon' => 'string', // Cast ke string biar 0 di depan tidak hilang
+        'kode' => 'string',
     ];
     public static function users()
     {
