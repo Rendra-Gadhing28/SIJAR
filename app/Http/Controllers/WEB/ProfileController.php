@@ -14,29 +14,30 @@ class ProfileController extends Controller
 {
 
     public function index(){
-        // $user = Auth::user();
-        // $user->where('role' != 'Admin')->get();
-        $data = User::lazy();
-         return response()->json([
-            "status" => true,
-            "message" => "data peminjaman berhasil diambil",
-            "data" => $data
-        ], 200);
+      $data = User::select('id', 'name', 'kode', 'telepon', 'profile')
+        ->find(8); // 1 query langsung, tidak perlu where manual
 
-        if(!$data){
-            return response()->json([
+    if (!$data) {
+        return response()->json([
             "status" => false,
-            "message" => "data tidak ada",
-            "data" => $data
-        ], 400);
-        }
+            "message" => "Data tidak ditemukan",
+            "data" => null
+        ], 404);
+    }
+
+    return response()->json([
+        "status" => true,
+        "message" => "Data user berhasil diambil",
+        "data" => $data
+    ], 200);
     }
     /**
      * Display the user's profile form.
      */
     public function edit(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user()::select('id', 'name', 'email', 'telepon', 'profile')
+            ->find($request->user()->id);
 
          return response()->json([
             "status" => true,
@@ -63,9 +64,9 @@ class ProfileController extends Controller
     try {
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $id,
+            'kode' => 'sometimes|string|unique:users,kode,' . $id,
             'telepon' => 'nullable|string|max:255',
-            'profile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         $validated['telepon'] = $request->input('telepon');
         if ($request->hasFile('profile')) {
@@ -76,9 +77,11 @@ class ProfileController extends Controller
         
         $profile = time() . '_' . $request->file('profile')->getClientOriginalName();
         $request->file('profile')->storeAs('avatars', $profile, 'public');
-        $validated['profile'] = $profile;
+        $hash = hash('sha256', $profile, true);
+        $base64 = base64_encode($hash);
+        $validated['profile'] = $base64;
     }
-        unset($validated['role']); // Jangan update role dari sini
+        unset($validated['role']); // Jangan update role dari sini // Jangan update kode dari sini
         unset($validated['jurusan_id']);
         unset($validated['kategori_id']);
         unset($validated['kelas']);
@@ -93,11 +96,12 @@ class ProfileController extends Controller
         $user->update($validated);
         
         // $user->update($validated);
-        
+    $data = User::select('name', 'kode', 'telepon', 'profile')
+        ->find($user->id);
         return response()->json([
             "status" => true,
             "message" => "Data user ID {$id} berhasil diupdate",
-            "data" => $user->fresh()
+            "data" => $data// Ambil data terbaru setelah update
         ], 200);
         
     } catch (\Illuminate\Validation\ValidationException $e) {
@@ -169,7 +173,6 @@ class ProfileController extends Controller
         ]);
 
         $user = Auth::user();
-
         // Cek password lama
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([

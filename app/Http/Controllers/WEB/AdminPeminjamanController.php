@@ -17,67 +17,71 @@ class AdminPeminjamanController extends Controller
      * Display a listing of the resource (Daftar semua peminjaman untuk admin).
      */
     public function dashboard()
-    {
-        //mengambil akun admin yang sedang login
-        $admin = Auth::user();
-        //mengambil kategori jurusan admin
-        $adminKategoriId = $admin->kategori_id;
+{
+    $admin = Auth::user();
+    $adminKategoriId = $admin->kategori_id;
 
-        // Filter notifikasi berdasarkan kategori_jurusan_id item
-        $notifications = Peminjaman::with(['user', 'item.kategori_jurusan'])
-            ->whereHas('item', function ($query) use ($adminKategoriId) {
-                $query->where('kategori_jurusan_id', $adminKategoriId);
-            })
-            ->latest()
-            ->lazy();
+    // ✅ Buat base query sekali, reuse berkali-kali
+    $basePeminjaman = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
+        $query->where('kategori_jurusan_id', $adminKategoriId);
+    });
 
-        // table peminjaman yang memiliki relasi item, dengan menggunakan function yang berisi parameter query, dan menggunakan variabel $adminKategoriId
-        $totalPending = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
-            //mengambil data kategori_jurusan_id yang sesuai dengan kategori admin
-            $query->where('kategori_jurusan_id', $adminKategoriId);
-        })//filter status tujuan
-        ->where('status_tujuan', 'Pending')->count();
+    // ✅ Ambil semua statistik dalam 1 query pakai aggregate
+    $stats = (clone $basePeminjaman)
+        ->selectRaw("
+            COUNT(*) as total,
+            SUM(CASE WHEN status_tujuan = 'Pending' THEN 1 ELSE 0 END) as total_pending,
+            SUM(CASE WHEN status_tujuan = 'Approved' THEN 1 ELSE 0 END) as total_approved,
+            SUM(CASE WHEN status_tujuan = 'Rejected' THEN 1 ELSE 0 END) as total_rejected,
+            SUM(CASE WHEN status_pinjaman = 'dipinjam' THEN 1 ELSE 0 END) as total_dipinjam,
+            SUM(CASE WHEN status_pinjaman = 'selesai' THEN 1 ELSE 0 END) as total_dikembalikan
+        ")
+        ->first(); // 1 query saja untuk semua statistik! ✅
 
-        $totalApproved = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
-            $query->where('kategori_jurusan_id', $adminKategoriId);
-        })->where('status_tujuan', 'Approved')->count();
+    // ✅ Notifikasi pakai get() bukan lazy()
+    $notifications = (clone $basePeminjaman)
+        ->with([
+            'user:id,name,kategori_id',
+            'item:id,nama_item,kategori_jurusan_id',
+            'item.kategori_jurusan:id,nama_jurusan'
+        ])
+        ->latest()
+        ->take(10) // batasi jangan ambil semua!
+        ->get()
+        ->only(['id', 'keperluan', 'status_tujuan', 'user', 'item']);
 
-        $totalRejected = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
-            $query->where('kategori_jurusan_id', $adminKategoriId);
-        })->where('status_tujuan', 'Rejected')->count();
+    // ✅ Recent peminjaman
+    $recentPeminjaman = (clone $basePeminjaman)
+        ->with([
+            'user:id,name',
+            'item:id,nama_item,kode_unit,foto_barang'
+        ])
+        ->latest()
+        ->take(5)
+        ->get();
 
-        $totalDipinjam = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
-            $query->where('kategori_jurusan_id', $adminKategoriId);
-        })->where('status_pinjaman', 'dipinjam')->count();
+    // ✅ Total item jurusan
+    $totalItems = Item::where('kategori_jurusan_id', $adminKategoriId)->count();
 
-        $totalDikembalikan = Peminjaman::whereHas('item', function ($query) use ($adminKategoriId) {
-            $query->where('kategori_jurusan_id', $adminKategoriId);
-        })->where('status_pinjaman', 'selesai')->count();
-
-
-        //hitung item yang ada sesuai jurusan admin
-        $totalItems = Item::where('kategori_jurusan_id', $adminKategoriId)->count();
-        //menghitung total riwayat peminjaman
-        $totalriwayat = $totalDipinjam + $totalDikembalikan;
-
-        // Peminjaman terbaru (5 terakhir) berdasarkan kategori_jurusan_id item
-        $recentPeminjaman = Peminjaman::with(['user', 'item'])
-            ->whereHas('item', function ($query) use ($adminKategoriId) {
-                $query->where('kategori_jurusan_id', $adminKategoriId);
-            })
-            ->latest()
-            ->take(5)
-            ->lazy();
-
-            $dataLengkap = [$notifications, $totalPending, $totalApproved, $totalRejected, $totalItems, $recentPeminjaman,$totalDipinjam, $totalDikembalikan, $totalriwayat];
-
-        return response()->json([
-            "status" => true,
-            "message" => "data berhasil diambil",
-            "data" => $dataLengkap,
-        ], 200);
-    }
-
+    return response()->json([
+        "status" => true,
+        "message" => "Data dashboard berhasil diambil",
+        "data" => [
+            // ✅ Terstruktur dan jelas
+            "statistik" => [
+                "total_pending"      => $stats->total_pending,
+                "total_approved"     => $stats->total_approved,
+                "total_rejected"     => $stats->total_rejected,
+                "total_dipinjam"     => $stats->total_dipinjam,
+                "total_dikembalikan" => $stats->total_dikembalikan,
+                "total_riwayat"      => $stats->total_dipinjam + $stats->total_dikembalikan,
+                "total_items"        => $totalItems,
+            ],
+            "notifications"     => $notifications,
+            "recent_peminjaman" => $recentPeminjaman,
+        ]
+    ], 200);
+}
     public function riwayat(Request $request)
     {
         $admin = Auth::user();
@@ -85,7 +89,7 @@ class AdminPeminjamanController extends Controller
 
         $query = Peminjaman::with(['item.kategori_jurusan', 'user.kategori'])
             ->whereHas('item', function ($q) use ($adminKategoriId) {
-                $q->where('kategori_jurusan_id', $adminKategoriId);
+                $q->where('kategori_id', $adminKategoriId);
             });
 
         // Filter berdasarkan kelas (X, XI, XII)
@@ -152,7 +156,7 @@ class AdminPeminjamanController extends Controller
             $kategori = Kategori::lazy();
         $query = Peminjaman::with(['item.kategori_jurusan', 'user.kategori'])
             ->whereHas('item', function ($q) use ($adminKategoriId) {
-                $q->where('kategori_jurusan_id', $adminKategoriId);
+                $q->where('kategori_id', $adminKategoriId);
             });
 
         // Filter berdasarkan kelas

@@ -31,7 +31,7 @@ class Item extends Model
 
      public function kategori_jurusan()
     {
-        return $this->belongsTo(Kategori::class, 'kategori_jurusan_id');
+        return $this->belongsTo(Kategori::class, 'kategori_id');
     }
      public function peminjaman()
     {

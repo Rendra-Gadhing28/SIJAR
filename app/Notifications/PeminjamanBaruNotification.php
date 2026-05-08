@@ -33,7 +33,7 @@ class PeminjamanBaruNotification extends Notification
             'user_name' => $this->peminjaman->user->name,
             'item_name' => $this->peminjaman->item?->nama_item,
             'tanggal' => Carbon::parse($this->peminjaman->tanggal)->format('d M Y'),
-            'message' => "{$this->peminjaman->user->name} mengajukan peminjaman {$this->peminjaman->item->nama_item}",
+            'message' => "{$this->peminjaman->keperluan}",
         ];
     }
 }

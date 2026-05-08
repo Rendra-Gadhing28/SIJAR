@@ -12,10 +12,11 @@ use App\Models\peminjaman;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable,HasApiTokens;
+    use HasFactory,HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -46,7 +47,8 @@ class User extends Authenticatable
 
     public function notifications()
     {
-        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable');
+        return $this->morphMany(\Illuminate\Notifications\DatabaseNotification::class, 'notifiable')
+         ->orderBy('created_at', 'desc');
     }
 
     public function unreadNotifications()

@@ -101,57 +101,53 @@ public function index(Request $request)
      * Menampilkan gambar yang terenkripsi
      */
     public function showImage(Request $req)
-    {
-        $filename = $req->input('filename');
-        try {
-            // Cek apakah filename sudah terenkripsi atau masih path biasa
-            // Jika foto_barang berisi path file (bukan encrypted data)
-            if (Storage::exists('encrypted/' . $filename)) {
-                $encryptedImage = Storage::get('encrypted/' . $filename);
-                $decryptedImage = Crypt::decrypt($encryptedImage);
-
-            }
-            // Jika foto_barang berisi encrypted data langsung di database
-            else {
-                // Dekripsi langsung dari data
-                $decryptedImage = Crypt::decrypt($filename);
-            }
-
-            // Deteksi MIME type
-            $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($decryptedImage);
-
-            // Return response dengan cache
-            return response($decryptedImage)
-                ->header('Content-Type', $mimeType)
-                ->header('Cache-Control', 'public, max-age=3600')
-                ->header('Access-Control-Allow-Origin', 'http://localhost:5173'); 
-
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            // Jika gagal decrypt, kembalikan placeholder
-            return response()->file(public_path('images/placeholder.png'));
-        } catch (\Exception $e) {
-            return response()->file(public_path('images/placeholder.png'));
-        }
+{
+    $filename = $req->input('filename');
+    
+    // ✅ File biasa, tidak perlu decrypt apapun!
+    $gambar_barang = 'encrypted/' . $filename;
+    $icons = 'icons/' . $filename;
+    
+    if (!Storage::disk('public')->exists($gambar_barang) && !Storage::disk('public')->exists($icons)) {
+        return response()->file(public_path('images/placeholder.png'));
     }
-    public function LandingPage(){
-        $brg = Item::with('kategori_jurusan')->
-        where('status_item', 'tersedia')
+
+    $file     = Storage::disk('public')->get($gambar_barang ?: $icons);
+    $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+    $mimeType = $finfo->buffer($file);
+
+    return response($file)
+        ->header('Content-Type', $mimeType)
+        ->header('Cache-Control', 'public, max-age=86400')
+        ->header('Access-Control-Allow-Origin', 'http://localhost:5173');
+}
+
+        public function LandingPage(){
+    $brg = Item::where('status_item', 'tersedia')
+        ->select('id', 'nama_item', 'jenis_item', 'kode_unit', 'kategori_jurusan_id', 'foto_barang')
         ->orderBy('created_at', 'desc')
         ->limit(6)
-        ->get();
+        ->get()
+        ->map(function ($item) {
+            $item->foto_url = $item->foto_barang
+                ? asset('storage/encrypted/' . $item->foto_barang)
+                : null;
+            return $item;
+        });
 
-        $jurusan = Kategori::get();
+    $jurusan = Kategori::select('id', 'nama_kategori', 'icon')
+        ->get()
+        ->map(function ($kat) {
+            $kat->icon_url = $kat->icon
+                ? asset('storage/icons/' . $kat->icon)
+                : null;
+            return $kat;
+        });
 
-        $dataLandingpage = [
-            'barang' => $brg,
-            'jurusan' => $jurusan
-        ];
-
-        return response()->json([
-            "status" => true,
-            "message" => "data untuk landing page",
-            "data" => $dataLandingpage
-        ], 200);
-    }
+    return response()->json([
+        "status"  => true,
+        "message" => "data untuk landing page",
+        "data"    => ['barang' => $brg, 'jurusan' => $jurusan]
+    ], 200);
+}
 }

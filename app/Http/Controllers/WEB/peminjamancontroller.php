@@ -25,10 +25,11 @@ class PeminjamanController extends Controller
     public function index(Request $request)
     {   //membuat variabel peminjaman yang berisi data dari table peminjaman
         //data peminjaman yang diambil hanya milik user yang sedang login
-        $user = User::find(8);
-        $peminjaman = peminjaman:://where("user_id", $user)
-        //     ->
-            with("item")//relasi table item
+        $user = User::find(11);
+        $peminjaman = peminjaman::where("user_id", $user->id)
+            ->
+            with(["item:id,nama_item,kode_unit"])//relasi table item
+            ->select(['id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'status_pinjaman', 'gambar_bukti', 'jam_pembelajaran'])
             ->latest()// mengambil data yang terbaru
             ->paginate(10);//menampilkan 10 data per halaman
 
@@ -165,7 +166,7 @@ class PeminjamanController extends Controller
             // Buat peminjaman dengan jam_pembelajaran
             $peminjaman = peminjaman::create([
                 'keperluan' => $validated['keperluan'],
-                'user_id' => Auth::id() ?? 8,
+                'user_id' => Auth::id() ?? 11,
                 'item_id' => $validated['item_id'],
                 'tanggal' => now()->toDateString(),
                 'status_tujuan' => 'pending',
@@ -174,6 +175,8 @@ class PeminjamanController extends Controller
                 'jam_pembelajaran' => json_encode($jamPembelajaran),  // Simpan sebagai JSON array
             ]);
 
+            $peminjaman->select('keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'gambar_bukti', 'jam_pembelajaran');
+
             
 
             // Update status item
@@ -181,9 +184,12 @@ class PeminjamanController extends Controller
             $item->update(['status' => 'tidak_tersedia']);
 
             // Kirim notifikasi ke admin
-            $admins = User::where('role', 'admin')->lazy();
-            foreach ($admins as $admin) {
-                $admin->notify(new PeminjamanBaruNotification($peminjaman));
+            $admins = User::where('role', 'admin')->get();
+            if ($admins->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send(
+                    $admins,
+                    new PeminjamanBaruNotification($peminjaman)
+                );
             }
 
            
@@ -199,7 +205,9 @@ class PeminjamanController extends Controller
              return response()->json([
                 "status" => true,
                 "message" => "peminjaman berhasil dibuat",
-                "data" => $peminjaman
+                "data" => $peminjaman->only([
+                    'id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'gambar_bukti', 'jam_pembelajaran'
+                ])
             ], 201);
 
         } catch (\Exception $e) {
@@ -258,10 +266,11 @@ class PeminjamanController extends Controller
     public function show($id)
     {
         $user = User::find(8);
-        $peminjaman = Peminjaman::with(['item', 'user'])
+        $peminjaman = Peminjaman::with(['item:id,nama_item,kode_unit,foto_barang','user:id,name,kategori_id'])
+        ->select('id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'status_pinjaman', 'gambar_bukti', 'jam_pembelajaran')
             // ->where('user_id', auth()->id()) // Ganti dengan Auth::id() untuk pengguna yang sedang login
             ->where('user_id', $user->id)
-            ->findOrFail($id);
+            ->find($id);
 
             if (!$peminjaman) {
              return response()->json([

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\DB;
 
 class NotificationController extends Controller
 {
@@ -13,46 +14,66 @@ class NotificationController extends Controller
      * Display a listing of notifications.
      */
     public function index(Request $request)
-    {
-        $user = Auth::user();
-        
-        $query = $user->notifications();
-        
-        // Filter berdasarkan tipe notifikasi
-        if ($request->filled('type')) {
-            $query->where('type', 'like', '%' . $request->type . '%');
-        }
-        
-        // Filter hanya yang belum dibaca
-        if ($request->has('unread') && $request->unread == '1') {
-            $query->whereNull('read_at');
-        }
-        
-        $notifications = $query->orderBy('created_at', 'desc')->paginate(15);
-        
-        // Hitung statistik
-        $totalNotifications = $user->notifications()->count();
-        $unreadNotifications = $user->unreadNotifications()->count();
-        
-        // Ambil tipe notifikasi yang unik untuk filter
-        $notificationTypes = $user->notifications()
-            ->select('type')
-            ->distinct()
-            ->pluck('type')
-            ->map(function ($type) {
-                // Ambil nama class terakhir
-                return class_basename($type);
-            })
-            ->unique()
-            ->values();
-        
-        return view('admin.notifications.index', compact(
-            'notifications',
-            'totalNotifications',
-            'unreadNotifications',
-            'notificationTypes'
-        ));
+{
+    $user = Auth::user();
+
+    // ✅ Debug dulu — cek apakah data ada
+    $rawCheck = DB::table('notifications')
+        ->where('notifiable_id', $user->id)
+        ->where('notifiable_type', get_class($user)) // "App\Models\User"
+        ->count();
+    
+    
+
+    $query = $user->notifications();
+
+    if ($request->filled('type')) {
+        $query->where('type', 'like', '%' . $request->type . '%');
     }
+
+    if ($request->has('unread') && $request->unread == '1') {
+        $query->whereNull('read_at');
+    }
+
+    $notifications = $query->orderBy('created_at', 'desc')->paginate(10);
+
+    // ✅ Gabung statistik dalam 1 query
+    $stats = DB::table('notifications')
+        ->where('notifiable_id', $user->id)
+        ->where('notifiable_type', get_class($user))
+        ->selectRaw("
+            COUNT(*) as total,
+            SUM(CASE WHEN read_at IS NULL THEN 1 ELSE 0 END) as unread,
+            COUNT(DISTINCT type) as total_types
+        ")
+        ->first();
+
+    // ✅ Ambil tipe unik
+    $notificationTypes = DB::table('notifications')
+        ->where('notifiable_id', $user->id)
+        ->where('notifiable_type', get_class($user))
+        ->distinct()
+        ->pluck('type')
+        ->map(fn($type) => class_basename($type))
+        ->values();
+
+    return response()->json([
+        'status'  => true,
+        'message' => 'Notifikasi berhasil diambil',
+        'data'    => [
+            'notifications'      => $notifications,
+            'totalNotifications' => $stats->total,
+            'unreadNotifications'=> $stats->unread,
+        ]
+    ], 200);
+}
+        // return view('admin.notifications.index', compact(
+        //     'notifications',
+        //     'totalNotifications',
+        //     'unreadNotifications',
+        //     'notificationTypes'
+        // ));
+    
     
     /**
      * Display a listing of trashed notifications.
