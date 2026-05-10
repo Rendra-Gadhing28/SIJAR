@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 
 class ProfileController extends Controller
 {
@@ -165,31 +166,62 @@ class ProfileController extends Controller
         "data" => null
     ], 200);
 }
-    public function gantiPassw(Request $request): \Illuminate\Http\JsonResponse
+
+
+
+
+    /**
+     * Update password untuk user yang sedang login.
+     * Menggunakan kolom 'password' dari tabel users.
+     */
+    public function gantiPassw(Request $request): JsonResponse
     {
+        // 1. Validasi Input sesuai standar Laravel
         $request->validate([
-            'current_password' => 'required',
-            'password' => ['required', 'confirmed', Password::min(8)],
+            'current_password' => ['required', 'string'],
+            'password' => [
+                'required', 
+                'confirmed', 
+                Password::min(8)
+                    ->letters()    // Harus ada huruf
+                    ->numbers()    // Harus ada angka
+            ],
+        ], [
+            // Custom message dalam Bahasa Indonesia
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'password.min' => 'Password baru minimal harus 8 karakter.',
         ]);
 
-        $user = Auth::user();
-        // Cek password lama
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        // 2. Cek apakah password lama (current_password) cocok dengan hash di DB
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 "status" => false,
-                "message" => "Password lama tidak sesuai"
+                "message" => "Password lama yang Anda masukkan salah.",
             ], 422);
         }
 
-        // Update password
+        // 3. Security Check: Password baru tidak boleh sama dengan password lama
+        if (Hash::check($request->password, $user->password)) {
+            return response()->json([
+                "status" => false,
+                "message" => "Password baru tidak boleh sama dengan password saat ini."
+            ], 422);
+        }
+
+        // 4. Update Password
+        // Laravel secara otomatis akan menangani instance User yang terautentikasi
         $user->update([
             'password' => Hash::make($request->password)
         ]);
 
         return response()->json([
             "status" => true,
-            "message" => "Password berhasil diubah"
+            "message" => "Password untuk user '{$user->name}' berhasil diperbarui."
         ], 200);
     }
+
 }
     

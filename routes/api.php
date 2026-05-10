@@ -6,8 +6,8 @@ use App\Http\Controllers\WEB\UserController;
 use App\Http\Controllers\WEB\waktuPembelajaran;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WEB\ProfileController;
-use App\Http\Controllers\WEB\PeminjamanController;
 use App\Http\Controllers\WEB\ItemController;
+use App\Http\Controllers\WEB\PeminjamanController;
 use App\Http\Controllers\WEB\AdminPeminjamanController;
 use App\Http\Controllers\Admin\AdminItemController;
 use App\Http\Controllers\Admin\ActivityLoggerController;
@@ -17,12 +17,12 @@ use App\Http\Controllers\Admin\NotificationController;
 Route::prefix('v1')->group( function () {
     Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
-    Route::post('/peminjaman/store', [PeminjamanController::class, 'store'])->name('peminjaman.store')->middleware('throttle:60,1');
+    Route::post('/peminjaman/stored', [PeminjamanController::class, 'store'])->name('peminjaman.store')->middleware('throttle:60,1');
     Route::get('/peminjaman/{id}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
     Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
-    Route::put('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
-    Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
-    Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
+    Route::put('/peminjaman/update/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
+    Route::delete('/peminjaman/destroy/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
+    Route::post('/peminjaman/selesai/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
     //home page
     Route::get('/homepage', [PeminjamanController::class, 'beranda'])->name('user.homepage');
     Route::get('/waktu', [waktuPembelajaran::class, 'index'])->name('waktu.pembelajaran');
@@ -59,10 +59,10 @@ Route::middleware(['auth:sanctum','role:user'])->group(function () {
     // atau bisa juga ditulis lengkap seperti ini:
     Route::get('/peminjaman', [peminjamanController::class, 'index'])->name('peminjaman.index');
     Route::get('/peminjaman/create', [peminjamanController::class, 'create'])->name('peminjaman.create');
-    Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store')->middleware('throttle:60,1');
+    Route::post('/peminjaman/store', [PeminjamanController::class, 'store'])->name('peminjaman.store')->middleware('throttle:60,1');
     Route::get('/peminjaman/{id}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
     Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
-    Route::put('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
+    Route::put('/peminjaman/update/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
     Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
     Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
     //home page
@@ -75,7 +75,7 @@ Route::middleware(['auth:sanctum','role:user'])->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update/{id}', [ProfileController::class, 'update'])->name('profile.update')->middleware('throttle:10,1');
     Route::delete('/profile/destroy/{id}', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::put('/password', [ProfileController::class, 'gantiPassw'])->name('password.update');
+    Route::patch('/profile/password/update', [ProfileController::class, 'gantiPassw'])->name('password.update');
 });
 
 
@@ -111,7 +111,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(func
     Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
     Route::put('/update/{id}', [ProfileController::class, 'update'])->name('update');
     Route::delete('/destroy/{id}', [ProfileController::class, 'destroy'])->name('destroy');
-    Route::put('/password', [ProfileController::class, 'gantiPassw'])->name('password.update');
+    Route::patch('/password/update', [ProfileController::class, 'gantiPassw'])->name('password.update');
 });
     // NOTIFICATION ROUTES - PERBAIKI DENGAN YANG BARU
     Route::prefix('notifications')->name('notifications.')->group(function () {

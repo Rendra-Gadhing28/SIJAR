@@ -10,18 +10,25 @@ use Illuminate\Support\Facades\Auth;
 
 class LogoutController extends Controller
 {
-    public function destroy(Request $request): JsonResponse
-    {
-        ActivityLoggerService::logLogout();
+   public function destroy(Request $request): JsonResponse
+{
+    // 1. Ambil data user sebelum logout agar tidak null
+    $user = $request->user();
+    $userName = $user ? $user->name : 'Pengguna';
 
-        Auth::guard('web')->logout();
+    // 2. Log aktivitas (pastikan service ini menangkap data sebelum auth hilang)
+    ActivityLoggerService::logLogout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    // 3. Proses Logout
+    Auth::guard('web')->logout();
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Logout berhasil',
-        ]);
-    }
+    // 4. Invalidate & Regenerate Token (Standar Keamanan Laravel)
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return response()->json([
+        'status'  => true,
+        'message' => "Logout berhasil, semoga harimu menyenangkan " . $userName . "!",
+    ], 200);
+}
 }
