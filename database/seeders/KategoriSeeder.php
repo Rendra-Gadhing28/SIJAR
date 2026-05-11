@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Seeder;
+use App\Models\Jurusan;
 use App\Models\Kategori;
 
 class KategoriSeeder extends Seeder

@@ -36,23 +36,23 @@ class LoginController extends Controller
 
         $user = Auth::user();
         $token = $user->createToken("token",['*'], 
-        now())->plainTextToken;
+        now()->addHours(24))->plainTextToken;
 
         // return response()->json([
         //     "token" => $token,
         //     "user" => $user,
         // ], 200);
 
-        $redirect = match($user->role) {
-            'admin' => route('admin.dashboard'),
-            default => route('user.homepage'),
-        };
+        // $redirect = match($user->role) {
+        //     'admin' => route('admin.dashboard'),
+        //     default => route('user.homepage'),
+        // };
 
         return response()->json([
             'token' => $token,
             'status'   => true,
             'message'  => 'Login berhasil',
-            'redirect' => $redirect,
+            // 'redirect' => $redirect,
             'user'     => [
                 'id'    => $user->id,
                 'name'  => $user->name,

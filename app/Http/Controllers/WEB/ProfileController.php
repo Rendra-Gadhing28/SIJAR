@@ -14,24 +14,15 @@ use Illuminate\Http\JsonResponse;
 class ProfileController extends Controller
 {
 
-    public function index(){
-      $data = User::select('id', 'name', 'kode', 'telepon', 'profile')
-        ->find(8); // 1 query langsung, tidak perlu where manual
-
-    if (!$data) {
-        return response()->json([
-            "status" => false,
-            "message" => "Data tidak ditemukan",
-            "data" => null
-        ], 404);
-    }
-
+    public function index() {
+    $user = Auth::user();
+    $data = User::select('id', 'name', 'kode', 'telepon', 'profile')->find($user->id);
     return response()->json([
         "status" => true,
         "message" => "Data user berhasil diambil",
         "data" => $data
     ], 200);
-    }
+}
     /**
      * Display the user's profile form.
      */

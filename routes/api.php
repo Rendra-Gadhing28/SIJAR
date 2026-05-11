@@ -13,43 +13,24 @@ use App\Http\Controllers\Admin\AdminItemController;
 use App\Http\Controllers\Admin\ActivityLoggerController;
 use App\Http\Controllers\Admin\NotificationController; 
 
-
-Route::prefix('v1')->group( function () {
-    Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman.index');
-    Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
-    Route::post('/peminjaman/stored', [PeminjamanController::class, 'store'])->name('peminjaman.store')->middleware('throttle:60,1');
-    Route::get('/peminjaman/{id}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
-    Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
-    Route::put('/peminjaman/update/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
-    Route::delete('/peminjaman/destroy/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
-    Route::post('/peminjaman/selesai/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
-    //home page
-    Route::get('/homepage', [PeminjamanController::class, 'beranda'])->name('user.homepage');
-    Route::get('/waktu', [waktuPembelajaran::class, 'index'])->name('waktu.pembelajaran');
-    Route::get('/jurusan', [UserController::class, 'getKategori'])->name('kategori.jurusan');
-    Route::get('/barang', [ItemController::class, 'index'])->name('barang.index')->middleware('auth:sanctum');
-
-    //landing page
+Route::prefix('v1')->group(function () {
+    // 1. Route Tanpa Login
+    Route::post('/auth/login', [LoginController::class, 'store']);
     Route::get('/landing', [ItemController::class, 'LandingPage']);
-    // PROFILE
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/update/{id}', [ProfileController::class, 'update'])->name('profile.update')->middleware('throttle:10,1');
-    Route::delete('/profile/destroy/{id}', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::patch('/profile/password/update', [ProfileController::class, 'gantiPassw'])->name('password.update');
 
-    Route::prefix('auth')->group( function () {
-        Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('api.login');
-        Route::post('/logout', [LogoutController::class, 'destroy'])->name('api.logout');
-    });;
-
-    // Hapus route showImage, ganti dengan:
-
-    // Route::middleware(['throttle:5,1'])->group( function () {
-    //     Route::post('/login', [UserController::class, 'login']);
-    // });
-
-
+    // 2. Route yang WAJIB Login
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'index']);
+        Route::get('/homepage', [PeminjamanController::class, 'beranda']);
+        Route::get('/barang', [ItemController::class, 'index']);
+        Route::get('/waktu', [waktuPembelajaran::class, 'index']);
+        Route::get('/peminjaman', [PeminjamanController::class, 'index']);
+        Route::get('/jurusan', [UserController::class, 'getKategori']);
+        
+        // Sesuaikan dengan Android: /peminjaman/store
+        Route::post('/peminjaman/store', [PeminjamanController::class, 'store']);
+        Route::post('/auth/logout', [LogoutController::class, 'destroy']);
+    });
 });
 
 

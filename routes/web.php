@@ -14,19 +14,19 @@ use App\Http\Controllers\Admin\NotificationController;
 // Route::get('/', [ItemController::class, 'Home'])->name('home');
 
 Route::middleware(['auth','role:user'])->group(function () {
-    // atau bisa juga ditulis lengkap seperti ini:
-    Route::get('/peminjaman', [peminjamanController::class, 'index'])->name('peminjaman.index');
-    Route::get('/peminjaman/create', [peminjamanController::class, 'create'])->name('peminjaman.create');
-    Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
-    Route::get('/peminjaman/{id}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
-    Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
-    Route::put('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
-    Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
-    Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
-    //home page
-    Route::get('/homepage', [peminjamanController::class, 'beranda'])->name('user.homepage');
-    // BARANG
-    Route::get('/barang', [ItemController::class, 'index'])->name('barang.index');
+    // // atau bisa juga ditulis lengkap seperti ini:
+    // Route::get('/peminjaman', [peminjamanController::class, 'index'])->name('peminjaman.index');
+    // Route::get('/peminjaman/create', [peminjamanController::class, 'create'])->name('peminjaman.create');
+    // Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
+    // Route::get('/peminjaman/{id}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
+    // Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
+    // Route::put('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
+    // Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
+    // Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
+    // //home page
+    // Route::get('/homepage', [peminjamanController::class, 'beranda'])->name('user.homepage');
+    // // BARANG
+    // Route::get('/barang', [ItemController::class, 'index'])->name('barang.index');
 
   
 

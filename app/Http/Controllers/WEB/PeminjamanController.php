@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Models\Item;
 use App\Models\waktu_pembelajaran;
-use App\Models\peminjaman;
+use App\Models\Peminjaman;
 use App\Models\Kategori;
-use App\Models\slot_peminjaman;
+use App\Models\slot_Peminjaman;
 use App\Notifications\PeminjamanBaruNotification;
 
 
@@ -23,7 +23,7 @@ class PeminjamanController extends Controller
     {
         $user = Auth::user();
 
-        $peminjaman = peminjaman::where("user_id", $user->id)
+        $Peminjaman = Peminjaman::where("user_id", $user->id)
             ->with(["item:id,nama_item,kode_unit"])
             ->select(['id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'status_pinjaman', 'gambar_bukti', 'jam_pembelajaran'])
             ->latest()
@@ -32,13 +32,13 @@ class PeminjamanController extends Controller
         // Tetap return 200 meski kosong, biar FE tidak error — kosong bukan error
         return response()->json([
             "status"  => true,
-            "message" => $peminjaman->isEmpty() ? "data masih kosong" : "data peminjaman berhasil diambil",
-            "data"    => $peminjaman
+            "message" => $Peminjaman->isEmpty() ? "data masih kosong" : "data Peminjaman berhasil diambil",
+            "data"    => $Peminjaman
         ], 200);
     }
 
     // ==================== CREATE (Form Data) ====================
-    // GET /api/peminjaman/create
+    // GET /api/Peminjaman/create
     // Endpoint ini dipakai FE untuk mengambil data dropdown/filter sebelum form ditampilkan
     public function create(Request $request)
     {
@@ -80,7 +80,7 @@ class PeminjamanController extends Controller
 
         return response()->json([
             "status"  => true,
-            "message" => "data form peminjaman berhasil diambil",
+            "message" => "data form Peminjaman berhasil diambil",
             "data"    => [
                 "items"        => $items,
                 "waktu"        => $waktu,
@@ -93,7 +93,7 @@ class PeminjamanController extends Controller
     }
 
     // ==================== STORE ====================
-    // POST /api/peminjaman
+    // POST /api/Peminjaman
     // FE kirim: FormData (karena ada file upload)
     // Content-Type: multipart/form-data
     //
@@ -120,7 +120,7 @@ class PeminjamanController extends Controller
         DB::beginTransaction();
 
         try {
-            $path = $request->file('bukti')->store('bukti_peminjaman', 'public');
+            $path = $request->file('bukti')->store('bukti_Peminjaman', 'public');
 
             // Validasi & proses waktu_ids
             $jamPembelajaran = [];
@@ -144,7 +144,7 @@ class PeminjamanController extends Controller
                 $jamPembelajaran[] = $waktuData;
             }
 
-            $peminjaman = peminjaman::create([
+            $Peminjaman = Peminjaman::create([
                 'keperluan'       => $validated['keperluan'],
                 'user_id'         => Auth::id(),
                 'item_id'         => $validated['item_id'],
@@ -162,21 +162,21 @@ class PeminjamanController extends Controller
             // Notifikasi ke admin
             $admins = User::where('role', 'admin')->get();
             if ($admins->isNotEmpty()) {
-                \Illuminate\Support\Facades\Notification::send($admins, new PeminjamanBaruNotification($peminjaman));
+                \Illuminate\Support\Facades\Notification::send($admins, new PeminjamanBaruNotification($Peminjaman));
             }
 
             ActivityLoggerService::logCreated(
                 'Peminjaman',
-                $peminjaman->id,
-                ['keperluan' => $peminjaman->keperluan, 'item_id' => $peminjaman->item_id, 'status_tujuan' => 'Pending']
+                $Peminjaman->id,
+                ['keperluan' => $Peminjaman->keperluan, 'item_id' => $Peminjaman->item_id, 'status_tujuan' => 'Pending']
             );
 
             DB::commit();
 
             return response()->json([
                 "status"  => true,
-                "message" => "peminjaman berhasil dibuat",
-                "data"    => $peminjaman->only(['id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'gambar_bukti', 'jam_pembelajaran'])
+                "message" => "Peminjaman berhasil dibuat",
+                "data"    => $Peminjaman->only(['id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'gambar_bukti', 'jam_pembelajaran'])
             ], 201);
 
         } catch (\Exception $e) {
@@ -194,10 +194,10 @@ class PeminjamanController extends Controller
     }
 
     // ==================== SHOW ====================
-    // GET /api/peminjaman/{id}
+    // GET /api/Peminjaman/{id}
     public function show($id)
     {
-        $peminjaman = peminjaman::with([
+        $Peminjaman = Peminjaman::with([
                 'item:id,nama_item,kode_unit,foto_barang',
                 'user:id,name,kategori_id'
             ])
@@ -205,23 +205,23 @@ class PeminjamanController extends Controller
             ->where('user_id', Auth::id())
             ->find($id);
 
-        if (!$peminjaman) {
+        if (!$Peminjaman) {
             return response()->json([
                 "status"  => false,
-                "message" => "data peminjaman dengan ID {$id} tidak ditemukan",
+                "message" => "data Peminjaman dengan ID {$id} tidak ditemukan",
                 "data"    => null
             ], 404);
         }
 
         return response()->json([
             "status"  => true,
-            "message" => "data peminjaman dengan ID {$id} berhasil diambil",
-            "data"    => $peminjaman
+            "message" => "data Peminjaman dengan ID {$id} berhasil diambil",
+            "data"    => $Peminjaman
         ], 200);
     }
 
     // ==================== EDIT (Form Data) ====================
-    // GET /api/peminjaman/{id}/edit
+    // GET /api/Peminjaman/{id}/edit
     // Dipakai FE untuk mengambil data form saat edit
     public function edit(Request $request, $id)
     {
@@ -242,37 +242,37 @@ class PeminjamanController extends Controller
             $items,
             $jenis_items,
             $waktu,
-            $peminjaman
+            $Peminjaman
         ] = [
             $query->with('kategori_jurusan')->latest()->paginate(9)->withQueryString(),
             Item::where('kategori_jurusan_id', $jurusan)->distinct()->pluck('jenis_item'),
             waktu_pembelajaran::orderBy('jam_ke')->get(),
-            peminjaman::find($id),
+            Peminjaman::find($id),
         ];
 
-        if (!$peminjaman) {
+        if (!$Peminjaman) {
             return response()->json([
                 "status"  => false,
-                "message" => "data peminjaman tidak ditemukan",
+                "message" => "data Peminjaman tidak ditemukan",
                 "data"    => null
             ], 404);
         }
 
         return response()->json([
             "status"  => true,
-            "message" => "data form edit peminjaman berhasil diambil",
+            "message" => "data form edit Peminjaman berhasil diambil",
             "data"    => [
                 "items"       => $items,
                 "waktu"       => $waktu,
                 "jenis_items" => $jenis_items,
-                "peminjaman"  => $peminjaman,
+                "Peminjaman"  => $Peminjaman,
                 "jurusan_id"  => $jurusan,
             ]
         ], 200);
     }
 
     // ==================== UPDATE ====================
-    // POST /api/peminjaman/{id}?_method=PUT  ← karena FormData tidak support PUT native
+    // POST /api/Peminjaman/{id}?_method=PUT  ← karena FormData tidak support PUT native
     // atau pakai method spoofing di FE dengan menambah field _method=PUT
     //
     // FE kirim: FormData
@@ -283,7 +283,7 @@ class PeminjamanController extends Controller
     //   bukti         : file (opsional, jika tidak diubah tidak perlu dikirim)
     public function update(Request $request, $id)
     {
-        $peminjaman = peminjaman::where('user_id', Auth::id())
+        $Peminjaman = Peminjaman::where('user_id', Auth::id())
         ->whereRaw('LOWER(status_tujuan) = ?', ['pending']) // ← case-insensitive
         ->find($id); // pakai find(), bukan findOrFail()
 
@@ -302,10 +302,10 @@ class PeminjamanController extends Controller
         DB::beginTransaction();
 
         try {
-            $oldData    = ['keperluan' => $peminjaman->keperluan, 'item_id' => $peminjaman->item_id];
-            $itemBerubah = $peminjaman->item_id != $validated['item_id'];
-            $oldItemId  = $peminjaman->item_id;
-            $path       = $peminjaman->gambar_bukti;
+            $oldData    = ['keperluan' => $Peminjaman->keperluan, 'item_id' => $Peminjaman->item_id];
+            $itemBerubah = $Peminjaman->item_id != $validated['item_id'];
+            $oldItemId  = $Peminjaman->item_id;
+            $path       = $Peminjaman->gambar_bukti;
 
             // Validasi item baru — optimasi: cukup exists check dulu
             $newItem = Item::findOrFail($validated['item_id']);
@@ -317,7 +317,7 @@ class PeminjamanController extends Controller
             // Upload bukti baru jika ada
             if ($request->hasFile('bukti')) {
                 if ($path) Storage::disk('public')->delete($path);
-                $path = $request->file('bukti')->store('bukti_peminjaman', 'public');
+                $path = $request->file('bukti')->store('bukti_Peminjaman', 'public');
             }
 
             // Proses waktu_ids
@@ -342,7 +342,7 @@ class PeminjamanController extends Controller
                 $jamPembelajaran[] = $waktuData;
             }
 
-            $peminjaman->update([
+            $Peminjaman->update([
                 'keperluan'        => $validated['keperluan'],
                 'item_id'          => $validated['item_id'],
                 'jam_pembelajaran' => json_encode($jamPembelajaran),
@@ -356,7 +356,7 @@ class PeminjamanController extends Controller
             }
             ActivityLoggerService::logUpdated(
                 'Peminjaman',
-                $peminjaman->id,
+                $Peminjaman->id,
                 $oldData,
                 ['keperluan' => $validated['keperluan'], 'item_id' => $validated['item_id']]
             );
@@ -365,14 +365,14 @@ class PeminjamanController extends Controller
 
             return response()->json([
                 "status"  => true,
-                "message" => "peminjaman berhasil diperbarui",
-                "data"    => $peminjaman->fresh()->only(['id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'gambar_bukti', 'jam_pembelajaran'])
+                "message" => "Peminjaman berhasil diperbarui",
+                "data"    => $Peminjaman->fresh()->only(['id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'gambar_bukti', 'jam_pembelajaran'])
             ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            if (isset($path) && $path && $path !== $peminjaman->gambar_bukti) {
+            if (isset($path) && $path && $path !== $Peminjaman->gambar_bukti) {
                 Storage::disk('public')->delete($path);
             }
 
@@ -385,22 +385,22 @@ class PeminjamanController extends Controller
     }
 
     // ==================== SELESAI ====================
-    // PATCH /api/peminjaman/{id}/selesai
+    // PATCH /api/Peminjaman/{id}/selesai
     public function selesai($id)
     {
-        $peminjaman = peminjaman::findOrFail($id);
+        $Peminjaman = Peminjaman::findOrFail($id);
 
-        $peminjaman->update([
+        $Peminjaman->update([
             'status_pinjaman' => 'selesai',
             'finished_at'     => now()
         ]);
 
         // Optimasi: langsung update tanpa find()
-        Item::where('id', $peminjaman->item_id)->update(['status_item' => 'tersedia']);
+        Item::where('id', $Peminjaman->item_id)->update(['status_item' => 'tersedia']);
 
         ActivityLoggerService::logUpdated(
             'Peminjaman',
-            $peminjaman->id,
+            $Peminjaman->id,
             ['status_pinjaman' => 'dipinjam'],
             ['status_pinjaman' => 'selesai']
         );
@@ -431,7 +431,7 @@ class PeminjamanController extends Controller
         $userId = Auth::id();
 
         // Optimasi: jalankan 3 query secara bersamaan dengan selectRaw untuk count
-        $peminjaman = peminjaman::where("user_id", $userId)
+        $Peminjaman = Peminjaman::where("user_id", $userId)
             ->with(["item:id,nama_item,kode_unit,foto_barang"])
             ->select(['id', 'keperluan', 'item_id', 'tanggal', 'status_tujuan', 'status_pinjaman'])
             ->latest()
@@ -439,7 +439,7 @@ class PeminjamanController extends Controller
             ->get(); // ← FIX: tambah get() yang hilang di kode lama
 
         // Optimasi: gabung 2 count query menjadi 1 query dengan selectRaw
-        $stats = peminjaman::where('user_id', $userId)
+        $stats = Peminjaman::where('user_id', $userId)
             ->selectRaw("
                 SUM(CASE WHEN status_pinjaman = 'dipinjam' THEN 1 ELSE 0 END) as dipinjam,
                 SUM(CASE WHEN status_pinjaman = 'selesai' THEN 1 ELSE 0 END) as selesai
@@ -450,7 +450,7 @@ class PeminjamanController extends Controller
             "status"  => true,
             "message" => "data beranda berhasil diambil",
             "data"    => [
-                "peminjaman_terbaru" => $peminjaman,
+                "Peminjaman_terbaru" => $Peminjaman,
                 "total_dipinjam"     => (int) $stats->dipinjam,
                 "total_selesai"      => (int) $stats->selesai,
             ]
@@ -458,10 +458,10 @@ class PeminjamanController extends Controller
     }
 
     // ==================== DESTROY ====================
-    // DELETE /api/peminjaman/{id}
+    // DELETE /api/Peminjaman/{id}
     public function destroy($id)
     {
-        $pinjam = peminjaman::where('user_id', Auth::id())->findOrFail($id); // Security: pastikan hanya milik user sendiri
+        $pinjam = Peminjaman::where('user_id', Auth::id())->findOrFail($id); // Security: pastikan hanya milik user sendiri
 
         if ($pinjam->gambar_bukti && Storage::disk('public')->exists($pinjam->gambar_bukti)) {
             Storage::disk('public')->delete($pinjam->gambar_bukti);
@@ -471,7 +471,7 @@ class PeminjamanController extends Controller
 
         return response()->json([
             "status"  => true,
-            "message" => "peminjaman berhasil dihapus",
+            "message" => "Peminjaman berhasil dihapus",
         ], 200);
     }
 }
