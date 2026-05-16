@@ -6,66 +6,105 @@ use App\Models\Peminjaman;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Carbon\Carbon;
 
-class PeminjamanExport implements FromCollection, WithHeadings, WithMapping
+class PeminjamanExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithTitle
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-
-    protected $starDate;
+    protected $startDate;
     protected $endDate;
-
-    public function __construct($starDate = null, $endDate = null){
-        $this->starDate = $starDate;
+    
+    public function __construct($startDate, $endDate)
+    {
+        $this->startDate = $startDate;
         $this->endDate = $endDate;
     }
-
+    
     public function collection()
     {
-        $q = Peminjaman::with(['user', 'item']);
-        if($this->starDate && $this->endDate){
-            $q->whereBetween('tanggal', [$this->starDate, $this->endDate]);
-        }
-        return $q->get();
+        return Peminjaman::with(['user', 'item'])
+            ->whereBetween('tanggal', [$this->startDate, $this->endDate])
+            ->orderBy('tanggal', 'desc')
+            ->get();
     }
-
-    public function headings():array{
+    
+    public function headings(): array
+    {
         return [
-            'No',
-            'ID Peminjaman',
+            'ID',
+            'Keperluan',
             'Peminjam',
             'Barang',
-            'Keperluan',
-            'Disetujui Pada',
-            'Ditolak Pada',
-            'Tanggal Kembali',
+            'Tanggal Peminjaman',
+            'Tanggal Selesai',
+            'Status Tujuan',
             'Status Peminjaman',
-            'Status Pinjaman',
-            'Bukti',
             'Jam Pembelajaran',
-            "Dibuat Pada"
+            'Dibuat Pada',
         ];
     }
-
-    public function map($peminjaman):array{
-        static $no = 0;
-        $no++;
-
+    
+    public function map($peminjaman): array
+    {
+        // Parse jam_pembelajaran
+        $jamPembelajaran = '';
+        if ($peminjaman->jam_pembelajaran) {
+            $jamData = json_decode($peminjaman->jam_pembelajaran, true);
+            if (is_array($jamData)) {
+                $jamList = [];
+                foreach ($jamData as $jam) {
+                    $jamList[] = "Jam {$jam['jam_ke']}: {$jam['start_time']} - {$jam['end_time']}";
+                }
+                $jamPembelajaran = implode("\n", $jamList);
+            }
+        }
+        
         return [
-            $no,
             $peminjaman->id,
-            $peminjaman->user->name ?? "-",
-            $peminjaman->item->nama_item ?? "-",
-            $peminjaman->keperluan ?? "-",
-            $peminjaman->approved_at ?? "-",
-            $peminjaman->rejected_at ?? "-",
-            $peminjaman->finished_at ?? "-",
-            $peminjaman->status_tujuan ?? "-",
-            $peminjaman->status_pinjaman ?? "-",
-            $peminjaman->gambar_bukti?? "-",
-            $peminjaman->jam_pembelajaran ?? "-",
-            $peminjaman->created_at ?? "-",
+            $peminjaman->keperluan,
+            $peminjaman->user ? $peminjaman->user->name : 'N/A',
+            $peminjaman->item ? $peminjaman->item->nama_item : 'N/A',
+            Carbon::parse($peminjaman->tanggal)->format('d/m/Y'),
+            $peminjaman->finished_at ? Carbon::parse($peminjaman->finished_at)->format('d/m/Y H:i') : '-',
+            $this->getStatusLabel($peminjaman->status_tujuan),
+            $this->getStatusPinjamanLabel($peminjaman->status_pinjaman),
+            $jamPembelajaran,
+            Carbon::parse($peminjaman->created_at)->format('d/m/Y H:i'),
         ];
+    }
+    
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => ['font' => ['bold' => true, 'size' => 12]],
+        ];
+    }
+    
+    public function title(): string
+    {
+        return 'Laporan Peminjaman';
+    }
+    
+    private function getStatusLabel($status)
+    {
+        $labels = [
+            'pending' => 'Menunggu',
+            'approved' => 'Disetujui',
+            'rejected' => 'Ditolak'
+        ];
+        return $labels[$status] ?? $status;
+    }
+    
+    private function getStatusPinjamanLabel($status)
+    {
+        $labels = [
+            'dipinjam' => 'Dipinjam',
+            'selesai' => 'Selesai',
+            'telat' => 'Terlambat'
+        ];
+        return $labels[$status] ?? $status;
     }
 }

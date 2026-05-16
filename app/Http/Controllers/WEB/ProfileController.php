@@ -16,13 +16,32 @@ class ProfileController extends Controller
 
     public function index() {
     $user = Auth::user();
-    $data = User::select('id', 'name', 'kode', 'telepon', 'profile')->find($user->id);
+    $data = User::with('jurusan')->select('id', 'name', 'kode','kelas', 'jurusan_id', 'telepon', 'profile', )->find($user->id);
+    $namaJurusan = $data->jurusan ? $data->jurusan->nama_jurusan : null;
+    return response()->json([
+    'status' => true,
+    'data' => [
+        'id' => $data->id,
+        'name' => $data->name,
+        'kode' => $data->kode,
+        'kelas' => $data->kelas,
+        'telepon' => $data->telepon,
+        'profile' => $data->profile,
+        'jurusan_id' => $data->jurusan_id,
+        'jurusan' => $namaJurusan, // ← nama jurusan
+    ]
+], 200 );
+    }
+
+    public function indexMobile(){
+        $user = Auth::user();
+        $data = User::select('id', 'name', 'kode', 'telepon', 'profile')->find($user->id);
     return response()->json([
         "status" => true,
         "message" => "Data user berhasil diambil",
         "data" => $data
     ], 200);
-}
+    }
     /**
      * Display the user's profile form.
      */
@@ -157,62 +176,58 @@ class ProfileController extends Controller
         "data" => null
     ], 200);
 }
-
-
-
-
     /**
      * Update password untuk user yang sedang login.
      * Menggunakan kolom 'password' dari tabel users.
      */
-    public function gantiPassw(Request $request): JsonResponse
-    {
-        // 1. Validasi Input sesuai standar Laravel
+        public function  gantiPassw(Request $request): JsonResponse {
+        // 1. Validasi Input - perbaiki nama field
         $request->validate([
-            'current_password' => ['required', 'string'],
-            'password' => [
-                'required', 
-                'confirmed', 
-                Password::min(8)
-                    ->letters()    // Harus ada huruf
-                    ->numbers()    // Harus ada angka
-            ],
-        ], [
-            // Custom message dalam Bahasa Indonesia
-            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
-            'password.min' => 'Password baru minimal harus 8 karakter.',
-        ]);
+        'current_password' => ['required', 'string'],
+        'new_password' => [
+            'required', 
+            'confirmed', 
+            Password::min(8)
+                ->letters()
+                ->numbers()
+        ],
+    ], [
+        'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        'new_password.min' => 'Password baru minimal harus 8 karakter.',
+    ]);
 
-        /** @var \App\Models\User $user */
-        $user = auth()->user();
+    /** @var \App\Models\User $user */
+    $user = auth()->user();
 
-        // 2. Cek apakah password lama (current_password) cocok dengan hash di DB
-        if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json([
-                "status" => false,
-                "message" => "Password lama yang Anda masukkan salah.",
-            ], 422);
-        }
-
-        // 3. Security Check: Password baru tidak boleh sama dengan password lama
-        if (Hash::check($request->password, $user->password)) {
-            return response()->json([
-                "status" => false,
-                "message" => "Password baru tidak boleh sama dengan password saat ini."
-            ], 422);
-        }
-
-        // 4. Update Password
-        // Laravel secara otomatis akan menangani instance User yang terautentikasi
-        $user->update([
-            'password' => Hash::make($request->password)
-        ]);
-
+    // 2. Cek password lama
+    if (!Hash::check($request->current_password, $user->password)) {
         return response()->json([
-            "status" => true,
-            "message" => "Password untuk user '{$user->name}' berhasil diperbarui."
-        ], 200);
+            "status" => false,
+            "message" => "Password lama yang Anda masukkan salah.",
+        ], 422);
     }
 
+    // 3. Security Check: Password baru tidak boleh sama dengan password lama
+    // PERBAIKAN: gunakan new_password, bukan password
+    if (Hash::check($request->new_password, $user->password)) {
+        return response()->json([
+            "status" => false,
+            "message" => "Password baru tidak boleh sama dengan password saat ini."
+        ], 422);
+    }
+
+    // 4. Update Password - PERBAIKAN: gunakan new_password
+    $user->update([
+        'password' => Hash::make($request->new_password)
+    ]);
+
+    // Optional: Logout user setelah ganti password (biar login ulang)
+    // auth()->logout();
+
+    return response()->json([
+        "status" => true,
+        "message" => "Password untuk user '{$user->name}' berhasil diperbarui."
+    ], 200);
+    }
 }
     

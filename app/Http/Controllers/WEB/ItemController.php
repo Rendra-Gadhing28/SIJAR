@@ -19,6 +19,68 @@ class ItemController extends Controller
 public function index(Request $request)
 {
     $user = Auth::user();
+
+    if (!$user) {
+        return response()->json([
+            "status"  => false,
+            "message" => "Unauthenticated. Silakan login terlebih dahulu.",
+        ], 401);
+    }
+
+    $user->load('kategori');
+    $jurusanNama = $user->kategori->nama_kategori ?? 'Semua Jurusan';
+
+    $item = Item::with('kategoriJurusan')
+        ->where('status_item', 'tersedia');
+
+    // Filter by kategori_jurusan_id
+    if ($request->filled('kategori_jurusan_id')) {
+        $item->where('kategori_jurusan_id', $request->kategori_jurusan_id);
+    }
+
+    // Filter by nama jurusan (string dari tab)
+    if ($request->filled('jurusan') && $request->jurusan !== 'Semua') {
+        $item->whereHas('kategoriJurusan', function ($q) use ($request) {
+            $q->where('nama_kategori', $request->jurusan);
+        });
+    }
+
+    // Filter search
+    if ($request->filled('search')) {
+        $keyword = $request->search;
+        $item->where(function ($q) use ($keyword) {
+            $q->where('nama_item', 'LIKE', "%$keyword%")
+              ->orWhere('kode_unit', 'LIKE', "%$keyword%");
+        });
+    }
+
+    $totalBarangJurusan = $item->count();
+
+    $data = $item->orderBy('created_at', 'desc')
+        ->paginate(8)
+        ->appends($request->only(['search', 'kategori_jurusan_id', 'jurusan']));
+
+    // Tambah foto_url ke setiap item
+    $data->getCollection()->transform(function ($item) {
+        $item->foto_url = $item->foto_barang
+            ? asset('storage/encrypted/' . $item->foto_barang)
+            : null;
+        return $item;
+    });
+
+    return response()->json([
+        "status"             => true,
+        "message"            => "Berhasil mengambil data untuk jurusan " . $jurusanNama,
+        "data"               => $data,               // ✅ PagingData (current_page, data[], last_page, total)
+        "Totalbarangjurusan" => $totalBarangJurusan,  // ✅ Int langsung
+        "jurusanNama"        => $jurusanNama,         // ✅ String
+    ], 200);
+}
+
+
+public function indexBarang(Request $request)
+{
+    $user = Auth::user();
     // $user = User::find(8)
     // ->with('kategori')->first();
     if (!$user) {
@@ -32,7 +94,7 @@ public function index(Request $request)
     $jurusanNama = $user->kategori->nama_kategori ?? 'Semua Jurusan';
 
     // Mulai dengan query builder (TANPA get)
-    $item = Item::with('kategori_jurusan');
+    $item = Item::with('kategoriJurusan');
 
     // Inisialisasi kategori default
     $kategori = $jurusan;
@@ -63,14 +125,14 @@ public function index(Request $request)
     $barangjurusan = $item->count();
 
     // Ambil data lengkap dengan relasi kategori
-   $data = $item->with('kategori_jurusan')
+   $data = $item->with('kategoriJurusan')
         ->orderBy('created_at', 'desc')
-        ->paginate(9)->appends($request->only(['search', 'kategori_jurusan_id']));;
+        ->paginate(8)->appends($request->only(['search', 'kategori_jurusan_id']));;
         // ->appends([
         //     'search' => $request->search,
         //     'kategori_jurusan_id' => $request->kategori_jurusan_id
         // ]);
-    $AllDataJurusan = Item::with('kategori_jurusan')->orderBy('created_at', 'desc')->paginate(9);
+    $AllDataJurusan = Item::with('kategoriJurusan')->orderBy('created_at', 'desc')->paginate(9);
 
     // Dropdown kategori
     $kategoris = Kategori::orderBy('nama_kategori')->get();
@@ -83,10 +145,11 @@ public function index(Request $request)
         "Totalbarangjurusan" => $dataLengkap[3],
         "jurusanNama" => $dataLengkap[4],
     ], 200) ;
+
 }
 
     public function getBarang(){
-        $item = Item::with('kategori_jurusan')
+        $item = Item::with('kategoriJurusan')
         ->lazy();
 
         return response()->json([

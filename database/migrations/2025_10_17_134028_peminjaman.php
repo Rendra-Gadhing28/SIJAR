@@ -21,9 +21,10 @@ return new class extends Migration
             $table->date('tanggal');
             $table->timestamp('finished_at')->nullable();
 
-            $table->enum('status_tujuan', ['Pending', 'Approved', 'Rejected'] )->default('Pending');
-            $table->enum('status_pinjaman',['dipinjam','selesai'])->default('dipinjam');
+            $table->enum('status_tujuan', ['pending', 'approved', 'rejected'] )->default('Pending');
+            $table->enum('status_pinjaman',['dipinjam','selesai', 'terlambat'])->default('dipinjam');
             $table->string('gambar_bukti');
+            $table->string('bukti_pengembalian')->nullable();
             $table->json('jam_pembelajaran')->nullable();
 
 

@@ -12,22 +12,26 @@ class Kategori extends Model
     protected $table = "kategori_jurusan";
     protected $fillable = [
         'id',
-        'nama_kategori'
+        'nama_kategori',
+        'icon',
+        'role',
+        'created_at',
+        'updated_at'
     ];
 
     public static function getKategori(){
         return DB::table('kategori_jurusan')->get();
     }
-     public function Items()
+     public function Item()
     {
-        return $this->hasMany(Item::class);
+        return $this->belongsTo(Item::class, 'kategori_jurusan_id');
     }
     public static function getKategoriById($id){
         return DB::table('kategori_jurusan')->where('id', $id)->first();
     }
 
-    public function user()
+    public function User()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(User::class, 'kategori_jurusan_id'  );
     }
 }

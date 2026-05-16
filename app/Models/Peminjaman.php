@@ -3,15 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\Items;
-use Illuminate\Support\Facades\DB;
-use Inertia\Commands\StopSsr;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Peminjaman extends Model
 {
-      protected $table = 'peminjaman';
-
+    protected $table = 'peminjaman';
+    
     protected $fillable = [
         'keperluan',
         'user_id',
@@ -23,30 +20,66 @@ class Peminjaman extends Model
         'gambar_bukti',
         'jam_pembelajaran',
         'approved_at',
-        'rejected_at',
+        'rejected_at'
     ];
 
     protected $casts = [
+        'jam_pembelajaran' => 'array',
         'tanggal' => 'date',
         'finished_at' => 'datetime',
         'approved_at' => 'datetime',
-        'rejected_at' => 'datetime',
-        'jam_pembelajaran' => 'array'
+        'rejected_at' => 'datetime'
     ];
 
-    public static function getAll(){
-        return DB::table('peminjaman');
+    // Relasi ke User
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function user()
+    // Relasi ke Item
+    public function item(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Item::class, 'item_id');
     }
 
-    public function item()
+    // Scope untuk peminjaman aktif
+    public function scopeActive($query)
     {
-        return $this->belongsTo(Item::class, 'item_id', 'id');
+        return $query->where('status_pinjaman', 'dipinjam');
+    }
+
+    // Scope untuk peminjaman selesai
+    public function scopeCompleted($query)
+    {
+        return $query->where('status_pinjaman', 'selesai');
+    }
+
+    // Scope untuk peminjaman telat
+    public function scopeLate($query)
+    {
+        return $query->where('status_pinjaman', 'telat');
+    }
+
+    // Accessor untuk status yang sudah diformat
+    public function getStatusPinjamanFormattedAttribute(): string
+    {
+        return match($this->status_pinjaman) {
+            'dipinjam' => 'Dipinjam',
+            'selesai' => 'Selesai',
+            'telat' => 'Terlambat',
+            default => ucfirst($this->status_pinjaman)
+        };
+    }
+
+    // Accessor untuk status tujuan yang sudah diformat
+    public function getStatusTujuanFormattedAttribute(): string
+    {
+        return match($this->status_tujuan) {
+            'pending' => 'Menunggu',
+            'approved' => 'Disetujui',
+            'rejected' => 'Ditolak',
+            default => ucfirst($this->status_tujuan)
+        };
     }
 }
-
-

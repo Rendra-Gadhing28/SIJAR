@@ -18,16 +18,20 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Session\Middleware\StartSession::class, // Ada session
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'cors' => \App\Http\Middleware\CorsMiddleware::class,
         ]);
 
         $middleware->api([
              \Illuminate\Routing\Middleware\SubstituteBindings::class,
              \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,  // Pastikan ada
+             // Pastikan ada
             \Illuminate\Session\Middleware\StartSession::class, // Ada session
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
              \Illuminate\Http\Middleware\HandleCors::class,
+            
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

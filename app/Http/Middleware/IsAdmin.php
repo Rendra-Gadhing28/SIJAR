@@ -26,7 +26,7 @@ class IsAdmin
             return redirect()->route('user.homepage');
         }
 
-        return redirect('/')->with('error', 'Anda tidak memiliki akses.');
+        return redirect('/landing')->with('error', 'Anda tidak memiliki akses.');
     }
 
 }
