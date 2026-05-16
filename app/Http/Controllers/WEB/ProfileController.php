@@ -147,7 +147,7 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-   public function destroy(Request $request): \Illuminate\Http\JsonResponse
+   public function destroy(Request $request): JsonResponse
 {
     $request->validate([
         'password' => ['required', 'current_password'], 
@@ -192,7 +192,7 @@ class ProfileController extends Controller
                 ->numbers()
         ],
     ], [
-        'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+        'new_password.confirmation' => 'Konfirmasi password baru tidak cocok.',
         'new_password.min' => 'Password baru minimal harus 8 karakter.',
     ]);
 
