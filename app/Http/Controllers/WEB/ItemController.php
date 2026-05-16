@@ -30,22 +30,18 @@ public function index(Request $request)
     $user->load('kategori');
     $jurusanNama = $user->kategori->nama_kategori ?? 'Semua Jurusan';
 
-    $item = Item::with('kategoriJurusan')
-        ->where('status_item', 'tersedia');
+    $item = Item::with('kategoriJurusan');
 
-    // Filter by kategori_jurusan_id
     if ($request->filled('kategori_jurusan_id')) {
         $item->where('kategori_jurusan_id', $request->kategori_jurusan_id);
     }
 
-    // Filter by nama jurusan (string dari tab)
     if ($request->filled('jurusan') && $request->jurusan !== 'Semua') {
         $item->whereHas('kategoriJurusan', function ($q) use ($request) {
             $q->where('nama_kategori', $request->jurusan);
         });
     }
 
-    // Filter search
     if ($request->filled('search')) {
         $keyword = $request->search;
         $item->where(function ($q) use ($keyword) {
@@ -54,13 +50,18 @@ public function index(Request $request)
         });
     }
 
-    $totalBarangJurusan = $item->count();
+    $baseQuery = $item;
 
-    $data = $item->orderBy('created_at', 'desc')
+    $barangTersedia     = (clone $baseQuery)->where('status_item', 'tersedia')->count();
+    $barangDipinjam     = (clone $baseQuery)->where('status_item', 'dipinjam')->count();
+    $barangRusak        = (clone $baseQuery)->where('status_item', 'rusak')->count();
+    $totalBarangJurusan = (clone $baseQuery)->count();
+
+    $data = (clone $baseQuery)
+        ->orderBy('created_at', 'desc')
         ->paginate(8)
         ->appends($request->only(['search', 'kategori_jurusan_id', 'jurusan']));
 
-    // Tambah foto_url ke setiap item
     $data->getCollection()->transform(function ($item) {
         $item->foto_url = $item->foto_barang
             ? asset('storage/encrypted/' . $item->foto_barang)
@@ -71,9 +72,12 @@ public function index(Request $request)
     return response()->json([
         "status"             => true,
         "message"            => "Berhasil mengambil data untuk jurusan " . $jurusanNama,
-        "data"               => $data,               // ✅ PagingData (current_page, data[], last_page, total)
-        "Totalbarangjurusan" => $totalBarangJurusan,  // ✅ Int langsung
-        "jurusanNama"        => $jurusanNama,         // ✅ String
+        "data"               => $data,
+        "Totalbarangjurusan" => $totalBarangJurusan,
+        "BarangTersedia"     => $barangTersedia,   // ✅ tambah ini
+        "BarangDipinjam"     => $barangDipinjam,   // ✅ tambah ini
+        "BarangRusak"        => $barangRusak,      // ✅ tambah ini
+        "jurusanNama"        => $jurusanNama,
     ], 200);
 }
 
