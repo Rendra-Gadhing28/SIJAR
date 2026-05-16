@@ -496,7 +496,9 @@ class PeminjamanController extends Controller
             "kode"          => $user->kode ?? '-',
             "kelas"          => $kelas,
             "jurusan"        => $jurusan,
-            "profile"         => $user->profile ?? null,
+            "profile" => $user->profile
+    ? asset('storage/avatars/' . $user->profile)
+    : null,
             "role"           => $user->role ?? 'siswa',
         ],
         "data"    => [

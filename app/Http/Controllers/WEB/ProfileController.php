@@ -14,24 +14,33 @@ use Illuminate\Http\JsonResponse;
 class ProfileController extends Controller
 {
 
-    public function index() {
+        public function index() {
     $user = Auth::user();
-    $data = User::with('jurusan')->select('id', 'name', 'kode','kelas', 'jurusan_id', 'telepon', 'profile', )->find($user->id);
+    $data = User::with('jurusan')
+        ->select('id', 'name', 'kode', 'kelas', 'jurusan_id', 'telepon', 'profile')
+        ->find($user->id);
+
     $namaJurusan = $data->jurusan ? $data->jurusan->nama_jurusan : null;
+
+    // ✅ Generate URL profile jika ada
+    $profileUrl = $data->profile
+        ? asset('storage/avatars/' . $data->profile)
+        : null;
+
     return response()->json([
-    'status' => true,
-    'data' => [
-        'id' => $data->id,
-        'name' => $data->name,
-        'kode' => $data->kode,
-        'kelas' => $data->kelas,
-        'telepon' => $data->telepon,
-        'profile' => $data->profile,
-        'jurusan_id' => $data->jurusan_id,
-        'jurusan' => $namaJurusan, // ← nama jurusan
-    ]
-], 200 );
-    }
+        'status' => true,
+        'data' => [
+            'id'         => $data->id,
+            'name'       => $data->name,
+            'kode'       => $data->kode,
+            'kelas'      => $data->kelas,
+            'telepon'    => $data->telepon,
+            'profile'    => $profileUrl, // ← URL lengkap, bukan nama file
+            'jurusan_id' => $data->jurusan_id,
+            'jurusan'    => $namaJurusan,
+        ]
+    ], 200);
+}
 
     public function indexMobile(){
         $user = Auth::user();
@@ -60,7 +69,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update($id, Request $request): \Illuminate\Http\JsonResponse
+    public function update($id, Request $request): JsonResponse
 {
     $user = User::find($id);
     
@@ -80,18 +89,23 @@ class ProfileController extends Controller
             'profile' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         $validated['telepon'] = $request->input('telepon');
+            
         if ($request->hasFile('profile')) {
-        // Hapus profile lama jika ada
-        if ($user->profile && Storage::disk('public')->exists('avatars/' . $user->profile)) {
-            Storage::disk('public')->delete('avatars/' . $user->profile);
-        }
-        
-        $profile = time() . '_' . $request->file('profile')->getClientOriginalName();
-        $request->file('profile')->storeAs('avatars', $profile, 'public');
-        $hash = hash('sha256', $profile, true);
-        $base64 = base64_encode($hash);
-        $validated['profile'] = $base64;
+    // Hapus profile lama jika ada
+    if ($user->profile && Storage::disk('public')->exists('avatars/' . $user->profile)) {
+        Storage::disk('public')->delete('avatars/' . $user->profile);
     }
+
+    $file      = $request->file('profile');
+    $extension = $file->getClientOriginalExtension();
+    
+    // ✅ Hash nama file, tanpa parameter `true`, + pertahankan ekstensi
+    $hashedName = hash('sha256', $file->getClientOriginalName() . time() . $id) . '.' . $extension;
+    
+    $file->storeAs('avatars', $hashedName, 'public');
+    
+    $validated['profile'] = $hashedName;
+}
         unset($validated['role']); // Jangan update role dari sini // Jangan update kode dari sini
         unset($validated['jurusan_id']);
         unset($validated['kategori_id']);
