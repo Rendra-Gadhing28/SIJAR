@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Notifications\DatabaseNotification;
@@ -10,254 +11,227 @@ use Illuminate\Support\Facades\DB;
 
 class NotificationController extends Controller
 {
-    /**
-     * Display a listing of notifications.
-     */
-    public function index(Request $request)
-{
-    $user = Auth::user();
-
-    // ✅ Debug dulu — cek apakah data ada
-    $rawCheck = DB::table('notifications')
-        ->where('notifiable_id', $user->id)
-        ->where('notifiable_type', get_class($user)) // "App\Models\User"
-        ->count();
-    
-    
-
-    $query = $user->notifications();
-
-    if ($request->filled('type')) {
-        $query->where('type', 'like', '%' . $request->type . '%');
-    }
-
-    if ($request->has('unread') && $request->unread == '1') {
-        $query->whereNull('read_at');
-    }
-
-    $notifications = $query->orderBy('created_at', 'desc')->paginate(10);
-
-    // ✅ Gabung statistik dalam 1 query
-    $stats = DB::table('notifications')
-        ->where('notifiable_id', $user->id)
-        ->where('notifiable_type', get_class($user))
-        ->selectRaw("
-            COUNT(*) as total,
-            SUM(CASE WHEN read_at IS NULL THEN 1 ELSE 0 END) as unread,
-            COUNT(DISTINCT type) as total_types
-        ")
-        ->first();
-
-    // ✅ Ambil tipe unik
-    $notificationTypes = DB::table('notifications')
-        ->where('notifiable_id', $user->id)
-        ->where('notifiable_type', get_class($user))
-        ->distinct()
-        ->pluck('type')
-        ->map(fn($type) => class_basename($type))
-        ->values();
-
-    return response()->json([
-        'status'  => true,
-        'message' => 'Notifikasi berhasil diambil',
-        'data'    => [
-            'notifications'      => $notifications,
-            'totalNotifications' => $stats->total,
-            'unreadNotifications'=> $stats->unread,
-        ]
-    ], 200);
-}
-        // return view('admin.notifications.index', compact(
-        //     'notifications',
-        //     'totalNotifications',
-        //     'unreadNotifications',
-        //     'notificationTypes'
-        // ));
-    
-    
-    /**
-     * Display a listing of trashed notifications.
-     */
-    public function trashed(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $user = Auth::user();
-        
-        // Query langsung dari DatabaseNotification untuk akses onlyTrashed()
-        $query = DatabaseNotification::where('notifiable_id', $user->id)
-            ->where('notifiable_type', get_class($user))
-            ->onlyTrashed();
-        
+
+        $query = $user->notifications();
+
         if ($request->filled('type')) {
             $query->where('type', 'like', '%' . $request->type . '%');
         }
-        if ($request->filled('days')) {
-            $days = $request->days;
-            $date = now()->subDays($days);
-            $query->where('deleted_at', '>=', $date);
+
+        if ($request->has('unread') && $request->unread == '1') {
+            $query->whereNull('read_at');
         }
-        
+
+        $notifications = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        $stats = DB::table('notifications')
+            ->where('notifiable_id', $user->id)
+            ->where('notifiable_type', get_class($user))
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN read_at IS NULL THEN 1 ELSE 0 END) as unread,
+                COUNT(DISTINCT type) as total_types
+            ")
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi berhasil diambil',
+            'data'    => [
+                'notifications'       => $notifications,
+                'totalNotifications'  => $stats->total,
+                'unreadNotifications' => $stats->unread,
+            ]
+        ], 200);
+    }
+
+    public function trashed(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+
+        $query = DatabaseNotification::where('notifiable_id', $user->id)
+            ->where('notifiable_type', get_class($user))
+            ->onlyTrashed();
+
+        if ($request->filled('type')) {
+            $query->where('type', 'like', '%' . $request->type . '%');
+        }
+
+        if ($request->filled('days')) {
+            $query->where('deleted_at', '>=', now()->subDays($request->days));
+        }
+
         $notifications = $query->orderBy('deleted_at', 'desc')->paginate(15);
-        
+
         $notificationTypes = DatabaseNotification::where('notifiable_id', $user->id)
             ->where('notifiable_type', get_class($user))
-            ->select('type')
             ->distinct()
             ->pluck('type')
-            ->map(function ($type) {
-                return class_basename($type);
-            })
-            ->unique();
-        
-        return view('admin.notifications.trashed', compact('notifications', 'notificationTypes'));
+            ->map(fn($type) => class_basename($type))
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi trash berhasil diambil',
+            'data'    => [
+                'notifications'     => $notifications,
+                'notificationTypes' => $notificationTypes,
+            ]
+        ], 200);
     }
-    
-    /**
-     * Mark notification as read.
-     */
-    public function markAsRead($id)
+
+    public function markAsRead($id): JsonResponse
     {
         $notification = Auth::user()->notifications()->find($id);
-        
+
         if (!$notification) {
-            return back()->withErrors('Notifikasi tidak ditemukan.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Notifikasi tidak ditemukan.'
+            ], 404);
         }
-        
+
         $notification->markAsRead();
-        
-        return back()->with('success', 'Notifikasi ditandai sudah dibaca.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi ditandai sudah dibaca.'
+        ], 200);
     }
-    
-    /**
-     * Mark all notifications as read.
-     */
-    public function markAllAsRead()
+
+    public function markAllAsRead(): JsonResponse
     {
         Auth::user()->unreadNotifications->markAsRead();
-        
-        return back()->with('success', 'Semua notifikasi ditandai sudah dibaca.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Semua notifikasi ditandai sudah dibaca.'
+        ], 200);
     }
-    
-    /**
-     * Soft delete notification.
-     */
-    public function destroy($id)
+
+    public function destroy($id): JsonResponse
     {
         $notification = Auth::user()->notifications()->find($id);
-        
+
         if (!$notification) {
-            return back()->withErrors('Notifikasi tidak ditemukan.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Notifikasi tidak ditemukan.'
+            ], 404);
         }
-        
+
         $notification->delete();
-        
-        return back()->with('success', 'Notifikasi dipindahkan ke trash.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi dipindahkan ke trash.'
+        ], 200);
     }
-    
-    
-    /**
-     * Restore notification from trash.
-     */
-    public function restore($id)
+
+    public function restore($id): JsonResponse
     {
         $user = Auth::user();
-        
-        // Query langsung dari DatabaseNotification untuk akses onlyTrashed()
+
         $notification = DatabaseNotification::where('notifiable_id', $user->id)
             ->where('notifiable_type', get_class($user))
             ->onlyTrashed()
             ->find($id);
-        
+
         if (!$notification) {
-            return back()->withErrors('Notifikasi tidak ditemukan.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Notifikasi tidak ditemukan.'
+            ], 404);
         }
-        
+
         $notification->restore();
-        
-        return redirect()->route('admin.notifications.trashed')
-            ->with('success', 'Notifikasi berhasil dipulihkan.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi berhasil dipulihkan.'
+        ], 200);
     }
-    
-    /**
-     * Permanently delete notification.
-     */
-    public function forceDelete($id)
+
+    public function forceDelete($id): JsonResponse
     {
         $user = Auth::user();
-        
-        // Query langsung dari DatabaseNotification untuk akses onlyTrashed()
+
         $notification = DatabaseNotification::where('notifiable_id', $user->id)
             ->where('notifiable_type', get_class($user))
             ->onlyTrashed()
             ->find($id);
-        
+
         if (!$notification) {
-            return back()->withErrors('Notifikasi tidak ditemukan.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Notifikasi tidak ditemukan.'
+            ], 404);
         }
-        
+
         $notification->forceDelete();
-        
-        return redirect()->route('admin.notifications.trashed')
-            ->with('success', 'Notifikasi dihapus permanen.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi dihapus permanen.'
+        ], 200);
     }
-    
-    /**
-     * Clear all trashed notifications.
-     */
-    public function clearTrash()
+
+    public function clearTrash(): JsonResponse
     {
         $user = Auth::user();
-        
-        // Query langsung dari DatabaseNotification untuk akses onlyTrashed()
+
         $count = DatabaseNotification::where('notifiable_id', $user->id)
             ->where('notifiable_type', get_class($user))
             ->onlyTrashed()
             ->count();
-        
+
         DatabaseNotification::where('notifiable_id', $user->id)
             ->where('notifiable_type', get_class($user))
             ->onlyTrashed()
             ->forceDelete();
-        
-        return redirect()->route('admin.notifications.trashed')
-            ->with('success', "{$count} notifikasi dihapus permanen dari trash.");
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$count} notifikasi dihapus permanen dari trash."
+        ], 200);
     }
-    
-    /**
-     * Mass actions for notifications.
-     */
-    public function massAction(Request $request)
+
+    public function massAction(Request $request): JsonResponse
     {
         $request->validate([
             'action' => 'required|in:read,unread,delete,restore,force_delete',
-            'ids' => 'required|array',
-            'ids.*' => 'exists:notifications,id'
+            'ids'    => 'required|array',
+            'ids.*'  => 'exists:notifications,id'
         ]);
-        
+
         $notifications = Auth::user()->notifications()->whereIn('id', $request->ids);
-        
+
         switch ($request->action) {
             case 'read':
                 $notifications->update(['read_at' => now()]);
                 $message = 'Notifikasi ditandai sebagai dibaca.';
                 break;
-                
+
             case 'unread':
                 $notifications->update(['read_at' => null]);
                 $message = 'Notifikasi ditandai sebagai belum dibaca.';
                 break;
-                
+
             case 'delete':
                 $notifications->delete();
                 $message = 'Notifikasi dipindahkan ke trash.';
                 break;
-                
+
             case 'restore':
                 Auth::user()->notifications()->onlyTrashed()
                     ->whereIn('id', $request->ids)
                     ->restore();
                 $message = 'Notifikasi berhasil dipulihkan.';
                 break;
-                
+
             case 'force_delete':
                 Auth::user()->notifications()->onlyTrashed()
                     ->whereIn('id', $request->ids)
@@ -265,10 +239,10 @@ class NotificationController extends Controller
                 $message = 'Notifikasi dihapus permanen.';
                 break;
         }
-        
+
         return response()->json([
             'success' => true,
             'message' => $message
-        ]);
+        ], 200);
     }
 }

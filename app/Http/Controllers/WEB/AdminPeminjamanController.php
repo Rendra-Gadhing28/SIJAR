@@ -43,7 +43,7 @@ class AdminPeminjamanController extends Controller
         ->with([
             'user:id,name,kategori_id',
             'item:id,nama_item,kategori_jurusan_id',
-            'item.kategori_jurusan:id,nama_jurusan'
+            'item.kategoriJurusan:id,nama_kategori'
         ])
         ->latest()
         ->take(10) // batasi jangan ambil semua!
@@ -53,7 +53,7 @@ class AdminPeminjamanController extends Controller
     // ✅ Recent peminjaman
     $recentPeminjaman = (clone $basePeminjaman)
         ->with([
-            'user:id,name',
+            'user:id,name,kategori_id',
             'item:id,nama_item,kode_unit,foto_barang'
         ])
         ->latest()
@@ -147,42 +147,90 @@ class AdminPeminjamanController extends Controller
         ], 201);
     }
 
-    public function index(Request $request)
-    {
-        $admin = Auth::user();
-        $adminKategoriId = $admin->kategori_id;
-        $item =
+ public function index(Request $request)
+{
+    $admin = Auth::user();
+    $adminKategoriId = $admin->kategori_id;
 
-            $kategori = Kategori::lazy();
-        $query = Peminjaman::with(['item.kategori_jurusan', 'user.kategori'])
-            ->whereHas('item', function ($q) use ($adminKategoriId) {
-                $q->where('kategori_id', $adminKategoriId);
-            });
-
-        // Filter berdasarkan kelas
-        if ($request->filled('kelas')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('kelas', $request->kelas);
-            });
-        }
-
-        // Filter berdasarkan status
-        if ($request->filled('status_tujuan')) {
-            $query->where('status_tujuan', $request->status_tujuan);
-        }
-
-        $peminjaman = $query->latest()
-            ->paginate(10)
-            ->appends($request->all());
-
-        $kelasList = ['X', 'XI', 'XII'];
-        $dataLengkap = [$peminjaman, $kategori, $kelasList, $item];
+    // ✅ DEBUG SEMENTARA - cek apakah admin punya kategori_id
+    if (!$adminKategoriId) {
         return response()->json([
-            "status" => true,
-            "message" => "data berhasil diambil",
-            "data" => $dataLengkap,
-        ], 200);
+            "status"  => false,
+            "message" => "Admin tidak memiliki kategori_id",
+            "debug"   => $admin,
+        ], 422);
     }
+
+    $kategori = Kategori::find($adminKategoriId);
+
+    // ✅ DEBUG SEMENTARA - cek apakah kategori ditemukan
+    if (!$kategori) {
+        return response()->json([
+            "status"  => false,
+            "message" => "Kategori dengan id {$adminKategoriId} tidak ditemukan",
+        ], 404);
+    }
+
+    // ✅ DEBUG SEMENTARA - cek total peminjaman tanpa filter apapun
+    $totalTanpaFilter = Peminjaman::count();
+
+    // ✅ DEBUG SEMENTARA - cek peminjaman dengan filter kategori_jurusan_id
+    $totalDenganFilter = Peminjaman::whereHas('item', function ($q) use ($adminKategoriId) {
+        $q->where('kategori_jurusan_id', $adminKategoriId);
+    })->count();
+
+    $query = Peminjaman::with(['item.kategoriJurusan', 'user.kategori'])
+        ->whereHas('item', function ($q) use ($adminKategoriId) {
+            $q->where('kategori_jurusan_id', $adminKategoriId);
+        });
+
+    if ($request->filled('kelas')) {
+        $query->whereHas('user', function ($q) use ($request) {
+            $q->where('kelas', $request->kelas);
+        });
+    }
+
+    if ($request->filled('status_tujuan')) {
+        $query->where('status_tujuan', $request->status_tujuan);
+    }
+
+    if ($request->filled('kategori_id')) {
+        $query->whereHas('user.kategori', function ($q) use ($request) {
+            $q->where('id', $request->kategori_id);
+        });
+    }
+
+    // ✅ FIX: variabel konsisten pakai $request->nama_jurusan
+    if ($request->filled('nama_jurusan')) {
+        $query->whereHas('user.kategori', function ($q) use ($request) {
+            $q->where('nama_kategori', 'like', '%' . $request->nama_jurusan . '%');
+        });
+    }
+
+    $peminjaman = $query->latest()
+        ->paginate(10)
+        ->appends($request->all());
+
+    $kelasList = ['X', 'XI', 'XII'];
+    $semuaKategori = Kategori::all(['id', 'nama_kategori']);
+
+    return response()->json([
+        "status"  => true,
+        "message" => "Data berhasil diambil",
+        // ✅ DEBUG SEMENTARA - tampilkan info debug
+        "debug"   => [
+            "admin_kategori_id"   => $adminKategoriId,
+            "total_tanpa_filter"  => $totalTanpaFilter,
+            "total_dengan_filter" => $totalDenganFilter,
+        ],
+        "data"    => [
+            "peminjaman"     => $peminjaman,
+            "kategori_admin" => $kategori,
+            "semua_kategori" => $semuaKategori,
+            "kelas_list"     => $kelasList,
+        ],
+    ], 200);
+}
 
 public function approve($id)
     {
@@ -195,15 +243,15 @@ public function approve($id)
             $item = Item::findOrFail($peminjaman->item_id);
             $item->update(['status_item' => 'dipinjam']);
             $peminjaman->update([
-                'status_tujuan' => 'Approved',
+                'status_tujuan' => 'approved',
                 'approved_at' => now(),
                 'status_pinjaman' => 'dipinjam'
             ]);
             ActivityLoggerService::logUpdated(
                 'Peminjaman',
                 $peminjaman->id,
-                ['status_tujuan' => 'Pending', 'status_pinjaman' => 'pending'],
-                ['status_tujuan' => 'Approved', 'status_pinjaman' => 'dipinjam']
+                ['status_tujuan' => 'pending', 'status_pinjaman' => 'pending'],
+                ['status_tujuan' => 'approved', 'status_pinjaman' => 'dipinjam']
             );
             $user = $peminjaman->user;
             if ($user) {
@@ -236,7 +284,7 @@ public function approve($id)
         try {
             // Update peminjaman
             $peminjaman->update([
-                'status_tujuan' => 'Rejected',
+                'status_tujuan' => 'rejected',
                 'rejected_at' => now(),
                 'alasan_reject' => $request->alasan
             ]);
@@ -251,8 +299,8 @@ public function approve($id)
             ActivityLoggerService::logUpdated(
                 'Peminjaman',
                 $peminjaman->id,
-                ['status_tujuan' => 'Pending'],
-                ['status_tujuan' => 'Rejected']
+                ['status_tujuan' => 'pending'],
+                ['status_tujuan' => 'rejected']
             );
             $user = $peminjaman->user;
             if ($user) {

@@ -17,64 +17,76 @@ class AdminItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($jurusan, Request $request)
+            public function index(Request $request)
 {
-    $admin = Auth::user();
-    $jurusan = $admin->kategori_id;
+    $user = Auth::user();
 
-    // Query utama berdasarkan kategori admin
-    $query = Item::where('kategori_jurusan_id', $jurusan);
-
-    // Inisialisasi kategori default
-    $kategori = $admin->kategori->nama_kategori ?? 'Semua Kategori';
-
- // Filter status
-    if ($request->has('status_item') && $request->status_item != '') {
-        $query->where('status_item', $request->status_item);
+    if (!$user) {
+        return response()->json([
+            "status"  => false,
+            "message" => "Unauthenticated. Silakan login terlebih dahulu.",
+        ], 401);
     }
 
-    // Filter search (nama item atau kode unit)
+    $user->load('kategori');
+    $jurusanNama = $user->kategori->nama_kategori ?? 'Semua Jurusan';
+
+    $item = Item::with('kategoriJurusan');
+
+    // Filter by kategori_jurusan_id
+    if ($request->filled('kategori_jurusan_id')) {
+        $item->where('kategori_jurusan_id', $request->kategori_jurusan_id);
+    }
+
+    // Filter by nama jurusan (string dari tab)
+    if ($request->filled('jurusan') && $request->jurusan !== 'Semua') {
+        $item->whereHas('kategoriJurusan', function ($q) use ($request) {
+            $q->where('nama_kategori', $request->jurusan);
+        });
+    }
+
+    // Filter search
     if ($request->filled('search')) {
         $keyword = $request->search;
-        
-        $query->where(function ($q) use ($keyword) {
+        $item->where(function ($q) use ($keyword) {
             $q->where('nama_item', 'LIKE', "%$keyword%")
               ->orWhere('kode_unit', 'LIKE', "%$keyword%");
         });
     }
+        $baseQuery = $item; // query builder dengan semua filter yang sudah diterapkan
 
-    // Hitung total barang yang sesuai filter (SEBELUM filter status)
-    $barangjurusan = $query->count();
+$Tersedia      = (clone $baseQuery)->where('status_item', 'tersedia')->get();
+$Dipinjam      = (clone $baseQuery)->where('status_item', 'dipinjam')->get();
+$Rusak         = (clone $baseQuery)->where('status_item', 'rusak')->get();
+$BarangJurusan = (clone $baseQuery)->get();
 
-    // Clone query untuk statistik berdasarkan status
-    $itemTersedia = (clone $query)->where('status_item', 'tersedia')->count();
-    $itemDipinjam = (clone $query)->where('status_item', 'dipinjam')->count();
-    $itemRusak = (clone $query)->where('status_item', 'rusak')->count();
+$barangTersedia     = $Tersedia->count();
+$barangDipinjam     = $Dipinjam->count();
+$barangRusak        = $Rusak->count();
+$totalBarangJurusan = $BarangJurusan->count();
 
-    // Filter hanya barang yang tersedia untuk ditampilkan di list
-  
+$data = (clone $baseQuery)
+    ->orderBy('created_at', 'desc')
+    ->paginate(8)
+    ->appends($request->only(['search', 'kategori_jurusan_id', 'jurusan']));
+    // Tambah foto_url ke setiap item
+    $data->getCollection()->transform(function ($item) {
+        $item->foto_url = $item->foto_barang
+            ? asset('storage/encrypted/' . $item->foto_barang)
+            : null;
+        return $item;
+    });
 
-    // Ambil data lengkap dengan relasi kategori
-    $data = $query->with('kategori_jurusan')
-        ->orderBy('created_at', 'desc')
-        ->paginate(9)
-        ->appends([
-            'search' => $request->search,
-            'kategori_jurusan_id' => $request->kategori_jurusan_id
-        ]);
-
-    // Dropdown kategori
-    $kategoris = Kategori::orderBy('nama_kategori')->get();
-
-    return view('admin.listbarang', compact(
-        'data', 
-        'kategoris', 
-        'kategori', 
-        'barangjurusan',
-        'itemTersedia', 
-        'itemDipinjam',
-        'itemRusak'
-    ));
+    return response()->json([
+        "status"             => true,
+        "message"            => "Berhasil mengambil data untuk jurusan " . $jurusanNama,
+        "data"               => $data,               // ✅ PagingData (current_page, data[], last_page, total)
+        "Totalbarangjurusan" => $totalBarangJurusan,  // ✅ Int langsung
+        "BarangTersedia" => $barangTersedia,  // ✅ Int langsung
+        "BarangDipinjam" => $barangDipinjam,  // ✅ Int langsung
+        "BarangRusak" => $barangRusak,  // ✅ Int langsung
+        "jurusanNama"        => $jurusanNama,         // ✅ String
+    ], 200);
 }
     /**
      * Show the form for creating a new resource.
@@ -190,57 +202,83 @@ Storage::disk('public')->put('encrypted/' . $encrypt, $content);
         //
     }
 
-    public function setTersedia($id){
-        try{
-            $barang = Item::findOrFail($id);
-            if($barang->status_item == 'dipinjam'){
-                return redirect()->back()->with('error', 'Barang masih dipinjam, tidak bisa diupdate');
-            }
-            elseif($barang->status_item == 'tersedia'){
-                return redirect()->back()->with('error', 'Barang sudah dalam status tersedia!');
-            }
-
-
-            $barang->status_item = 'tersedia';
-            $barang->save();
-
-             ActivityLoggerService::logUpdated(
-                'Item',
-                $barang->id,
-                ['status_Item' => 'rusak'],
-                ['status_Item' => 'tersedia']
-            );
-            return redirect()->back()->with('success', "Barang '{$barang->nama_item}' berhasil diubah menjadi tersedia");
-    } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Gagal mengubah status: ' . $e->getMessage());
+   public function setTersedia($id){
+    try{
+        $barang = Item::findOrFail($id);
+        if($barang->status_item == 'dipinjam'){
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang masih dipinjam, tidak bisa diupdate'
+            ], 400);
         }
+        elseif($barang->status_item == 'tersedia'){
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang sudah dalam status tersedia!'
+            ], 400);
+        }
+
+        $barang->status_item = 'tersedia';
+        $barang->save();
+
+        ActivityLoggerService::logUpdated(
+            'Item',
+            $barang->id,
+            ['status_Item' => 'rusak'],
+            ['status_Item' => 'tersedia']
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => "Barang '{$barang->nama_item}' berhasil diubah menjadi tersedia"
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengubah status: ' . $e->getMessage()
+        ], 500);
     }
-    public function setRusak($id)
+}
+
+public function setRusak($id)
 {
     try {
         $barang = Item::findOrFail($id);
-        
-        // Cek apakah barang sedang dipinjam
+
         if ($barang->status_item == 'dipinjam') {
-            return redirect()->back()->with('error', 'Barang sedang dipinjam, tidak bisa diubah menjadi rusak!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang sedang dipinjam, tidak bisa diubah menjadi rusak!'
+            ], 400);
         }
         elseif($barang->status_item == 'rusak'){
-            return redirect()->back()->with('error', 'Barang sudah dalam status rusak!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang sudah dalam status rusak!'
+            ], 400);
         }
 
         $barang->status_item = 'rusak';
         $barang->save();
+
         ActivityLoggerService::logUpdated(
-                'Item',
-                $barang->id,
-                ['status_Item' => 'tersedia'],
-                ['status_Item' => 'rusak']
-            );
-        return redirect()->back()->with('success', "Barang '{$barang->nama_item}' berhasil ditandai sebagai rusak");
+            'Item',
+            $barang->id,
+            ['status_Item' => 'tersedia'],
+            ['status_Item' => 'rusak']
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => "Barang '{$barang->nama_item}' berhasil ditandai sebagai rusak"
+        ], 200);
+
     } catch (\Exception $e) {
-        return redirect()->back()->with('error', 'Gagal mengubah status: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengubah status: ' . $e->getMessage()
+        ], 500);
     }
 }
-
-    
 }

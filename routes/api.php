@@ -103,14 +103,14 @@ Route::get('/foto/{filename}', [ItemController::class, 'showImage']);
 
 
 
-Route::middleware(['auth:sanctum', 'cors', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [AdminPeminjamanController::class, 'dashboard'])->name('dashboard'); // admin.dashboard
     Route::get('/barang', [AdminItemController::class, 'index'])->name('barang.index'); // admin.barang.index
-    Route::get('/barang/create', [AdminItemController::class, 'create'])->name('barang.create'); // admin.barang.create
+    // Route::get('/barang/create', [AdminItemController::class, 'create'])->name('barang.create'); // admin.barang.create
     Route::post('/barang', [AdminItemController::class, 'store'])->name('barang.store'); // admin.barang.store
-    Route::get('/barang/{id}/edit', [AdminItemController::class, 'edit'])->name('barang.edit'); // admin.barang.edit
+    // Route::get('/barang/{id}/edit', [AdminItemController::class, 'edit'])->name('barang.edit'); // admin.barang.edit
     Route::put('/barang/{id}', [AdminItemController::class, 'update'])->name('barang.update'); // admin.barang.update
     Route::delete('/barang/{id}', [AdminItemController::class, 'destroy'])->name('barang.destroy'); // admin.barang.destroy
     Route::put('/barang/{id}/tersedia', [AdminItemController::class, 'setTersedia'])->name('barang.setTersedia');
@@ -119,8 +119,8 @@ Route::middleware(['auth:sanctum', 'cors', 'role:admin'])->prefix('admin')->name
     // Peminjaman
     Route::get('/peminjaman', [AdminPeminjamanController::class, 'index'])->name('peminjaman.index'); // admin.peminjaman.index
     Route::get('/peminjaman/{id}', [AdminPeminjamanController::class, 'show'])->name('peminjaman.show'); // admin.peminjaman.show
-    // Route::post('/peminjaman/{id}/approve', [AdminPeminjamanController::class, 'approve'])->name('peminjaman.approve'); // admin.peminjaman.approve
-    // Route::post('/peminjaman/{id}/reject', [AdminPeminjamanController::class, 'reject'])->name('peminjaman.reject'); // admin.peminjaman.reject
+    Route::post('/peminjaman/{id}/approve', [AdminPeminjamanController::class, 'approve'])->name('peminjaman.approve'); // admin.peminjaman.approve
+    Route::post('/peminjaman/{id}/reject', [AdminPeminjamanController::class, 'reject'])->name('peminjaman.reject'); // admin.peminjaman.reject
     Route::post('/peminjaman/{id}/selesai', [AdminPeminjamanController::class, 'selesai'])->name('peminjaman.selesai'); // admin.peminjaman.selesai
 
     // Activity Logger
@@ -131,7 +131,7 @@ Route::middleware(['auth:sanctum', 'cors', 'role:admin'])->prefix('admin')->name
 
     Route::prefix('profile')->name('profile.')->group(function () {
     Route::get('/', [ProfileController::class, 'index'])->name('index');
-    Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+    // Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
     Route::put('/update/{id}', [ProfileController::class, 'update'])->name('update');
     Route::delete('/destroy/{id}', [ProfileController::class, 'destroy'])->name('destroy');
     Route::patch('/password/update', [ProfileController::class, 'gantiPassw'])->name('password.update');
@@ -153,60 +153,4 @@ Route::middleware(['auth:sanctum', 'cors', 'role:admin'])->prefix('admin')->name
         Route::get('/laporan/excel',[UnduLaporan::class, 'exportExcel'])->name('laporan.excel');
         Route::get('/laporan/pdf',[UnduLaporan::class, 'exportPDF'])->name('laporan.pdf');
 });
-
-
-Route::prefix('test')->group(function () {
-     // Dashboard
-    Route::get('/dashboard', [AdminPeminjamanController::class, 'dashboard'])->name('dashboard'); // admin.dashboard
-    Route::get('/barang', [AdminItemController::class, 'index'])->name('barang.index'); // admin.barang.index
-    Route::get('/barang/create', [AdminItemController::class, 'create'])->name('barang.create'); // admin.barang.create
-    Route::post('/barang', [AdminItemController::class, 'store'])->name('barang.store'); // admin.barang.store
-    Route::get('/barang/{id}/edit', [AdminItemController::class, 'edit'])->name('barang.edit'); // admin.barang.edit
-    Route::put('/barang/{id}', [AdminItemController::class, 'update'])->name('barang.update'); // admin.barang.update
-    Route::delete('/barang/{id}', [AdminItemController::class, 'destroy'])->name('barang.destroy'); // admin.barang.destroy
-    Route::put('/barang/{id}/tersedia', [AdminItemController::class, 'setTersedia'])->name('barang.setTersedia');
-    Route::put('/barang/{id}/rusak', [AdminItemController::class, 'setRusak'])->name('barang.setRusak');
-
-    // Peminjaman
-    Route::get('/peminjaman', [AdminPeminjamanController::class, 'index'])->name('peminjaman.index'); // admin.peminjaman.index
-    Route::get('/peminjaman/{id}', [AdminPeminjamanController::class, 'show'])->name('peminjaman.show'); // admin.peminjaman.show
-    Route::post('/peminjaman/{id}/approve', [AdminPeminjamanController::class, 'approve'])->name('peminjaman.approve'); // admin.peminjaman.approve
-    Route::post('/peminjaman/{id}/reject', [AdminPeminjamanController::class, 'reject'])->name('peminjaman.reject'); // admin.peminjaman.reject
-    Route::post('/peminjaman/{id}/selesai', [AdminPeminjamanController::class, 'selesai'])->name('peminjaman.selesai'); // admin.peminjaman.selesai
-     Route::patch('/admin/peminjaman/{id}/verify', [AdminPeminjamanController::class, 'verifyReturn']);
-
-    // Activity Logger
-    Route::get('/activitylogger', [ActivityLoggerController::class, 'index'])->name('activitylogger.index');
-    Route::get('/activitylogger/{activityLogger}', [ActivityLoggerController::class, 'show'])->name('activitylogger.show');
-    Route::delete('/activitylogger/{activityLogger}', [ActivityLoggerController::class, 'destroy'])->name('activitylogger.destroy');
-    Route::post('/activitylogger/clear', [ActivityLoggerController::class, 'clearOldLogs'])->name('activitylogger.clear');
-
-   
-
-    Route::prefix('profile')->name('profile.')->group(function () {
-    Route::get('/', [ProfileController::class, 'index'])->name('index');
-    Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
-    Route::put('/update/{id}', [ProfileController::class, 'update'])->name('update');
-    Route::delete('/destroy/{id}', [ProfileController::class, 'destroy'])->name('destroy');
-    Route::put('/password', [ProfileController::class, 'gantiPassw'])->name('password.update');
-});
-    // NOTIFICATION ROUTES - PERBAIKI DENGAN YANG BARU
-    Route::prefix('notifications')->name('notifications.')->group(function () {
-        Route::get('/', [NotificationController::class, 'index'])->name('index');
-        Route::get('/trashed', [NotificationController::class, 'trashed'])->name('trashed');
-        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
-        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllRead');
-        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
-        Route::post('/{id}/restore', [NotificationController::class, 'restore'])->name('restore');
-        Route::delete('/{id}/force', [NotificationController::class, 'forceDelete'])->name('forceDelete');
-        Route::post('/clear-trash', [NotificationController::class, 'clearTrash'])->name('clearTrash');
-        Route::post('/mass-action', [NotificationController::class, 'massAction'])->name('massAction');
-    });
-    //unduh laporan admin
-        Route::get('/laporan/data',[UnduLaporan::class, 'getData'])->name('laporan.data');
-        Route::get('/laporan/excel',[UnduLaporan::class, 'exportExcel'])->name('laporan.excel');
-        Route::get('/laporan/pdf',[UnduLaporan::class, 'exportPDF'])->name('laporan.pdf');
-});
-
-
 ?>
