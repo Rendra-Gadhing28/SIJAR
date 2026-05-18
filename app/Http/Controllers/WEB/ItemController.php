@@ -81,6 +81,35 @@ public function index(Request $request)
     ], 200);
 }
 
+        public function selectItem()
+{
+    $items = Item::with(['kategoriJurusan:id,nama_kategori'])
+        ->select(['id', 'nama_item', 'kode_unit', 'kategori_jurusan_id', 'status_item'])
+        ->whereNull('deleted_at')
+        ->paginate(10);
+
+    $items->through(function ($item) {
+        return [
+            'id'             => $item->id,
+            'nama_item'      => $item->nama_item,
+            'kode_unit'      => $item->kode_unit,
+            'status_item'    => $item->status_item,
+            'nama_kategori'  => $item->kategoriJurusan?->nama_kategori,
+        ];
+    });
+
+    return response()->json([
+        'status'  => true,
+        'message' => 'Data item berhasil diambil',
+        'data'    => $items->items(),
+        'meta'    => [
+            'current_page' => $items->currentPage(),
+            'last_page'    => $items->lastPage(),
+            'per_page'     => $items->perPage(),
+            'total'        => $items->total(),
+        ]
+    ], 200);
+}
 
 public function indexBarang(Request $request)
 {

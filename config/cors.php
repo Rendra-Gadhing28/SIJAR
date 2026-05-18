@@ -2,6 +2,7 @@
 
 return [
     'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
+    
 
     'allowed_methods' => ['*','GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
@@ -24,7 +25,7 @@ return [
         '#^https?://192\.168\.\d+\.\d+(:\d+)?$#', // Physical device testing via Local Wi-Fi
     ] : [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['*','Content-Type', 'X-Requested-With', 'Authorization'], // atau ['Content-Type', 'X-Requested-With', 'Authorization'],
 
     'exposed_headers' => [],
 

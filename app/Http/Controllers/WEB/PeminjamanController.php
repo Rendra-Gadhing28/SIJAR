@@ -22,23 +22,39 @@ class PeminjamanController extends Controller
 {
           public function index(Request $request)
     {
-        $user = Auth::user();
-        $Peminjaman = Peminjaman::where("user_id", $user->id)
-            ->with(["item:id,nama_item,kode_unit,foto_barang",])
-            ->select(['id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'status_pinjaman', 'gambar_bukti', 'jam_pembelajaran'])
-            ->latest()
-            ->paginate(10)->map(function ($bukti) {
-                $bukti->gambar_bukti = $bukti->gambar_bukti
-                        ? asset('storage/' . $bukti->gambar_bukti) : null;
-            return $bukti;
-        });
+                $user = Auth::user();
 
-        // Tetap return 200 meski kosong, biar FE tidak error — kosong bukan error
-        return response()->json([
-            "status"  => true,
-            "message" => $Peminjaman->isEmpty() ? "data masih kosong" : "data Peminjaman berhasil diambil",
-            "data"    => $Peminjaman
-        ], 200);
+$Peminjaman = Peminjaman::where("user_id", $user->id)
+    ->with([
+        "item:id,nama_item,kode_unit,foto_barang",
+        "user" => function ($query) {
+            $query->select('id', 'kategori_id')
+                  ->with(['kategori:id,nama_kategori']);
+        }
+    ])
+    ->select(['id', 'keperluan', 'user_id', 'item_id', 'tanggal', 'status_tujuan', 'status_pinjaman', 'gambar_bukti', 'jam_pembelajaran'])
+    ->latest()
+    ->paginate(10);
+
+// Transform gambar_bukti setelah paginate
+$Peminjaman->through(function ($bukti) {
+    $bukti->gambar_bukti = $bukti->gambar_bukti
+        ? asset('storage/' . $bukti->gambar_bukti)
+        : null;
+    return $bukti;
+});
+
+return response()->json([
+    "status"  => true,
+    "message" => $Peminjaman->isEmpty() ? "data masih kosong" : "data Peminjaman berhasil diambil",
+    "data"    => $Peminjaman->items(),       // ← ambil array datanya saja
+    "meta"    => [
+        "current_page" => $Peminjaman->currentPage(),
+        "last_page"    => $Peminjaman->lastPage(),
+        "per_page"     => $Peminjaman->perPage(),
+        "total"        => $Peminjaman->total(),
+    ]
+], 200);        
     }
             public function indexMobile(Request $request)
     {
@@ -308,6 +324,12 @@ class PeminjamanController extends Controller
         $Peminjaman = Peminjaman::where('user_id', Auth::id())
         ->whereRaw('status_tujuan = ?', ['pending']) // ← case-insensitive
         ->find($id); // pakai find(), bukan findOrFail()
+        if (!$Peminjaman) {
+    return response()->json([
+        'status'  => false,
+        'message' => 'Peminjaman tidak ditemukan atau tidak bisa diedit',
+    ], 404);
+}   
 
         $validated = $request->validate([
             'keperluan'   => 'required|string|max:255',
@@ -408,30 +430,36 @@ class PeminjamanController extends Controller
 
     // ==================== SELESAI ====================
     // PATCH /api/Peminjaman/{id}/selesai
-    public function selesai($id)
-    {
-        $Peminjaman = Peminjaman::findOrFail($id);
+        public function selesai(Request $request, $id)
+{
+    $Peminjaman = Peminjaman::where('user_id', Auth::id())->findOrFail($id);
 
-        $Peminjaman->update([
-            'status_pinjaman' => 'selesai',
-            'finished_at'     => now()
-        ]);
+    $validated = $request->validate([
+        'bukti_pengembalian' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+    ]);
 
-        // Optimasi: langsung update tanpa find()
-        Item::where('id', $Peminjaman->item_id)->update(['status_item' => 'tersedia']);
+    $path = $request->file('bukti_pengembalian')->store('bukti_pengembalian', 'public');
 
-        ActivityLoggerService::logUpdated(
-            'Peminjaman',
-            $Peminjaman->id,
-            ['status_pinjaman' => 'dipinjam'],
-            ['status_pinjaman' => 'selesai']
-        );
+    $Peminjaman->update([
+        'status_pinjaman'    => 'selesai',
+        'finished_at'        => now(),
+        'bukti_pengembalian' => $path, // ← simpan path bukti kembali
+    ]);
 
-        return response()->json([
-            "status"  => true,
-            "message" => "barang berhasil dikembalikan",
-        ], 200);
-    }
+    Item::where('id', $Peminjaman->item_id)->update(['status_item' => 'tersedia']);
+
+    ActivityLoggerService::logUpdated(
+        'Peminjaman',
+        $Peminjaman->id,
+        ['status_pinjaman' => 'dipinjam'],
+        ['status_pinjaman' => 'selesai']
+    );
+
+    return response()->json([
+        "status"  => true,
+        "message" => "Barang berhasil dikembalikan",
+    ], 200);
+}
 
     // ==================== RUSAK ====================
     // PATCH /api/item/{id}/rusak
@@ -471,6 +499,34 @@ class PeminjamanController extends Controller
         ->latest()
         ->limit(6)
         ->get();
+    // Tambah di beranda()
+       // Query 1 — hitung pinjam per hari (by created_at)
+$pinjamPerHari = Peminjaman::where('user_id', $userId)
+    ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+    ->selectRaw("DATE_FORMAT(created_at, '%Y-%m-%d') as tanggal, COUNT(*) as pinjam")
+    ->groupByRaw("DATE_FORMAT(created_at, '%Y-%m-%d')")
+    ->get()->keyBy('tanggal');
+
+// Query 2 — hitung kembali per hari (by finished_at)
+$kembaliPerHari = Peminjaman::where('user_id', $userId)
+    ->where('finished_at', '>=', now()->subDays(6)->startOfDay())
+    ->whereNotNull('finished_at')
+    ->selectRaw("DATE_FORMAT(finished_at, '%Y-%m-%d') as tanggal, COUNT(*) as kembali")
+    ->groupByRaw("DATE_FORMAT(finished_at, '%Y-%m-%d')")
+    ->get()->keyBy('tanggal');
+
+// Gabungkan
+$weekly = collect();
+for ($i = 6; $i >= 0; $i--) {
+    $tgl = now()->subDays($i)->format('Y-m-d');
+    $weekly->push([
+        'tanggal' => $tgl,
+        'pinjam'  => $pinjamPerHari[$tgl]->pinjam ?? 0,
+        'kembali' => $kembaliPerHari[$tgl]->kembali ?? 0,
+    ]);
+}
+
+    
 
     // Hitung statistik peminjaman
     $stats = Peminjaman::where('user_id', $userId)
@@ -506,7 +562,11 @@ class PeminjamanController extends Controller
             "total_dipinjam"     => (int) ($stats->dipinjam ?? 0),
             "total_selesai"      => (int) ($stats->selesai ?? 0),
             "total_telat"        => (int) ($stats->telat ?? 0),
-        ]
+        ],
+        "weekly" => $weekly,
+        'debug_weekly' => $weekly->toArray(),
+        'debug_now' => now()->toDateTimeString(),
+        'debug_start' => now()->subDays(6)->startOfDay()->toDateTimeString(),
     ], 200);
 }
 
@@ -548,19 +608,19 @@ class PeminjamanController extends Controller
 }
     // ==================== DESTROY ====================
     // DELETE /api/Peminjaman/{id}
-    public function destroy($id)
-    {
-        $pinjam = Peminjaman::where('user_id', Auth::id())->findOrFail($id); // Security: pastikan hanya milik user sendiri
+        public function destroy($id)
+        {
+            $pinjam = Peminjaman::where('user_id', Auth::id())->findOrFail($id); // Security: pastikan hanya milik user sendiri
 
-        if ($pinjam->gambar_bukti && Storage::disk('public')->exists($pinjam->gambar_bukti)) {
-            Storage::disk('public')->delete($pinjam->gambar_bukti);
+            if ($pinjam->gambar_bukti && Storage::disk('public')->exists($pinjam->gambar_bukti)) {
+                Storage::disk('public')->delete($pinjam->gambar_bukti);
+            }
+
+            $pinjam->delete();
+
+            return response()->json([
+                "status"  => true,
+                "message" => "Peminjaman berhasil dihapus",
+            ], 200);
         }
-
-        $pinjam->delete();
-
-        return response()->json([
-            "status"  => true,
-            "message" => "Peminjaman berhasil dihapus",
-        ], 200);
-    }
 }

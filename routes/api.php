@@ -24,6 +24,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/profile', [ProfileController::class, 'index']);
         Route::get('/homepage', [PeminjamanController::class, 'beranda'])->name('user.dashboard');
         Route::get('/barang', [ItemController::class, 'index']);
+        Route::get('/item', [ItemController::class, 'selectItem']);
         Route::post('/item/image', [ItemController::class, 'showImage']);
         Route::get('/waktu', [waktuPembelajaran::class, 'index']);
         Route::get('/peminjaman', [PeminjamanController::class, 'index']);
@@ -41,9 +42,9 @@ Route::prefix('v1')->group(function () {
     Route::get('/peminjaman/{id}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
     Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
     Route::put('/peminjaman/update/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
-    Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
-    Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
-    Route::post('/peminjaman/{id}/return', [PeminjamanController::class, 'returnItem'])->name('peminjaman.return');
+    Route::delete('/peminjaman/destroy/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
+    // Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
+    Route::post('/peminjaman/{id}/selesai', [PeminjamanController::class, 'selesai'])->name('peminjaman.return');
     //home page
     // Route::get('/homepage', [PeminjamanController::class, 'beranda'])->name('user.homepage');
     // // BARANG
@@ -57,6 +58,7 @@ Route::prefix('v1')->group(function () {
     Route::patch('/profile/password/update', [ProfileController::class, 'gantiPassw'])->name('password.update');
     });
 });
+
 Route::prefix('mobile')->group(function () {
     // 1. Route Tanpa Login
      Route::post('/auth/login', [LoginController::class, 'storeMobile']);
@@ -84,7 +86,7 @@ Route::get('/foto/{filename}', [ItemController::class, 'showImage']);
     Route::get('/peminjaman/{id}', [PeminjamanController::class, 'show'])->name('peminjaman.show');
     Route::get('/peminjaman/{id}/edit', [PeminjamanController::class, 'edit'])->name('peminjaman.edit');
     Route::put('/peminjaman/update/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
-    Route::delete('/peminjaman/{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
+    Route::delete('/peminjaman/destroy{id}', [PeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
     Route::post('/peminjaman/{id}', [PeminjamanController::class, 'selesai'])->name('peminjaman.selesai');
     Route::post('/peminjaman/{id}/return', [PeminjamanController::class, 'returnItem'])->name('peminjaman.return');
     //home page
@@ -119,8 +121,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('admin.
     // Peminjaman
     Route::get('/peminjaman', [AdminPeminjamanController::class, 'index'])->name('peminjaman.index'); // admin.peminjaman.index
     Route::get('/peminjaman/{id}', [AdminPeminjamanController::class, 'show'])->name('peminjaman.show'); // admin.peminjaman.show
-    Route::post('/peminjaman/{id}/approve', [AdminPeminjamanController::class, 'approve'])->name('peminjaman.approve'); // admin.peminjaman.approve
-    Route::post('/peminjaman/{id}/reject', [AdminPeminjamanController::class, 'reject'])->name('peminjaman.reject'); // admin.peminjaman.reject
+    Route::patch('/peminjaman/{id}/approve', [AdminPeminjamanController::class, 'approve'])->name('peminjaman.approve'); // admin.peminjaman.approve
+    Route::patch('/peminjaman/{id}/reject', [AdminPeminjamanController::class, 'reject'])->name('peminjaman.reject'); // admin.peminjaman.reject
     Route::post('/peminjaman/{id}/selesai', [AdminPeminjamanController::class, 'selesai'])->name('peminjaman.selesai'); // admin.peminjaman.selesai
 
     // Activity Logger

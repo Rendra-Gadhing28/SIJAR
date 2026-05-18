@@ -18,6 +18,7 @@ class Peminjaman extends Model
         'status_tujuan',
         'status_pinjaman',
         'gambar_bukti',
+        'bukti_pengembalian',
         'jam_pembelajaran',
         'approved_at',
         'rejected_at'
