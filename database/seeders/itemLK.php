@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 class itemLK extends Seeder
 {
+    use ImageSeederHelper;
+
     /**
      * Run the database seeds.
      */
@@ -61,29 +63,11 @@ class itemLK extends Seeder
                 str_replace(' ', '', $namaAsli),                // KabelVGA
                 $namaAsli,                                       // Kabel VGA (original)
         ];
-                $extensions = ['jpg', 'jpeg', 'png','webp','avif'];
-                $gambarPath = '';
-                $origin = '';
-                
-                foreach ($extensions as $ext) {
-                    foreach($namaVariasi as $var)
-                    $tryPath = "{$LK}/{$var}.{$ext}";
-                    
-                $encrypt = null; // Deklarasi di luar
+                $encrypt = null;
+                $origin = $this->findBestImagePath($LK, $namaAsli);
 
-    if (Storage::disk('public')->exists($tryPath)) {
-    $origin = $tryPath;
-    $content = Storage::disk('public')->get($tryPath);
-    
-    $extension = pathinfo($tryPath, PATHINFO_EXTENSION);
-    $encrypt = hash('sha256', $content . time()) . '.' . $extension;
-    
-    // Simpan file
-    Storage::disk('public')->put('encrypted/' . $encrypt, $content);
-    
-    break;
-    };
-
+                if ($origin !== null) {
+                    $encrypt = $this->copyImageToEncrypted($origin);
                 }
                
                  // 🔢 Buat unit individual untuk setiap stok
