@@ -3,108 +3,162 @@
 namespace App\Exports;
 
 use App\Models\Peminjaman;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use Carbon\Carbon;
 
-class PeminjamanExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithTitle
+class PeminjamanExport implements
+    FromCollection,
+    WithHeadings,
+    WithMapping,
+    WithStyles,
+    WithTitle
+    // ShouldAutoSize  ← aktifkan jika tidak pakai WithColumnWidths
 {
-    protected $startDate;
-    protected $endDate;
-    
-    public function __construct($startDate, $endDate)
+    protected ?string $startDate;
+    protected ?string $endDate;
+
+    public function __construct(?string $startDate = null, ?string $endDate = null)
     {
         $this->startDate = $startDate;
-        $this->endDate = $endDate;
+        $this->endDate   = $endDate;
     }
-    
-    public function collection()
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Data source — WAJIB eager-load relasi di sini, bukan cuma di controller
+    // ─────────────────────────────────────────────────────────────────────────
+    public function collection(): Collection
     {
-        return Peminjaman::with(['user', 'item'])
-            ->whereBetween('tanggal', [$this->startDate, $this->endDate])
-            ->orderBy('tanggal', 'desc')
-            ->get();
+        $query = Peminjaman::with([
+            'user.jurusan',         // nama siswa + nama_jurusan
+            'item.kategoriJurusan', // nama_item + nama_kategori
+        ]);
+
+        if ($this->startDate && $this->endDate) {
+            $query->whereBetween('tanggal', [$this->startDate, $this->endDate]);
+        }
+
+        return $query->orderBy('tanggal', 'asc')->get();
     }
-    
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Heading row (row #1 di Excel)
+    // ─────────────────────────────────────────────────────────────────────────
     public function headings(): array
     {
         return [
-            'ID',
+            'No',
+            'Nama Siswa',
+            'Jurusan',
+            'Nama Barang',
+            'Kategori Barang',
             'Keperluan',
-            'Peminjam',
-            'Barang',
-            'Tanggal Peminjaman',
-            'Tanggal Selesai',
-            'Status Tujuan',
+            'Tanggal Pinjam',
+            'Tanggal Kembali',
             'Status Peminjaman',
-            'Jam Pembelajaran',
-            'Dibuat Pada',
+            'Status Tujuan',
         ];
     }
-    
-    public function map($peminjaman): array
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Row mapping — tiap baris dikonversi di sini
+    // ─────────────────────────────────────────────────────────────────────────
+    public function map($row): array
     {
-        // Parse jam_pembelajaran
-        $jamPembelajaran = '';
-        if ($peminjaman->jam_pembelajaran) {
-            $jamData = json_decode($peminjaman->jam_pembelajaran, true);
-            if (is_array($jamData)) {
-                $jamList = [];
-                foreach ($jamData as $jam) {
-                    $jamList[] = "Jam {$jam['jam_ke']}: {$jam['start_time']} - {$jam['end_time']}";
-                }
-                $jamPembelajaran = implode("\n", $jamList);
-            }
-        }
-        
+        // Nomor urut — pakai static agar increment
+        static $no = 0;
+        $no++;
+
+        // Pastikan tanggal selalu string bahkan kalau model tidak punya $casts
+        $tanggal        = $row->tanggal
+            ? Carbon::parse($row->tanggal)->format('d/m/Y')
+            : '-';
+
+        $tanggalKembali = $row->tanggal_kembali
+            ? Carbon::parse($row->tanggal_kembali)->format('d/m/Y')
+            : '-';
+
+        // Status label — jika model punya accessor `status_pinjaman_formatted`
+        // gunakan itu; fallback ke raw value dengan ucfirst
+        $statusPinjaman = $row->status_pinjaman_formatted
+            ?? ucfirst($row->status_pinjaman ?? '-');
+
+        $statusTujuan   = $row->status_tujuan_formatted
+            ?? ucfirst($row->status_tujuan ?? '-');
+
         return [
-            $peminjaman->id,
-            $peminjaman->keperluan,
-            $peminjaman->user ? $peminjaman->user->name : 'N/A',
-            $peminjaman->item ? $peminjaman->item->nama_item : 'N/A',
-            Carbon::parse($peminjaman->tanggal)->format('d/m/Y'),
-            $peminjaman->finished_at ? Carbon::parse($peminjaman->finished_at)->format('d/m/Y H:i') : '-',
-            $this->getStatusLabel($peminjaman->status_tujuan),
-            $this->getStatusPinjamanLabel($peminjaman->status_pinjaman),
-            $jamPembelajaran,
-            Carbon::parse($peminjaman->created_at)->format('d/m/Y H:i'),
+            $no,
+            $row->user?->name                              ?? '-',
+            $row->user?->jurusan?->nama_jurusan            ?? '-',
+            $row->item?->nama_item                         ?? '-',
+            $row->item?->kategoriJurusan?->nama_kategori   ?? '-',
+            $row->keperluan                                ?? '-',
+            $tanggal,
+            $tanggalKembali,
+            $statusPinjaman,
+            $statusTujuan,
         ];
     }
-    
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true, 'size' => 12]],
-        ];
-    }
-    
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Sheet title
+    // ─────────────────────────────────────────────────────────────────────────
     public function title(): string
     {
         return 'Laporan Peminjaman';
     }
-    
-    private function getStatusLabel($status)
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Styling
+    // ─────────────────────────────────────────────────────────────────────────
+    public function styles(Worksheet $sheet): array
     {
-        $labels = [
-            'pending' => 'Menunggu',
-            'approved' => 'Disetujui',
-            'rejected' => 'Ditolak'
+        // ── Set column widths manual ──────────────────────────────────────────
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(22);
+        $sheet->getColumnDimension('C')->setWidth(18);
+        $sheet->getColumnDimension('D')->setWidth(24);
+        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->getColumnDimension('F')->setWidth(22);
+        $sheet->getColumnDimension('G')->setWidth(14);
+        $sheet->getColumnDimension('H')->setWidth(14);
+        $sheet->getColumnDimension('I')->setWidth(18);
+        $sheet->getColumnDimension('J')->setWidth(16);
+
+        // ── Header row style ──────────────────────────────────────────────────
+        return [
+            1 => [
+                'font' => [
+                    'bold'  => true,
+                    'color' => ['argb' => 'FFFFFFFF'],
+                    'size'  => 10,
+                ],
+                'fill' => [
+                    'fillType'   => Fill::FILL_SOLID,
+                    'startColor' => ['argb' => 'FF1A3F70'], // --blue-darker
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => Alignment::VERTICAL_CENTER,
+                    'wrapText'   => true,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color'       => ['argb' => 'FF4A90D9'],
+                    ],
+                ],
+            ],
         ];
-        return $labels[$status] ?? $status;
-    }
-    
-    private function getStatusPinjamanLabel($status)
-    {
-        $labels = [
-            'dipinjam' => 'Dipinjam',
-            'selesai' => 'Selesai',
-            'telat' => 'Terlambat'
-        ];
-        return $labels[$status] ?? $status;
     }
 }

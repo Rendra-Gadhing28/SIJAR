@@ -55,12 +55,14 @@ class AdminPeminjamanController extends Controller
         $recentPeminjaman = (clone $basePeminjaman)
             ->with([
                 'user:id,name,kategori_id',
-                'item:id,nama_item,kode_unit,foto_barang'
+                'item:id,nama_item,kode_unit,foto_barang,kategori_jurusan_id',
+                'item.kategoriJurusan:id,nama_kategori',
+                'user.kategori:id,nama_kategori'
             ])
             ->latest()
             ->take(5)
             ->get();
-
+        $jurusan = Kategori::where('id', )->get();
         // Total item jurusan
         $totalItems = Item::where('kategori_jurusan_id', $adminKategoriId)->count();
 
@@ -79,6 +81,7 @@ class AdminPeminjamanController extends Controller
                 ],
                 "notifications"     => $notifications,
                 "recent_peminjaman" => $recentPeminjaman,
+          
             ]
         ], 200);
     }

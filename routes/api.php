@@ -110,14 +110,14 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->name('admin.
     // Dashboard
     Route::get('/dashboard', [AdminPeminjamanController::class, 'dashboard'])->name('dashboard'); // admin.dashboard
     Route::get('/barang', [AdminItemController::class, 'index'])->name('barang.index'); // admin.barang.index
-    // Route::get('/barang/create', [AdminItemController::class, 'create'])->name('barang.create'); // admin.barang.create
-    Route::post('/barang', [AdminItemController::class, 'store'])->name('barang.store'); // admin.barang.store
-    // Route::get('/barang/{id}/edit', [AdminItemController::class, 'edit'])->name('barang.edit'); // admin.barang.edit
-    Route::put('/barang/{id}', [AdminItemController::class, 'update'])->name('barang.update'); // admin.barang.update
-    Route::delete('/barang/{id}', [AdminItemController::class, 'destroy'])->name('barang.destroy'); // admin.barang.destroy
+    Route::post('/barang/store', [AdminItemController::class, 'store'])->name('barang.store'); // admin.barang.store
+    Route::put('/barang/update/{id}', [AdminItemController::class, 'update'])->name('barang.update'); // admin.barang.update
+    Route::delete('/barang/delete/{id}', [AdminItemController::class, 'destroy'])->name('barang.destroy'); // admin.barang.destroy
     Route::put('/barang/{id}/tersedia', [AdminItemController::class, 'setTersedia'])->name('barang.setTersedia');
     Route::put('/barang/{id}/rusak', [AdminItemController::class, 'setRusak'])->name('barang.setRusak');
 
+    // Route::get('/barang/create', [AdminItemController::class, 'create'])->name('barang.create'); // admin.barang.create
+    // Route::get('/barang/{id}/edit', [AdminItemController::class, 'edit'])->name('barang.edit'); // admin.barang.edit
     // Peminjaman
     Route::get('/peminjaman', [AdminPeminjamanController::class, 'index'])->name('peminjaman.index'); // admin.peminjaman.index
     Route::get('/peminjaman/{id}', [AdminPeminjamanController::class, 'show'])->name('peminjaman.show'); // admin.peminjaman.show

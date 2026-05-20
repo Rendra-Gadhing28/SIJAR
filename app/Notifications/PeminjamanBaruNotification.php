@@ -36,4 +36,6 @@ class PeminjamanBaruNotification extends Notification
             'message' => "{$this->peminjaman->keperluan}",
         ];
     }
+
+    
 }

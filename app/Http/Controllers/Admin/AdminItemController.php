@@ -65,7 +65,7 @@ $barangDipinjam     = $Dipinjam->count();
 $barangRusak        = $Rusak->count();
 $totalBarangJurusan = $BarangJurusan->count();
 
-$data = (clone $baseQuery)
+    $data = (clone $baseQuery)
     ->orderBy('created_at', 'desc')
     ->paginate(8)
     ->appends($request->only(['search', 'kategori_jurusan_id', 'jurusan']));

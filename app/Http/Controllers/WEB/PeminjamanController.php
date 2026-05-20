@@ -483,7 +483,7 @@ return response()->json([
 
     // Ambil data peminjaman terbaru dengan relasi ke item
     $peminjaman = Peminjaman::where("user_id", $userId)
-        ->with(["item:id,nama_item,kode_unit,foto_barang"])
+        ->with(["item:id,nama_item,kode_unit,foto_barang" , "user:id,name,kategori_id"])
         ->select([
             'id', 
             'keperluan', 
@@ -506,7 +506,7 @@ $pinjamPerHari = Peminjaman::where('user_id', $userId)
     ->selectRaw("DATE_FORMAT(created_at, '%Y-%m-%d') as tanggal, COUNT(*) as pinjam")
     ->groupByRaw("DATE_FORMAT(created_at, '%Y-%m-%d')")
     ->get()->keyBy('tanggal');
-
+    
 // Query 2 — hitung kembali per hari (by finished_at)
 $kembaliPerHari = Peminjaman::where('user_id', $userId)
     ->where('finished_at', '>=', now()->subDays(6)->startOfDay())
